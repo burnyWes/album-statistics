@@ -211,6 +211,9 @@ button[aria-disabled='true'] {
 .rowButton {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   text-align: left;
   overflow-wrap: anywhere;
 }
@@ -347,4 +350,15 @@ html:has(.bottomBar:not(.bottomBarInFlow)) {
   scroll-padding-bottom: calc(
     var(--bottomBarHeight) + env(safe-area-inset-bottom)
   );
+}
+
+.albumStats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.albumStats .buttonIcon {
+  width: 1.25rem;
+  height: 1.25rem;
 }

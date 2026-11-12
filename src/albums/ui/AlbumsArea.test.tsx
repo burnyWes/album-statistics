@@ -1,8 +1,11 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { accessibilityViolations } from '../../testSupport/accessibility'
-import { createInMemoryAlbumsClient } from '../api/inMemoryAlbumsClient'
+import {
+  createInMemoryAlbumsClient,
+  type InMemoryAlbumsClient,
+} from '../api/inMemoryAlbumsClient'
 import type { Album } from '../domain/album'
 import { AlbumsArea } from './AlbumsArea'
 
@@ -15,8 +18,12 @@ const kindOfBlue: Album = {
   listenings: [],
 }
 
-function renderArea(initialAlbums: readonly Album[] = []) {
-  const albumsClient = createInMemoryAlbumsClient(initialAlbums)
+function renderArea(
+  initialAlbums: readonly Album[] = [],
+  albumsClient: InMemoryAlbumsClient = createInMemoryAlbumsClient(
+    initialAlbums,
+  ),
+) {
   const announcements: string[] = []
   const rendered = render(
     <AlbumsArea
@@ -52,11 +59,26 @@ function heading(name: string) {
 function albumRows() {
   return screen
     .getAllByRole('listitem')
-    .map((row) => row.querySelector('.rowButton')?.textContent)
+    .map((row) => row.querySelector('.albumName')?.textContent)
+}
+
+function albumButton(name: string) {
+  return screen.getByRole('button', {
+    name: (accessibleName) =>
+      accessibleName.startsWith(`${name}. Diesen Monat`),
+  })
 }
 
 function openAlbum(name: string) {
-  return userEvent.click(screen.getByRole('button', { name }))
+  return userEvent.click(albumButton(name))
+}
+
+function listenedButton(name: string) {
+  return screen.getByRole('button', { name: `${name} gehört` })
+}
+
+function undoButton(name: string) {
+  return screen.queryByRole('button', { name: `Rückgängig: ${name}` })
 }
 
 function button(name: string) {
@@ -330,6 +352,93 @@ describe('AlbumsArea', () => {
     const { container } = renderArea([kindOfBlue])
     await openAlbum('Kind of Blue, Miles Davis')
     await userEvent.click(button('Löschen'))
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('counts a listening and announces both counts', async () => {
+    const { albumsClient, announcements } = renderArea([listenedKindOfBlue])
+
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+    expect(announcements).toEqual([
+      'Kind of Blue, Miles Davis gehört. Diesen Monat 15, insgesamt 15.',
+    ])
+    expect(listenedButton('Kind of Blue, Miles Davis')).toHaveFocus()
+    expect(albumsClient.storedAlbums()[0].listenings).toHaveLength(15)
+    expect(albumsClient.storedAlbums()[0].listenings.at(-1)).toBe(
+      now.toISOString(),
+    )
+  })
+
+  it('shows this month and total in the row', () => {
+    renderArea([
+      {
+        ...kindOfBlue,
+        listenings: ['2026-10-03T12:00:00.000Z', now.toISOString()],
+      },
+    ])
+
+    const row = albumButton('Kind of Blue, Miles Davis')
+    expect(row).toHaveAccessibleName(
+      'Kind of Blue, Miles Davis. Diesen Monat 1 Mal, insgesamt 2 Mal gehört.',
+    )
+    expect(within(row).getByText('Kind of Blue, Miles Davis')).toBeVisible()
+    expect(row.querySelector('.albumStats')?.textContent).toBe('12')
+  })
+
+  it('takes back the last listening', async () => {
+    const { albumsClient, announcements } = renderArea([listenedKindOfBlue])
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+    await userEvent.click(undoButton('Kind of Blue, Miles Davis')!)
+
+    expect(announcements.at(-1)).toBe(
+      'Kind of Blue, Miles Davis: Hören zurückgenommen. Diesen Monat 14, insgesamt 14.',
+    )
+    expect(undoButton('Kind of Blue, Miles Davis')).not.toBeInTheDocument()
+    expect(listenedButton('Kind of Blue, Miles Davis')).toHaveFocus()
+    expect(albumsClient.storedAlbums()).toEqual([listenedKindOfBlue])
+  })
+
+  it('offers taking back only the latest listening', async () => {
+    const { albumsClient } = renderArea([kindOfBlue, theWall])
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+    await userEvent.click(listenedButton('The Wall, Pink Floyd'))
+
+    expect(undoButton('Kind of Blue, Miles Davis')).not.toBeInTheDocument()
+    await userEvent.click(undoButton('The Wall, Pink Floyd')!)
+    expect(
+      albumsClient.storedAlbums().map((album) => album.listenings.length),
+    ).toEqual([1, 0])
+  })
+
+  it('drops the undo offer when leaving the list', async () => {
+    renderArea([kindOfBlue])
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+    await userEvent.click(addAlbumButton())
+    await userEvent.click(button('Zurück zu den Alben'))
+
+    expect(undoButton('Kind of Blue, Miles Davis')).not.toBeInTheDocument()
+  })
+
+  it('keeps listenings after reopening', async () => {
+    const { albumsClient, unmount } = renderArea([kindOfBlue])
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+    unmount()
+
+    renderArea([], albumsClient)
+
+    expect(albumButton('Kind of Blue, Miles Davis')).toHaveAccessibleName(
+      'Kind of Blue, Miles Davis. Diesen Monat 1 Mal, insgesamt 1 Mal gehört.',
+    )
+  })
+
+  it('has no accessibility violations with the undo offer', async () => {
+    const { container } = renderArea([kindOfBlue])
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
 
     expect(await accessibilityViolations(container)).toEqual([])
   })

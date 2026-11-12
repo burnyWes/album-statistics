@@ -3,10 +3,16 @@ import { InvalidAlbum, type Album } from './album'
 import {
   albumDeletedAnnouncement,
   albumFailureMessage,
+  albumRowLabel,
   albumSavedAnnouncement,
   albumsHeading,
   deletionConsequence,
+  listenedAnnouncement,
+  listenedButtonLabel,
+  listeningTakenBackAnnouncement,
+  undoListeningLabel,
 } from './albumAnnouncements'
+import { listeningAt } from './listening'
 
 describe('albumsHeading', () => {
   it('names only the albums while there are none', () => {
@@ -95,6 +101,55 @@ describe('deletionConsequence', () => {
   it('names several lost listenings', () => {
     expect(deletionConsequence(kindOfBlueListened(14))).toBe(
       'Damit gehen auch 14 Mal Hören verloren.',
+    )
+  })
+})
+
+const now = new Date(2026, 10, 15, 12, 0)
+
+function kindOfBlueListenedSince(
+  thisMonth: number,
+  inEarlierMonths: number,
+): Album {
+  const listenings = [
+    ...Array.from({ length: inEarlierMonths }, () =>
+      listeningAt(new Date(2026, 9, 3)),
+    ),
+    ...Array.from({ length: thisMonth }, () => listeningAt(now)),
+  ]
+  return { ...kindOfBlueListened(0), listenings }
+}
+
+describe('listening texts', () => {
+  it('labels the row with both counts', () => {
+    expect(albumRowLabel(kindOfBlueListenedSince(3, 11), now)).toBe(
+      'Kind of Blue, Miles Davis. Diesen Monat 3 Mal, insgesamt 14 Mal gehört.',
+    )
+  })
+
+  it('labels the listened button', () => {
+    expect(listenedButtonLabel(kindOfBlueListened(1))).toBe(
+      'Kind of Blue, Miles Davis gehört',
+    )
+  })
+
+  it('announces a listening with both counts', () => {
+    expect(listenedAnnouncement(kindOfBlueListenedSince(3, 11), now)).toBe(
+      'Kind of Blue, Miles Davis gehört. Diesen Monat 3, insgesamt 14.',
+    )
+  })
+
+  it('announces a listening taken back with both counts', () => {
+    expect(
+      listeningTakenBackAnnouncement(kindOfBlueListenedSince(2, 11), now),
+    ).toBe(
+      'Kind of Blue, Miles Davis: Hören zurückgenommen. Diesen Monat 2, insgesamt 13.',
+    )
+  })
+
+  it('labels taking back a listening', () => {
+    expect(undoListeningLabel({ title: 'Greatest Hits', artist: '' })).toBe(
+      'Rückgängig: Greatest Hits',
     )
   })
 })

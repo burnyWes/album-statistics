@@ -492,7 +492,7 @@ nach Bestätigung löschen.
 - [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy mit TalkBack: Tipp auf ein Album öffnet „Album bearbeiten“ mit
+- [x] Auf dem Handy mit TalkBack: Tipp auf ein Album öffnet „Album bearbeiten“ mit
   vorbefüllten Feldern; „Löschen“ führt zur Rückfrage mit Anzahl; nach dem Löschen wird
   die Restzahl angesagt und der Fokus liegt auf der Überschrift.
 
@@ -505,7 +505,7 @@ Jede Zeile zählt Hören per `[↑]`, zeigt Monat und insgesamt, und ein Fehltip
 sich unten zurücknehmen.
 
 **Aufgaben**:
-- [ ] `src/albums/domain/listening.test.ts` (zuerst), dann `listening.ts`. Zeiten mit
+- [x] `src/albums/domain/listening.test.ts` (zuerst), dann `listening.ts`. Zeiten mit
   `new Date(2026, 10, 15, 12, 0)` (Ortszeit), damit die Tests unabhängig von der
   Zeitzone der Maschine sind:
   - `records a listening as ISO timestamp`
@@ -514,34 +514,34 @@ sich unten zurücknehmen.
   - `counts all listenings in total`
   - `adds a listening` / `removes exactly the given listening` – bei zwei gleichen
     Zeitstempeln wird nur einer entfernt
-- [ ] `src/albums/domain/albumAnnouncements.ts` (+ Test, zuerst):
+- [x] `src/albums/domain/albumAnnouncements.ts` (+ Test, zuerst):
   `albumRowLabel(album, now)` („<Album>. Diesen Monat 3 Mal, insgesamt 14 Mal
   gehört.“), `listenedButtonLabel(album)` („<Album> gehört“),
   `listenedAnnouncement(album, now)`, `listeningTakenBackAnnouncement(album, now)`,
   `undoListeningLabel(album)` („Rückgängig: <Album>“).
-- [ ] `src/albums/ui/useAlbums.ts` – `listenTo(id): Listening` (mit `clock()`) und
+- [x] `src/albums/ui/useAlbums.ts` – `listenTo(id): Listening` (mit `clock()`) und
   `takeBackListening(id, listening)`.
-- [ ] `src/albums/ui/CalendarIcon.tsx` aus `Mahlzeitenplaner/src/shared/ui/` übernehmen
+- [x] `src/albums/ui/CalendarIcon.tsx` aus `Mahlzeitenplaner/src/shared/ui/` übernehmen
   (nur Alben nutzen ihn, daher unter `albums/ui`); `ArrowUpIcon.tsx` neu im Stil von
   `SettingsIcon` (`<path d="M12 19V5" /><path d="m5 12 7-7 7 7" />`).
-- [ ] `src/albums/ui/AlbumListRow.tsx` – zweizeiliger `rowButton` mit
+- [x] `src/albums/ui/AlbumListRow.tsx` – zweizeiliger `rowButton` mit
   `aria-label={albumRowLabel(album, now)}`: oben `albumName`, darunter
   `<span className="albumStats">` mit `CalendarIcon`, Monatszahl, `RecordIcon`,
   Gesamtzahl; daneben `button.iconButton` mit `ArrowUpIcon` und
   `aria-label={listenedButtonLabel(album)}`.
-- [ ] `src/index.css` – `.albumStats` (Flex, `gap: 0.5rem`, `align-items: center`),
+- [x] `src/index.css` – `.albumStats` (Flex, `gap: 0.5rem`, `align-items: center`),
   `.albumStats .buttonIcon` (`width`/`height` 1.25rem), `.rowButton` mit `display: flex; flex-direction: column;
   align-items: flex-start`.
-- [ ] `src/albums/ui/AlbumListPage.tsx` – Prop `undoListening: { label; onUndo } | null`;
+- [x] `src/albums/ui/AlbumListPage.tsx` – Prop `undoListening: { label; onUndo } | null`;
   wenn gesetzt, `BottomBar` mit dem Knopf.
-- [ ] `src/albums/ui/AlbumsArea.tsx` – Zustand `lastListening: { albumId; listening } |
+- [x] `src/albums/ui/AlbumsArea.tsx` – Zustand `lastListening: { albumId; listening } |
   null`; nach `listenTo` setzen und ansagen; „Rückgängig“ ruft `takeBackListening`,
   sagt an, setzt `null`; jeder Seitenwechsel setzt `null`. Nach dem Rückgängigmachen
   geht der Fokus auf den `[↑]`-Knopf desselben Albums, weil der gedrückte Knopf
   verschwindet: `AlbumsArea` hält `listenButtonFocusRequest: { albumId; request } |
   null`, `AlbumListPage` reicht ihn durch, und `AlbumListRow` fokussiert seinen
   `[↑]`-Knopf per `useEffect`, wenn die `albumId` passt und `request` sich ändert.
-- [ ] `src/albums/ui/AlbumsArea.test.tsx` zuerst ergänzen (feste Uhr):
+- [x] `src/albums/ui/AlbumsArea.test.tsx` zuerst ergänzen (feste Uhr):
   - `counts a listening and announces both counts` – Fokus bleibt auf `[↑]`
   - `shows this month and total in the row label` – Album mit Hören aus Vormonat
   - `takes back the last listening` – Zähler wieder alt, Ansage, Knopf weg, Fokus auf
@@ -550,15 +550,15 @@ sich unten zurücknehmen.
   - `drops the undo offer when leaving the list`
   - `keeps listenings after reopening` – neuer Render mit demselben Fake
   - `has no accessibility violations` – Liste mit Rückgängig-Leiste
-- [ ] `src/App.test.tsx` – `drops the undo offer when switching the area`.
-- [ ] `e2e/albums.spec.ts` – dritter Test: Album anlegen, zweimal `[↑]`, einmal
+- [x] `src/App.test.tsx` – `drops the undo offer when switching the area`.
+- [x] `e2e/albums.spec.ts` – dritter Test: Album anlegen, zweimal `[↑]`, einmal
   „Rückgängig“, neu laden, Zeile nennt „insgesamt 1 Mal gehört“.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `listening.test.ts`, `albumAnnouncements.test.ts`,
+- [x] `npm run test` grün, darunter `listening.test.ts`, `albumAnnouncements.test.ts`,
   `AlbumsArea.test.tsx`, `App.test.tsx`
-- [ ] `npm run lint`, `npm run build`, `npm run test:e2e` grün
-- [ ] `test/colorContrast.test.ts` weiterhin grün (keine neuen Farben)
+- [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
+- [x] `test/colorContrast.test.ts` weiterhin grün (keine neuen Farben)
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy mit TalkBack: `[↑]` wird als „<Album> gehört“ angesagt; nach dem

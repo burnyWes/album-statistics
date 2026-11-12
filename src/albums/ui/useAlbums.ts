@@ -4,22 +4,34 @@ import {
   byTitle,
   type Album,
   type AlbumId,
+  type Listening,
   type NewAlbum,
 } from '../domain/album'
+import {
+  listeningAt,
+  withListening,
+  withoutListening,
+} from '../domain/listening'
 
 export type Albums = {
   albums: readonly Album[]
   addAlbum: (album: NewAlbum) => Album
   changeAlbum: (id: AlbumId, album: NewAlbum) => void
   removeAlbum: (id: AlbumId) => void
+  listenTo: (id: AlbumId) => Listening
+  takeBackListening: (id: AlbumId, listening: Listening) => void
 }
 
-export function useAlbums(client: AlbumsClient): Albums {
+export function useAlbums(client: AlbumsClient, clock: () => Date): Albums {
   const [knownAlbums, setKnownAlbums] = useState(() => client.readAlbums())
 
   function store(albums: readonly Album[]) {
     client.writeAlbums(albums)
     setKnownAlbums(albums)
+  }
+
+  function storeChanged(id: AlbumId, change: (album: Album) => Album) {
+    store(knownAlbums.map((album) => (album.id === id ? change(album) : album)))
   }
 
   function addAlbum(newAlbum: NewAlbum): Album {
@@ -33,16 +45,29 @@ export function useAlbums(client: AlbumsClient): Albums {
   }
 
   function changeAlbum(id: AlbumId, changed: NewAlbum) {
-    store(
-      knownAlbums.map((album) =>
-        album.id === id ? { ...album, ...changed } : album,
-      ),
-    )
+    storeChanged(id, (album) => ({ ...album, ...changed }))
   }
 
   function removeAlbum(id: AlbumId) {
     store(knownAlbums.filter((album) => album.id !== id))
   }
 
-  return { albums: byTitle(knownAlbums), addAlbum, changeAlbum, removeAlbum }
+  function listenTo(id: AlbumId): Listening {
+    const listening = listeningAt(clock())
+    storeChanged(id, (album) => withListening(album, listening))
+    return listening
+  }
+
+  function takeBackListening(id: AlbumId, listening: Listening) {
+    storeChanged(id, (album) => withoutListening(album, listening))
+  }
+
+  return {
+    albums: byTitle(knownAlbums),
+    addAlbum,
+    changeAlbum,
+    removeAlbum,
+    listenTo,
+    takeBackListening,
+  }
 }

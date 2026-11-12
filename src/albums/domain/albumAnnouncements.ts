@@ -5,6 +5,7 @@ import {
   type InvalidAlbumReason,
   type NewAlbum,
 } from './album'
+import { listeningsInTotal, listeningsThisMonth } from './listening'
 
 const messagesByReason: Record<InvalidAlbumReason, string> = {
   titleMissing: 'Bitte einen Albumnamen eingeben.',
@@ -39,9 +40,36 @@ export function albumDeletedAnnouncement(
 }
 
 export function deletionConsequence(album: Album): string {
-  const lostListenings = album.listenings.length
+  const lostListenings = listeningsInTotal(album)
   if (lostListenings === 0) return 'Es ist noch kein Hören erfasst.'
   return lostListenings === 1
     ? 'Damit geht auch 1 Mal Hören verloren.'
     : `Damit gehen auch ${lostListenings} Mal Hören verloren.`
+}
+
+export function albumRowLabel(album: Album, now: Date): string {
+  return `${albumName(album)}. Diesen Monat ${listeningsThisMonth(album, now)} Mal, insgesamt ${listeningsInTotal(album)} Mal gehört.`
+}
+
+export function listenedButtonLabel(album: NewAlbum): string {
+  return `${albumName(album)} gehört`
+}
+
+function bothCounts(album: Album, now: Date): string {
+  return `Diesen Monat ${listeningsThisMonth(album, now)}, insgesamt ${listeningsInTotal(album)}.`
+}
+
+export function listenedAnnouncement(album: Album, now: Date): string {
+  return `${albumName(album)} gehört. ${bothCounts(album, now)}`
+}
+
+export function listeningTakenBackAnnouncement(
+  album: Album,
+  now: Date,
+): string {
+  return `${albumName(album)}: Hören zurückgenommen. ${bothCounts(album, now)}`
+}
+
+export function undoListeningLabel(album: NewAlbum): string {
+  return `Rückgängig: ${albumName(album)}`
 }

@@ -2,6 +2,7 @@ import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { createInMemoryAlbumsClient } from './albums/api/inMemoryAlbumsClient'
+import type { Album } from './albums/domain/album'
 import { App } from './App'
 import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppearanceClient'
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
@@ -12,11 +13,12 @@ import { accessibilityViolations } from './testSupport/accessibility'
 function renderApp({
   invertedColors = false,
   installOutcome = 'accepted' as InstallOutcome,
+  albums = [] as readonly Album[],
 } = {}) {
   const appearanceClient = createInMemoryAppearanceClient(invertedColors)
   const installOfferClient = createInMemoryInstallOfferClient(installOutcome)
   const appUpdateClient = createInMemoryAppUpdateClient()
-  const albumsClient = createInMemoryAlbumsClient()
+  const albumsClient = createInMemoryAlbumsClient(albums)
   const rendered = render(
     <App
       appearanceClient={appearanceClient}
@@ -72,6 +74,36 @@ describe('App', () => {
       screen.getByRole('heading', { level: 1, name: 'Album hinzufügen' }),
     ).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Albumname' })).toHaveFocus()
+  })
+
+  it('drops the undo offer when switching the area', async () => {
+    renderApp({
+      albums: [
+        {
+          id: 'kind-of-blue',
+          title: 'Kind of Blue',
+          artist: 'Miles Davis',
+          listenings: [],
+        },
+      ],
+    })
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Kind of Blue, Miles Davis gehört' }),
+    )
+    expect(
+      screen.getByRole('button', {
+        name: 'Rückgängig: Kind of Blue, Miles Davis',
+      }),
+    ).toBeInTheDocument()
+
+    await userEvent.click(areaButton('Einstellungen'))
+    await userEvent.click(areaButton('Alben'))
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'Rückgängig: Kind of Blue, Miles Davis',
+      }),
+    ).not.toBeInTheDocument()
   })
 
   it('marks the active area in the navigation', () => {
