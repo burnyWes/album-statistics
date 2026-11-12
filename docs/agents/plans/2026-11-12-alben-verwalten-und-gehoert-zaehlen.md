@@ -5,7 +5,7 @@ branch: main
 story: ALS-002
 topic: "Alben anlegen, bearbeiten, löschen und „gehört“ zählen"
 tags: [plan, albums, domain, storage, ui]
-status: ready
+status: done
 ---
 
 # PLAN: ALS-002 — Alben verwalten und „gehört“ zählen
@@ -561,11 +561,11 @@ sich unten zurücknehmen.
 - [x] `test/colorContrast.test.ts` weiterhin grün (keine neuen Farben)
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy mit TalkBack: `[↑]` wird als „<Album> gehört“ angesagt; nach dem
+- [x] Auf dem Handy mit TalkBack: `[↑]` wird als „<Album> gehört“ angesagt; nach dem
   Tipp kommen beide Zähler in der Ansage, die Zeile zeigt Kalender und Platte mit den
   neuen Zahlen; unten erscheint „Rückgängig: <Album>“ und nimmt das Hören zurück; nach
   dem Wechsel zu den Einstellungen und zurück ist die Leiste weg.
-- [ ] In beiden Farbschemata: Icons in der Zeile gut sichtbar, die Leiste unten
+- [x] In beiden Farbschemata: Icons in der Zeile gut sichtbar, die Leiste unten
   verdeckt beim Scrollen keine letzte Zeile.
 
 ## Notizen zur Umsetzung
