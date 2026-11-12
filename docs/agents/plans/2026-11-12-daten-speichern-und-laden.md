@@ -5,7 +5,7 @@ branch: main
 story: ALS-004
 topic: "Daten speichern, teilen und laden"
 tags: [plan, albums, settings, files, domain, ui]
-status: ready
+status: done
 ---
 
 # PLAN: ALS-004 — Daten speichern und laden
@@ -391,7 +391,7 @@ speichern“ lädt die Sicherungsdatei herunter.
 - [x] `npm run test:e2e` grün, darunter `backup.spec.ts`
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy mit TalkBack: In den Einstellungen wird „Daten speichern und laden“
+- [x] Auf dem Handy mit TalkBack: In den Einstellungen wird „Daten speichern und laden“
   angesagt, die Seite öffnet mit der Überschrift; „Daten speichern“ legt
   `album-statistics-<Datum>.json` im Ordner „Download“ ab (auch in der installierten
   App), die Ansage nennt den Dateinamen; „Zurück zu den Einstellungen“ landet auf dem
@@ -501,11 +501,11 @@ lehnt eine ungültige Datei ab, ohne etwas zu ändern.
 - [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy mit TalkBack: „Daten laden“ öffnet die Android-Dateiauswahl, die
+- [x] Auf dem Handy mit TalkBack: „Daten laden“ öffnet die Android-Dateiauswahl, die
   zuvor gespeicherte Datei aus „Download“ lässt sich wählen, die Ansage nennt neue und
   ergänzte Alben, der Fokus liegt danach auf „Daten laden“; eine beliebige andere Datei
   (etwa ein Foto) wird mit dem Fehlertext abgelehnt und die Alben bleiben unverändert.
-- [ ] Umzug: auf einem zweiten Gerät oder in einem anderen Browser die Datei laden; die
+- [x] Umzug: auf einem zweiten Gerät oder in einem anderen Browser die Datei laden; die
   Alben und Zähler stimmen mit dem ersten Gerät überein.
 
 ### Phase 3: Daten teilen
@@ -556,7 +556,7 @@ Browser die Datei teilen kann.
 - [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
-- [ ] In Chrome auf Android: „Daten teilen“ ist sichtbar und öffnet das Teilen-Menü;
+- [x] In Chrome auf Android: „Daten teilen“ ist sichtbar und öffnet das Teilen-Menü;
   „In Drive speichern“ oder Gmail erhält `album-statistics-<Datum>.txt`; TalkBack sagt
   „Daten geteilt.“ an, nach Zurück-Wischen im Menü „Teilen abgebrochen.“; die geteilte
   Datei lässt sich über „Daten laden“ wieder laden.
@@ -566,7 +566,7 @@ Browser die Datei teilen kann.
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
 
 - Alle drei Phasen in einem Zug umgesetzt (Wunsch des Nutzers); manuelle Prüfungen
-  stehen noch aus.
+  vom Nutzer am 2026-11-12 bestätigt.
 - `browserFileExportClient.test.ts` läuft im Projekt `unit` (Node). Statt eines
   Klick-Beobachters am echten `document` nutzt er einen kleinen Dokument-Ersatz, der
   geklickte Links samt `href`, `download` und Einhängezustand festhält.
