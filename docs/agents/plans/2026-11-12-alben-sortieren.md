@@ -5,7 +5,7 @@ branch: main
 story: ALS-006
 topic: "Albenliste per Button sortieren: A–Z, Monat, Gesamt"
 tags: [plan, albums, domain, ui, storage]
-status: ready
+status: done
 ---
 
 # PLAN: ALS-006 — Albenliste sortieren
@@ -317,12 +317,12 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem Handy mit TalkBack: Die Gruppe wird als „Sortierung“ angesagt, jeder
+- [x] Auf dem Handy mit TalkBack: Die Gruppe wird als „Sortierung“ angesagt, jeder
   Button mit Vorlesetext und Zustand „gedrückt“/„nicht gedrückt“. Nach dem Umschalten
   kommt die Ansage „Sortiert: …. Zuerst: …“.
-- [ ] Bei „Gesamt“ ein Album hören, das dadurch nach oben springt: Der TalkBack-Fokus
+- [x] Bei „Gesamt“ ein Album hören, das dadurch nach oben springt: Der TalkBack-Fokus
   bleibt auf seinem 🔊-Button.
-- [ ] Die drei Buttons passen bei ca. 360 px Breite nebeneinander, ohne Umbruch. Das gilt
+- [x] Die drei Buttons passen bei ca. 360 px Breite nebeneinander, ohne Umbruch. Das gilt
   auch mit invertierten Farben bzw. invertierten Buttons.
 
 ### Phase 2: Sortierung merken
@@ -383,7 +383,7 @@ Die gewählte Sortierung wird auf dem Gerät gespeichert und beim Start gelesen.
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem Handy in der installierten App „Monat“ wählen, die App schließen und neu
+- [x] Auf dem Handy in der installierten App „Monat“ wählen, die App schließen und neu
   öffnen. „Monat“ ist weiter gewählt.
 
 ## Notizen zur Umsetzung
