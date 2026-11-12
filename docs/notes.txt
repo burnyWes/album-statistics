@@ -52,3 +52,6 @@ TODO
     - Tracks (optional)
     |Speichern||Löschen|
 
+- Commit-Gate um den Build-Schritt (npm run build, also auch tsc -b über e2e/) ergänzen, damit
+  Typfehler nicht erst in der CI auffallen (ALS-005: Pipeline war rot)
+
