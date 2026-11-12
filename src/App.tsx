@@ -65,23 +65,18 @@ export function App({
 
   const settingsEntries: SettingsEntry[] = [
     {
-      kind: 'toggleGroup',
-      id: 'colorInversion',
-      label: 'Farbumkehr',
-      toggles: [
-        {
-          id: 'invertedColors',
-          label: 'Farben invertieren',
-          enabled: appearance.colorInversion === 'everything',
-          onToggle: () => appearance.toggleColorInversion('everything'),
-        },
-        {
-          id: 'invertedButtons',
-          label: 'Nur Buttons invertieren',
-          enabled: appearance.colorInversion === 'buttonsOnly',
-          onToggle: () => appearance.toggleColorInversion('buttonsOnly'),
-        },
-      ],
+      kind: 'toggle',
+      id: 'invertedColors',
+      label: 'Farben invertieren',
+      enabled: appearance.invertedColors,
+      onToggle: appearance.toggleInvertedColors,
+    },
+    {
+      kind: 'toggle',
+      id: 'invertedButtons',
+      label: 'Nur Buttons invertieren',
+      enabled: appearance.invertedButtons,
+      onToggle: appearance.toggleInvertedButtons,
     },
     ...installEntries,
   ]

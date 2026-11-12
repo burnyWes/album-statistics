@@ -1,5 +1,5 @@
 import { deviceStorage, type DeviceStorage } from '../storage/deviceStorage'
-import type { AppearanceClient, ColorInversion } from './appearanceClient'
+import type { AppearanceClient } from './appearanceClient'
 
 export const INVERTED_COLORS_KEY = 'invertedColors'
 export const INVERTED_BUTTONS_KEY = 'invertedButtons'
@@ -20,20 +20,17 @@ function store(storage: DeviceStorage | null, key: string, on: boolean): void {
   }
 }
 
-function storedColorInversion(storage: DeviceStorage | null): ColorInversion {
-  if (isSwitchedOn(storage, INVERTED_COLORS_KEY)) return 'everything'
-  if (isSwitchedOn(storage, INVERTED_BUTTONS_KEY)) return 'buttonsOnly'
-  return 'none'
-}
-
 export function createLocalStorageAppearanceClient(
   storage: DeviceStorage | null = deviceStorage(),
 ): AppearanceClient {
   return {
-    readColorInversion: () => storedColorInversion(storage),
-    writeColorInversion: (colorInversion) => {
-      store(storage, INVERTED_COLORS_KEY, colorInversion === 'everything')
-      store(storage, INVERTED_BUTTONS_KEY, colorInversion === 'buttonsOnly')
+    readColorInversion: () => ({
+      invertedColors: isSwitchedOn(storage, INVERTED_COLORS_KEY),
+      invertedButtons: isSwitchedOn(storage, INVERTED_BUTTONS_KEY),
+    }),
+    writeColorInversion: ({ invertedColors, invertedButtons }) => {
+      store(storage, INVERTED_COLORS_KEY, invertedColors)
+      store(storage, INVERTED_BUTTONS_KEY, invertedButtons)
     },
   }
 }

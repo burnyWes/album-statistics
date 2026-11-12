@@ -1,13 +1,17 @@
-import type { AppearanceClient, ColorInversion } from './appearanceClient'
+import {
+  NO_COLOR_INVERSION,
+  type AppearanceClient,
+  type ColorInversion,
+} from './appearanceClient'
 
 export type StoringAppearanceClient = AppearanceClient & {
   storedColorInversion(): ColorInversion
 }
 
 export function createInMemoryAppearanceClient(
-  colorInversion: ColorInversion = 'none',
+  colorInversion: Partial<ColorInversion> = {},
 ): StoringAppearanceClient {
-  let storedColorInversion = colorInversion
+  let storedColorInversion = { ...NO_COLOR_INVERSION, ...colorInversion }
 
   return {
     readColorInversion: () => storedColorInversion,

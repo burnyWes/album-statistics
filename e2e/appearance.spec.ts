@@ -52,4 +52,5 @@ test('remembers the inverted buttons after a reload', async ({ page }) => {
   await page.getByRole('button', { name: 'Einstellungen' }).click()
 
   await expect(invertedButtonsCheckbox(page)).toBeChecked()
+  await expect(invertedColorsCheckbox(page)).not.toBeChecked()
 })

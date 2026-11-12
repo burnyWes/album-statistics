@@ -11,13 +11,8 @@
   --accent: #dc2626;
   --accentInk: #ffffff;
   --accentLine: #b91c1c;
-  --quietButton: #ffffff;
-  --quietButtonInk: #000000;
-  --systemBar: #b91c1c;
-  --checkMark: #b91c1c;
   --divider: #d1d5db;
   --fieldBorder: #4b5563;
-  --disabled: #f3f4f6;
   --disabledLine: #6b7280;
   --disabledInk: #4b5563;
   --failure: #991b1b;
@@ -28,16 +23,9 @@
   color-scheme: dark;
   --surface: #000000;
   --ink: #ffffff;
-  --accent: #23d9d9;
-  --accentInk: #000000;
-  --accentLine: #46e3e3;
-  --quietButton: #000000;
-  --quietButtonInk: #ffffff;
-  --systemBar: #46e3e3;
-  --checkMark: #46e3e3;
+  --accentLine: #f87171;
   --divider: #2e2a24;
   --fieldBorder: #b4aa9c;
-  --disabled: #0c0b09;
   --disabledLine: #948d7f;
   --disabledInk: #b4aa9c;
   --failure: #66e4e4;
@@ -46,12 +34,11 @@
 :root[data-inverted-buttons='true'] {
   --accent: #23d9d9;
   --accentInk: #000000;
+  --accentLine: #078e8e;
+}
+
+:root[data-inverted-colors='true'][data-inverted-buttons='true'] {
   --accentLine: #46e3e3;
-  --quietButton: #000000;
-  --quietButtonInk: #ffffff;
-  --disabled: #0c0b09;
-  --disabledLine: #948d7f;
-  --disabledInk: #b4aa9c;
 }
 
 html {
@@ -156,9 +143,9 @@ button {
 
 .navigationBar button,
 .rowButton {
-  background-color: var(--quietButton);
+  background-color: var(--surface);
   border-color: var(--accentLine);
-  color: var(--quietButtonInk);
+  color: var(--ink);
 }
 
 .navigationBar button[aria-current='page'] {
@@ -169,7 +156,7 @@ button {
 
 button:disabled,
 button[aria-disabled='true'] {
-  background-color: var(--disabled);
+  background-color: var(--surface);
   border-color: var(--disabledLine);
   color: var(--disabledInk);
 }
@@ -242,14 +229,8 @@ button[aria-disabled='true'] {
 }
 
 .settingsToggle {
-  justify-content: space-between;
-}
-
-.settingsToggleGroup {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: space-between;
 }
 
 input[type='checkbox'],
@@ -279,8 +260,8 @@ input[type='radio']:checked::before {
   box-sizing: border-box;
   width: 15px;
   height: 29px;
-  border-right: 5px solid var(--checkMark);
-  border-bottom: 5px solid var(--checkMark);
+  border-right: 5px solid var(--accentLine);
+  border-bottom: 5px solid var(--accentLine);
   transform: rotate(45deg);
 }
 

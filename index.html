@@ -19,7 +19,6 @@
         document.documentElement.dataset.invertedColors =
           localStorage.getItem('invertedColors') === 'true'
         document.documentElement.dataset.invertedButtons =
-          localStorage.getItem('invertedColors') !== 'true' &&
           localStorage.getItem('invertedButtons') === 'true'
       } catch (storageBlocked) {
         document.documentElement.dataset.invertedColors = 'false'

@@ -21,13 +21,13 @@ function givenASystemBar(content = 'untouched') {
 function givenThePalette() {
   const palette = document.createElement('style')
   palette.textContent = `
-    :root { --systemBar: ${LIGHT_SYSTEM_BAR}; }
-    :root[data-inverted-colors='true'] { --systemBar: ${INVERTED_SYSTEM_BAR}; }
+    :root { --accentLine: ${LIGHT_SYSTEM_BAR}; }
+    :root[data-inverted-colors='true'] { --accentLine: ${INVERTED_SYSTEM_BAR}; }
   `
   document.head.append(palette)
 }
 
-function renderAppearance(colorInversion: ColorInversion = 'none') {
+function renderAppearance(colorInversion: Partial<ColorInversion> = {}) {
   const appearanceClient = createInMemoryAppearanceClient(colorInversion)
   const { result } = renderHook(() => useAppearance(appearanceClient))
   return { appearance: result, appearanceClient }
@@ -59,7 +59,7 @@ describe('useAppearance', () => {
     givenThePalette()
     const { appearance } = renderAppearance()
 
-    act(() => appearance.current.toggleColorInversion('everything'))
+    act(() => appearance.current.toggleInvertedColors())
 
     expect(rootMarks()).toEqual({
       invertedColors: 'true',
@@ -76,36 +76,34 @@ describe('useAppearance', () => {
     expect(systemBar()?.getAttribute('content')).toBe('untouched')
   })
 
-  it('inverts the buttons only and remembers it', () => {
-    const { appearance, appearanceClient } = renderAppearance()
+  it('inverts the buttons on top of the inverted colours', () => {
+    const { appearance, appearanceClient } = renderAppearance({
+      invertedColors: true,
+    })
 
-    act(() => appearance.current.toggleColorInversion('buttonsOnly'))
+    act(() => appearance.current.toggleInvertedButtons())
 
-    expect(appearance.current.colorInversion).toBe('buttonsOnly')
-    expect(appearanceClient.storedColorInversion()).toBe('buttonsOnly')
+    expect(appearanceClient.storedColorInversion()).toEqual({
+      invertedColors: true,
+      invertedButtons: true,
+    })
     expect(rootMarks()).toEqual({
-      invertedColors: 'false',
+      invertedColors: 'true',
       invertedButtons: 'true',
     })
   })
 
-  it('replaces one inversion with the other', () => {
-    const { appearance, appearanceClient } = renderAppearance('everything')
+  it('turns the inverted buttons off without touching the colours', () => {
+    const { appearance, appearanceClient } = renderAppearance({
+      invertedButtons: true,
+    })
 
-    act(() => appearance.current.toggleColorInversion('buttonsOnly'))
+    act(() => appearance.current.toggleInvertedButtons())
 
-    expect(appearanceClient.storedColorInversion()).toBe('buttonsOnly')
-  })
-
-  it('turns the chosen inversion off again', () => {
-    const { appearance, appearanceClient } = renderAppearance('buttonsOnly')
-
-    act(() => appearance.current.toggleColorInversion('buttonsOnly'))
-
-    expect(appearanceClient.storedColorInversion()).toBe('none')
-    expect(rootMarks()).toEqual({
-      invertedColors: 'false',
-      invertedButtons: 'false',
+    expect(appearance.current.invertedButtons).toBe(false)
+    expect(appearanceClient.storedColorInversion()).toEqual({
+      invertedColors: false,
+      invertedButtons: false,
     })
   })
 })

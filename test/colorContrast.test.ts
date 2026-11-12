@@ -7,20 +7,9 @@ const GRAPHICS_CONTRAST = 3
 
 const stylesheet = readFileSync('src/index.css', 'utf8')
 
-const LIGHT_SELECTOR = ':root'
-const DARK_SELECTOR = ":root[data-inverted-colors='true']"
-const INVERTED_BUTTONS_SELECTOR = ":root[data-inverted-buttons='true']"
-
-const BUTTON_COLORS = [
-  '--accent',
-  '--accentInk',
-  '--accentLine',
-  '--quietButton',
-  '--quietButtonInk',
-  '--disabled',
-  '--disabledLine',
-  '--disabledInk',
-]
+const INVERTED_COLORS = ":root[data-inverted-colors='true']"
+const INVERTED_BUTTONS = ":root[data-inverted-buttons='true']"
+const INVERTED_BOTH = `${INVERTED_COLORS}[data-inverted-buttons='true']`
 
 function escapedForPattern(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -48,22 +37,17 @@ const REQUIRED_PAIRS = [
   },
   {
     foreground: '--disabledInk',
-    background: '--disabled',
+    background: '--surface',
     minimum: TEXT_CONTRAST,
   },
   { foreground: '--failure', background: '--surface', minimum: TEXT_CONTRAST },
   {
-    foreground: '--quietButtonInk',
-    background: '--quietButton',
-    minimum: TEXT_CONTRAST,
-  },
-  {
     foreground: '--accentLine',
-    background: '--quietButton',
+    background: '--surface',
     minimum: GRAPHICS_CONTRAST,
   },
   {
-    foreground: '--checkMark',
+    foreground: '--disabledLine',
     background: '--surface',
     minimum: GRAPHICS_CONTRAST,
   },
@@ -95,33 +79,30 @@ function invertedPalette(
   )
 }
 
-const lightPalette = paletteOf(LIGHT_SELECTOR)
+const plain = paletteOf(':root')
+const withInvertedColors = { ...plain, ...paletteOf(INVERTED_COLORS) }
+const withInvertedButtons = { ...plain, ...paletteOf(INVERTED_BUTTONS) }
+const withBothInverted = {
+  ...withInvertedColors,
+  ...paletteOf(INVERTED_BUTTONS),
+  ...paletteOf(INVERTED_BOTH),
+}
 
-describe('the dark colour scheme', () => {
-  it('inverts every colour of the light scheme exactly', () => {
-    expect(paletteOf(DARK_SELECTOR)).toEqual(invertedPalette(lightPalette))
+describe('the colour schemes', () => {
+  it('turn into the exact opposite with both inversions', () => {
+    expect(withBothInverted).toEqual(invertedPalette(plain))
   })
-})
 
-describe('the inverted buttons', () => {
-  it('invert exactly the button colours of the light scheme', () => {
-    const lightButtonColors = Object.fromEntries(
-      BUTTON_COLORS.map((variable) => [variable, lightPalette[variable]]),
-    )
-
-    expect(paletteOf(INVERTED_BUTTONS_SELECTOR)).toEqual(
-      invertedPalette(lightButtonColors),
-    )
+  it('mirror inverted colours and inverted buttons exactly', () => {
+    expect(withInvertedColors).toEqual(invertedPalette(withInvertedButtons))
   })
 })
 
 const SCHEMES = [
-  { name: 'light', palette: lightPalette },
-  { name: 'dark', palette: paletteOf(DARK_SELECTOR) },
-  {
-    name: 'inverted buttons',
-    palette: { ...lightPalette, ...paletteOf(INVERTED_BUTTONS_SELECTOR) },
-  },
+  { name: 'plain', palette: plain },
+  { name: 'inverted colours', palette: withInvertedColors },
+  { name: 'inverted buttons', palette: withInvertedButtons },
+  { name: 'fully inverted', palette: withBothInverted },
 ]
 
 describe.each(SCHEMES)('the $name colour scheme', ({ palette }) => {
