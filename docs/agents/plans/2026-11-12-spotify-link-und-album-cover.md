@@ -5,7 +5,7 @@ branch: main
 story: ALS-005
 topic: "Spotify-Link, Album-Cover, Lautsprecher-Icon und Umbenennung der Sicherungsseite"
 tags: [plan, albums, settings, files, domain, ui]
-status: ready
+status: done
 ---
 
 # PLAN: ALS-005 — Spotify-Link und Album-Cover
@@ -318,7 +318,7 @@ Lautsprecher.
 - [x] `npx playwright test e2e/backup.spec.ts` grün.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy zeigen Albumzeile und Detailseite einen gut erkennbaren Lautsprecher
+- [x] Auf dem Handy zeigen Albumzeile und Detailseite einen gut erkennbaren Lautsprecher
   mit Schallwellen, in beiden Farbschemata.
 
 ### Phase 2: Spotify-Link
@@ -392,10 +392,10 @@ Detailseite als Button angeboten wird.
 - [x] `npx playwright test` grün.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Android-Handy einen über „Teilen → Link kopieren“ aus der Spotify-App
+- [x] Auf dem Android-Handy einen über „Teilen → Link kopieren“ aus der Spotify-App
   kopierten Album-Link einfügen und speichern. „Auf Spotify öffnen“ öffnet das Album in
   der Spotify-App.
-- [ ] Der Link-Button sieht in allen vier Farbkombinationen aus wie ein normaler Button.
+- [x] Der Link-Button sieht in allen vier Farbkombinationen aus wie ein normaler Button.
 
 ### Phase 3: Album-Cover
 
@@ -480,15 +480,15 @@ geladen wird. Eine volle Quota wird sichtbar.
 - [x] `npx playwright test` grün, inklusive des Browser-Adapters über das E2E-Cover.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Android-Handy per „Cover wählen“ einmal ein Foto mit der Kamera aufnehmen und
+- [x] Auf dem Android-Handy per „Cover wählen“ einmal ein Foto mit der Kamera aufnehmen und
   einmal ein Bild aus der Galerie wählen. Das Bild ist richtig herum gedreht, mittig
   quadratisch und in Liste und Detailseite scharf genug.
-- [ ] Ein Hochkant-Foto wird mittig zugeschnitten, nicht verzerrt.
-- [ ] Mit TalkBack: Die Listenzeile wird wie bisher angesagt, das Bild nicht zusätzlich.
+- [x] Ein Hochkant-Foto wird mittig zugeschnitten, nicht verzerrt.
+- [x] Mit TalkBack: Die Listenzeile wird wie bisher angesagt, das Bild nicht zusätzlich.
   Auf der Detailseite wird „Album-Cover“ angesagt, im Formular „Cover gewählt.“ bzw.
   „Cover entfernt.“
-- [ ] Platzhalter und Bildrahmen stimmen in allen vier Farbkombinationen.
-- [ ] Eine Sicherung mit Covern auf dem Handy teilen und auf einem frischen Stand laden.
+- [x] Platzhalter und Bildrahmen stimmen in allen vier Farbkombinationen.
+- [x] Eine Sicherung mit Covern auf dem Handy teilen und auf einem frischen Stand laden.
   Die Cover sind wieder da.
 
 ## Notizen zur Umsetzung
