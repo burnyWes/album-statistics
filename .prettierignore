@@ -1,0 +1,11 @@
+.claude
+docs
+dist
+dev-dist
+coverage
+node_modules
+playwright-report
+test-results
+package-lock.json
+CLAUDE.md
+README.md

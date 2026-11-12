@@ -6,19 +6,19 @@
 
 Name:    Album-Statistics
 Kürzel:  ALS
-Stack:   -
+Stack:   TypeScript, React 19, Vite 8, vite-plugin-pwa, Vitest, Playwright, GitHub Pages
 Bauart:  onion
 
 ## Befehle
 
-Test:    -
-Lint:    -
-Format:  -
-Build:   -
+Test:    npm run test
+Lint:    npm run lint
+Format:  npm run format
+Build:   npm run build
 
 ## Fachliche Kontexte
 
-<noch keine>
+- **albums** — die Alben, über die Album-Statistics Auskunft gibt.
 
 ---
 

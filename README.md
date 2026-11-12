@@ -1,74 +1,49 @@
-# Projekt-Template
+# Album-Statistics
 
-Vorlage für neue Projekte. Enthält die Arbeitsweise, die in jedem Projekt gleich ist,
-damit sie nicht jedes Mal neu erklärt werden muss.
+Private Anwendung für Statistiken zu Alben — eine PWA mit React und Vite, ausgeliefert
+über GitHub Pages.
 
-## Neues Projekt starten
+## Arbeitsweise
 
-1. Das Template **ohne** den Ordner `.git` an den Zielort kopieren und umbenennen —
-   oder auf GitHub über „Use this template“ ein neues Repository daraus erzeugen.
-2. Im neuen Ordner `claude` starten.
-3. `/setup` ausführen.
+Die Dauerregeln stehen in [CLAUDE.md](CLAUDE.md), die projektspezifischen Angaben in
+[.claude/projekt.md](.claude/projekt.md). Offene Punkte und Bugs stehen in
+[docs/notes.txt](docs/notes.txt).
 
-`/setup` fragt Projektname, Kürzel und Bauart ab, erkennt Stack und Befehle, schreibt
-`.claude/projekt.md`, legt `docs/`, `.gitignore` und das Git-Repository an und erzeugt
-auf Wunsch ein lauffähiges Grundgerüst.
-
-Das Template ist selbst ein Git-Repository, damit seine Pflege versioniert ist. Seine
-Historie gehört nicht in neue Projekte: Wurde `.git` versehentlich mitkopiert, erkennt
-`/setup` das und bietet an, mit einer frischen Historie zu beginnen.
-
-## Was drin ist
+## Ablauf
 
 ```
-CLAUDE.md                     Dauerregeln: Sprache, Code, Architektur, Tests
-.claude/
-  projekt.md                  einziger projektspezifischer Ort (von /setup gefüllt)
-  settings.json               Freigaben, damit nicht jeder Testlauf nachfragt
-  skills/
-    setup/                    Projekt einrichten
-    architecture/             DDD und Onion - Schichten, Bausteine, Anti-Patterns
-    commit/                   Commit mit Gate
-    rpi-research/             Codebasis untersuchen
-    rpi-plan/                 Plan erstellen
-    rpi-implement/            Plan umsetzen
-    grill-me/                 Vorhaben auf Herz und Nieren prüfen
-docs/
-  notes.txt                   TODO-Liste des Nutzers
-```
-
-## Arbeitsablauf
-
-```
-/setup                      einmal zu Beginn
-   |
 /rpi-research <Frage>       Bestehendes verstehen        -> docs/agents/research/
-   |
 /rpi-plan <Vorhaben>        Plan erstellen               -> docs/agents/plans/
-   |
 /rpi-implement <Plan>       Plan Phase für Phase umsetzen
-   |
 /commit                     Format, Lint, Tests, Architektur, Secrets -> Commit
 ```
 
-`/grill-me <Vorhaben>` lässt sich jederzeit dazwischenschieben, wenn ein Entwurf erst
-noch auseinandergenommen werden soll.
+`/grill-me <Vorhaben>` nimmt einen Entwurf vorab auseinander.
 
-## Festgelegte Arbeitsweise
+## Befehle
 
-- **Sprache** — Gespräch, Skills und Dokumente auf Deutsch; Code, Bezeichner und
-  Commit-Nachrichten auf Englisch.
-- **Architektur** — Domain-Driven Design mit Onion-Architektur, fachlicher Kontext vor
-  Schicht. Über `Bauart: schlank` in `.claude/projekt.md` abwählbar.
-- **Code** — so sprechend, dass keine Kommentare nötig sind. Einzige Ausnahme: ein
-  Warum-Kommentar mit überprüfbarer Quelle, wenn der Grund ausserhalb des Codes liegt.
-- **Tests** — test-getrieben in `domain` und `application`, dort ohne Framework und ohne
-  Mockito; aussen pragmatisch.
-- **Commits** — `KUERZEL-NNN > type: subject` mit Fusszeile `(committed by agent)`, nur
-  bei grünem Gate.
+| Befehl              | Zweck                                         |
+|---------------------|-----------------------------------------------|
+| `npm run dev`       | Entwicklungsserver                            |
+| `npm run test`      | Unit- und Komponententests (Vitest)           |
+| `npm run test:e2e`  | Build und End-to-End-Tests (Playwright)       |
+| `npm run lint`      | ESLint samt Schicht- und Kontextgrenzen       |
+| `npm run format`    | Prettier                                      |
+| `npm run build`     | Typprüfung und Produktions-Build nach `dist/` |
 
-## Template pflegen
+Vor dem ersten E2E-Lauf einmalig `npx playwright install chromium`.
 
-Änderungen an der Arbeitsweise gehören in dieses Template, nicht in einzelne Projekte.
-`CLAUDE.md` und die Skills sind projektunabhängig und lassen sich in bestehende Projekte
-kopieren, ohne `.claude/projekt.md` zu berühren.
+## Aufbau
+
+`src/<kontext>/{domain,api,ui}` je fachlichem Kontext, dazu `src/shared/` für
+Kontextübergreifendes. `domain` kennt weder React noch Adapter; ESLint setzt das durch,
+`test/domainLayerBoundary.test.ts` sichert die Regeln ab.
+
+## Eckdaten
+
+| Feld    | Wert                                                   |
+|---------|--------------------------------------------------------|
+| Kürzel  | `ALS` — Präfix der Story-Nummern (`ALS-007`)           |
+| Bauart  | `onion` — Domain-Driven Design mit Onion-Architektur   |
+| Basispfad | `/album-statistics/` — muss zum Namen des GitHub-Repositorys passen |
+| Repository | <https://github.com/burnyWes/album-statistics> |

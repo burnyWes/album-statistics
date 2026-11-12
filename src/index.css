@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  --surface: #ffffff;
+  --ink: #000000;
+  --accent: #1e3a8a;
+}
+
+html {
+  background-color: var(--surface);
+}
+
+body {
+  margin: 0;
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+.page {
+  padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  max-width: 40rem;
+  margin: 0 auto;
+}
