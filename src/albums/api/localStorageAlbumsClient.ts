@@ -3,11 +3,23 @@ import {
   type DeviceStorage,
 } from '../../shared/storage/deviceStorage'
 import type { Album } from '../domain/album'
-import type { AlbumsClient } from './albumsClient'
+import { AlbumsStorageFull, type AlbumsClient } from './albumsClient'
 import { albumsFileText, storedAlbumsFromText } from './albumsFile'
 
 export const ALBUMS_KEY = 'albums'
 export const UNREADABLE_ALBUMS_KEY = 'albums.unreadable'
+
+// Older Firefox versions report a full storage under this name instead of QuotaExceededError:
+// https://developer.mozilla.org/en-US/docs/Web/API/DOMException#quotaexceedederror
+const FIREFOX_LEGACY_QUOTA_ERROR_NAME = 'NS_ERROR_DOM_QUOTA_REACHED'
+
+function isStorageFull(error: unknown): boolean {
+  return (
+    error instanceof DOMException &&
+    (error.name === 'QuotaExceededError' ||
+      error.name === FIREFOX_LEGACY_QUOTA_ERROR_NAME)
+  )
+}
 
 function storedText(storage: DeviceStorage | null, key: string): string | null {
   try {
@@ -40,7 +52,11 @@ function readAlbums(storage: DeviceStorage | null): readonly Album[] {
 }
 
 function writeAlbums(storage: DeviceStorage | null, albums: readonly Album[]) {
-  store(storage, ALBUMS_KEY, albumsFileText(albums))
+  try {
+    storage?.setItem(ALBUMS_KEY, albumsFileText(albums))
+  } catch (error) {
+    if (isStorageFull(error)) throw new AlbumsStorageFull()
+  }
 }
 
 export function createLocalStorageAlbumsClient(

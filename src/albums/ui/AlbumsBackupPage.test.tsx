@@ -15,6 +15,8 @@ const kindOfBlue: Album = {
   id: 'kind-of-blue',
   title: 'Kind of Blue',
   artist: 'Miles Davis',
+  spotifyLink: null,
+  cover: null,
   listenings: ['2026-11-12T18:04:00.000Z'],
 }
 
@@ -22,6 +24,8 @@ const theWall: Album = {
   id: 'the-wall',
   title: 'The Wall',
   artist: 'Pink Floyd',
+  spotifyLink: null,
+  cover: null,
   listenings: [],
 }
 
@@ -29,6 +33,8 @@ const blueTrain: Album = {
   id: 'blue-train',
   title: 'Blue Train',
   artist: 'John Coltrane',
+  spotifyLink: null,
+  cover: null,
   listenings: ['2026-11-10T20:00:00.000Z'],
 }
 
@@ -36,8 +42,10 @@ function renderPage({
   albums = [kindOfBlue, theWall] as readonly Album[],
   shareable = false,
   shareOutcome = 'shared' as ShareOutcome,
+  storageFull = false,
 } = {}) {
   const albumsClient = createInMemoryAlbumsClient(albums)
+  if (storageFull) albumsClient.storageFull()
   const fileExportClient = createInMemoryFileExportClient({
     shareable,
     shareOutcome,
@@ -72,6 +80,8 @@ function backupFile(
   return new File([albumsFileText(albums)], name, { type })
 }
 
+const storageFullMessage = 'Der Speicher ist voll. Es wurde nichts geändert.'
+
 const unreadableMessage =
   'Diese Datei enthält keine lesbaren Album-Daten. Es wurde nichts geändert.'
 
@@ -82,7 +92,7 @@ describe('AlbumsBackupPage', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'Daten speichern und laden',
+        name: 'Daten speichern / laden',
       }),
     ).toHaveFocus()
   })
@@ -131,7 +141,7 @@ describe('AlbumsBackupPage', () => {
 
     await waitFor(() =>
       expect(announcements).toEqual([
-        'Daten geladen. 1 Album neu, 1 Album um 1 Mal Hören ergänzt.',
+        'Daten geladen. 1 Album neu, 1 Album ergänzt.',
       ]),
     )
     expect(albumsClient.storedAlbums()).toEqual([
@@ -181,6 +191,17 @@ describe('AlbumsBackupPage', () => {
 
     await waitFor(() => expect(announcements).toEqual([unreadableMessage]))
     expect(screen.getByText(unreadableMessage)).toBeInTheDocument()
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue, theWall])
+    expect(button('Daten laden')).toHaveFocus()
+  })
+
+  it('tells about a full storage and keeps the albums', async () => {
+    const { albumsClient, announcements } = renderPage({ storageFull: true })
+
+    await userEvent.upload(fileInput(), backupFile([blueTrain]))
+
+    await waitFor(() => expect(announcements).toEqual([storageFullMessage]))
+    expect(screen.getByText(storageFullMessage)).toBeInTheDocument()
     expect(albumsClient.storedAlbums()).toEqual([kindOfBlue, theWall])
     expect(button('Daten laden')).toHaveFocus()
   })

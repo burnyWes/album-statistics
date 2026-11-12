@@ -1,16 +1,33 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
 
-async function addAlbum(page: Page, title: string, artist: string) {
+async function addAlbum(
+  page: Page,
+  title: string,
+  artist: string,
+  spotifyLink = '',
+  coverFile = '',
+) {
   await page.getByRole('button', { name: 'Album hinzufügen' }).click()
   await page.getByRole('textbox', { name: 'Albumname' }).fill(title)
   await page.getByRole('textbox', { name: 'Bandname (optional)' }).fill(artist)
+  await page
+    .getByRole('textbox', { name: 'Spotify-Link (optional)' })
+    .fill(spotifyLink)
+  if (coverFile !== '') {
+    const fileChooserOpened = page.waitForEvent('filechooser')
+    await page.getByRole('button', { name: 'Cover wählen' }).click()
+    await (await fileChooserOpened).setFiles(coverFile)
+    await expect(page.getByRole('status')).toContainText('Cover gewählt.')
+  }
   await page.getByRole('button', { name: 'Speichern' }).click()
 }
 
+const SPOTIFY_LINK = 'https://open.spotify.com/album/1weenld61qoidwYuZ1GESA'
+
 async function openBackup(page: Page) {
   await page.getByRole('button', { name: 'Einstellungen' }).click()
-  await page.getByRole('button', { name: 'Daten speichern und laden' }).click()
+  await page.getByRole('button', { name: 'Daten speichern / laden' }).click()
 }
 
 async function downloadBackup(page: Page) {
@@ -38,7 +55,13 @@ test('downloads the albums as a file', async ({ page }) => {
 
 test('brings saved albums back after loading the file', async ({ page }) => {
   await page.goto('./')
-  await addAlbum(page, 'Kind of Blue', 'Miles Davis')
+  await addAlbum(
+    page,
+    'Kind of Blue',
+    'Miles Davis',
+    SPOTIFY_LINK,
+    'public/icon-192.png',
+  )
   await page
     .getByRole('button', { name: 'Kind of Blue, Miles Davis gehört' })
     .click()
@@ -68,4 +91,12 @@ test('brings saved albums back after loading the file', async ({ page }) => {
   await page.reload()
 
   await expect(albumRow).toHaveAccessibleName(/insgesamt 1 Mal gehört/)
+  await albumRow.click()
+  await expect(
+    page.getByRole('link', { name: 'Auf Spotify öffnen' }),
+  ).toHaveAttribute('href', SPOTIFY_LINK)
+  await expect(page.getByRole('img', { name: 'Album-Cover' })).toHaveAttribute(
+    'src',
+    /^data:image\/jpeg;base64,/,
+  )
 })

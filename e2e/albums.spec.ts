@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 async function addAlbum(page: Page, title: string, artist: string) {
   await page.getByRole('button', { name: 'Album hinzufügen' }).click()
@@ -114,4 +114,65 @@ test('deletes a single listening for good', async ({ page }) => {
   await expect(
     albumButton(page, 'Kind of Blue, Miles Davis'),
   ).toHaveAccessibleName(/insgesamt 1 Mal gehört/)
+})
+
+test('keeps a spotify link after a reload', async ({ page }) => {
+  await page.goto('./')
+  await page.getByRole('button', { name: 'Album hinzufügen' }).click()
+  await page.getByRole('textbox', { name: 'Albumname' }).fill('Kind of Blue')
+  await page
+    .getByRole('textbox', { name: 'Spotify-Link (optional)' })
+    .fill('open.spotify.com/album/1weenld61qoidwYuZ1GESA')
+  await page.getByRole('button', { name: 'Speichern' }).click()
+
+  await page.reload()
+  await albumButton(page, 'Kind of Blue').click()
+
+  await expect(
+    page.getByRole('link', { name: 'Auf Spotify öffnen' }),
+  ).toHaveAttribute(
+    'href',
+    'https://open.spotify.com/album/1weenld61qoidwYuZ1GESA',
+  )
+})
+
+async function cornerPixel(image: Locator) {
+  return image.evaluate((element: HTMLImageElement) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = element.naturalWidth
+    canvas.height = element.naturalHeight
+    const context = canvas.getContext('2d')!
+    context.drawImage(element, 0, 0)
+    return [...context.getImageData(1, 1, 1, 1).data]
+  })
+}
+
+async function expectShrunkenCover(image: Locator) {
+  await expect(image).toHaveAttribute('src', /^data:image\/jpeg;base64,/)
+  await expect
+    .poll(() =>
+      image.evaluate((element: HTMLImageElement) => element.naturalWidth),
+    )
+    .toBe(256)
+  const [red, green, blue] = await cornerPixel(image)
+  expect(Math.min(red, green, blue)).toBeGreaterThan(240)
+}
+
+test('keeps a shrunken cover after a reload', async ({ page }) => {
+  await page.goto('./')
+  await page.getByRole('button', { name: 'Album hinzufügen' }).click()
+  await page.getByRole('textbox', { name: 'Albumname' }).fill('Kind of Blue')
+  const fileChooserOpened = page.waitForEvent('filechooser')
+  await page.getByRole('button', { name: 'Cover wählen' }).click()
+  await (await fileChooserOpened).setFiles('public/icon-192.png')
+  await expect(page.getByRole('status')).toContainText('Cover gewählt.')
+  await page.getByRole('button', { name: 'Speichern' }).click()
+
+  await page.reload()
+
+  await expectShrunkenCover(
+    albumButton(page, 'Kind of Blue').locator('img.albumCoverThumbnail'),
+  )
+  await albumButton(page, 'Kind of Blue').click()
+  await expectShrunkenCover(page.getByRole('img', { name: 'Album-Cover' }))
 })

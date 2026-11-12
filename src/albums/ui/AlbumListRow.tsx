@@ -5,7 +5,8 @@ import {
   listenedButtonLabel,
 } from '../domain/albumAnnouncements'
 import { listeningsInTotal, listeningsThisMonth } from '../domain/listening'
-import { ArrowUpIcon } from './ArrowUpIcon'
+import { AlbumCoverThumbnail } from './AlbumCover'
+import { SpeakerIcon } from './SpeakerIcon'
 import { CalendarIcon } from './CalendarIcon'
 import { RecordIcon } from './RecordIcon'
 
@@ -46,12 +47,17 @@ export function AlbumListRow({
         aria-label={albumRowLabel(album, now)}
         onClick={() => onOpenAlbum(album)}
       >
-        <span className="albumName">{albumName(album)}</span>
-        <span className="albumStats">
-          <CalendarIcon />
-          {listeningsThisMonth(album, now)}
-          <RecordIcon />
-          {listeningsInTotal(album)}
+        <span className="albumRowContent">
+          <AlbumCoverThumbnail cover={album.cover} />
+          <span className="albumRowText">
+            <span className="albumName">{albumName(album)}</span>
+            <span className="albumStats">
+              <CalendarIcon />
+              {listeningsThisMonth(album, now)}
+              <RecordIcon />
+              {listeningsInTotal(album)}
+            </span>
+          </span>
         </span>
       </button>
       <button
@@ -61,7 +67,7 @@ export function AlbumListRow({
         aria-label={listenedButtonLabel(album)}
         onClick={() => onListen(album)}
       >
-        <ArrowUpIcon />
+        <SpeakerIcon />
       </button>
     </li>
   )

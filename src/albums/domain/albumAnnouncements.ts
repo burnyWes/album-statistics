@@ -4,7 +4,7 @@ import {
   type Album,
   type InvalidAlbumReason,
   type Listening,
-  type NewAlbum,
+  type NamedAlbum,
 } from './album'
 import type { AlbumsMerge } from './albumMerge'
 import { listeningsInTotal, listeningsThisMonth } from './listening'
@@ -12,6 +12,7 @@ import { spokenListeningTime } from './listeningTime'
 
 const messagesByReason: Record<InvalidAlbumReason, string> = {
   titleMissing: 'Bitte einen Albumnamen eingeben.',
+  spotifyLinkInvalid: 'Das ist kein Spotify-Link.',
   alreadyListed: 'Dieses Album gibt es schon.',
 }
 
@@ -24,7 +25,7 @@ export function albumsHeading(albumCount: number): string {
   return albumCount === 0 ? 'Alben' : `Alben, ${albumCount}`
 }
 
-export function albumSavedAnnouncement(album: NewAlbum): string {
+export function albumSavedAnnouncement(album: NamedAlbum): string {
   return `${albumName(album)} gespeichert.`
 }
 
@@ -36,7 +37,7 @@ function remainingAlbumsPhrase(remainingCount: number): string {
 }
 
 export function albumDeletedAnnouncement(
-  album: NewAlbum,
+  album: NamedAlbum,
   remainingCount: number,
 ): string {
   return `${albumName(album)} gelöscht. ${remainingAlbumsPhrase(remainingCount)}`
@@ -54,7 +55,7 @@ export function albumRowLabel(album: Album, now: Date): string {
   return `${albumName(album)}. Diesen Monat ${listeningsThisMonth(album, now)} Mal, insgesamt ${listeningsInTotal(album)} Mal gehört.`
 }
 
-export function listenedButtonLabel(album: NewAlbum): string {
+export function listenedButtonLabel(album: NamedAlbum): string {
   return `${albumName(album)} gehört`
 }
 
@@ -73,7 +74,7 @@ export function listeningTakenBackAnnouncement(
   return `${albumName(album)}: Hören zurückgenommen. ${bothCounts(album, now)}`
 }
 
-export function undoListeningLabel(album: NewAlbum): string {
+export function undoListeningLabel(album: NamedAlbum): string {
   return `Rückgängig: ${albumName(album)}`
 }
 
@@ -116,9 +117,7 @@ export function albumsLoadedAnnouncement(merge: AlbumsMerge): string {
       ? [`${albumCountPhrase(merge.addedAlbums)} neu`]
       : []),
     ...(merge.extendedAlbums > 0
-      ? [
-          `${albumCountPhrase(merge.extendedAlbums)} um ${merge.addedListenings} Mal Hören ergänzt`,
-        ]
+      ? [`${albumCountPhrase(merge.extendedAlbums)} ergänzt`]
       : []),
   ]
   if (changes.length === 0) return 'Daten geladen. Es war nichts Neues dabei.'
@@ -139,3 +138,12 @@ const announcementsByShareResult: Record<ShareResult, string> = {
 export function shareAnnouncement(result: ShareResult): string {
   return announcementsByShareResult[result]
 }
+
+export const storageFullMessage =
+  'Der Speicher ist voll. Es wurde nichts geändert.'
+
+export const unreadableCoverMessage = 'Dieses Bild konnte nicht gelesen werden.'
+
+export const coverChosenAnnouncement = 'Cover gewählt.'
+
+export const coverRemovedAnnouncement = 'Cover entfernt.'

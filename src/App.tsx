@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { AlbumsClient } from './albums/api/albumsClient'
+import type { CoverImageClient } from './albums/api/coverImageClient'
 import { AlbumsArea } from './albums/ui/AlbumsArea'
 import { AlbumsBackupPage } from './albums/ui/AlbumsBackupPage'
 import { RecordIcon } from './albums/ui/RecordIcon'
@@ -39,6 +40,7 @@ type AppProps = {
   appUpdateClient: AppUpdateClient
   albumsClient: AlbumsClient
   fileExportClient: FileExportClient
+  coverImageClient: CoverImageClient
   clock: () => Date
 }
 
@@ -48,6 +50,7 @@ export function App({
   appUpdateClient,
   albumsClient,
   fileExportClient,
+  coverImageClient,
   clock,
 }: AppProps) {
   const { spokenText, announce } = useAnnouncer()
@@ -96,7 +99,7 @@ export function App({
     {
       kind: 'action',
       id: 'albumsBackup',
-      label: 'Daten speichern und laden',
+      label: 'Daten speichern / laden',
       onSelect: () => setSettingsPage({ kind: 'backup' }),
     },
     ...installEntries,
@@ -120,6 +123,7 @@ export function App({
       {activeArea === 'albums' && (
         <AlbumsArea
           albumsClient={albumsClient}
+          coverImageClient={coverImageClient}
           clock={clock}
           announce={announce}
           navigation={navigation}

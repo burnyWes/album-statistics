@@ -7,6 +7,8 @@ import {
   albumSavedAnnouncement,
   albumsLoadedAnnouncement,
   albumsSavedAnnouncement,
+  coverChosenAnnouncement,
+  coverRemovedAnnouncement,
   albumsHeading,
   deleteListeningLabel,
   deleteListeningQuestion,
@@ -17,8 +19,10 @@ import {
   listeningsHeading,
   listeningTakenBackAnnouncement,
   shareAnnouncement,
+  storageFullMessage,
   undoListeningLabel,
   unreadableAlbumsFileMessage,
+  unreadableCoverMessage,
 } from './albumAnnouncements'
 import { listeningAt } from './listening'
 
@@ -45,8 +49,33 @@ describe('albumFailureMessage', () => {
     )
   })
 
+  it('names a link that is no spotify link', () => {
+    expect(albumFailureMessage(new InvalidAlbum('spotifyLinkInvalid'))).toBe(
+      'Das ist kein Spotify-Link.',
+    )
+  })
+
   it('knows no message for foreign errors', () => {
     expect(albumFailureMessage(new Error('broken'))).toBeNull()
+  })
+})
+
+describe('storage and cover texts', () => {
+  it('names a full storage', () => {
+    expect(storageFullMessage).toBe(
+      'Der Speicher ist voll. Es wurde nichts geändert.',
+    )
+  })
+
+  it('names an unreadable image', () => {
+    expect(unreadableCoverMessage).toBe(
+      'Dieses Bild konnte nicht gelesen werden.',
+    )
+  })
+
+  it('announces a chosen and a removed cover', () => {
+    expect(coverChosenAnnouncement).toBe('Cover gewählt.')
+    expect(coverRemovedAnnouncement).toBe('Cover entfernt.')
   })
 })
 
@@ -69,6 +98,8 @@ function kindOfBlueListened(times: number): Album {
     id: 'kind-of-blue',
     title: 'Kind of Blue',
     artist: 'Miles Davis',
+    spotifyLink: null,
+    cover: null,
     listenings: Array.from({ length: times }, () => '2026-11-12T18:04:00.000Z'),
   }
 }
@@ -205,12 +236,8 @@ describe('deleting a listening', () => {
 })
 
 describe('saving and loading data', () => {
-  function merged(
-    addedAlbums: number,
-    extendedAlbums: number,
-    addedListenings: number,
-  ) {
-    return { albums: [], addedAlbums, extendedAlbums, addedListenings }
+  function merged(addedAlbums: number, extendedAlbums: number) {
+    return { albums: [], addedAlbums, extendedAlbums }
   }
 
   it('announces the saved file', () => {
@@ -220,31 +247,34 @@ describe('saving and loading data', () => {
   })
 
   it('announces new and extended albums', () => {
-    expect(albumsLoadedAnnouncement(merged(3, 2, 25))).toBe(
-      'Daten geladen. 3 Alben neu, 2 Alben um 25 Mal Hören ergänzt.',
+    expect(albumsLoadedAnnouncement(merged(2, 3))).toBe(
+      'Daten geladen. 2 Alben neu, 3 Alben ergänzt.',
     )
   })
 
   it('announces only new albums', () => {
-    expect(albumsLoadedAnnouncement(merged(3, 0, 0))).toBe(
-      'Daten geladen. 3 Alben neu.',
+    expect(albumsLoadedAnnouncement(merged(2, 0))).toBe(
+      'Daten geladen. 2 Alben neu.',
     )
   })
 
   it('announces only extended albums', () => {
-    expect(albumsLoadedAnnouncement(merged(0, 2, 25))).toBe(
-      'Daten geladen. 2 Alben um 25 Mal Hören ergänzt.',
+    expect(albumsLoadedAnnouncement(merged(0, 3))).toBe(
+      'Daten geladen. 3 Alben ergänzt.',
     )
   })
 
-  it('names a single album and listening', () => {
-    expect(albumsLoadedAnnouncement(merged(1, 1, 1))).toBe(
-      'Daten geladen. 1 Album neu, 1 Album um 1 Mal Hören ergänzt.',
+  it('names a single album', () => {
+    expect(albumsLoadedAnnouncement(merged(1, 1))).toBe(
+      'Daten geladen. 1 Album neu, 1 Album ergänzt.',
+    )
+    expect(albumsLoadedAnnouncement(merged(0, 1))).toBe(
+      'Daten geladen. 1 Album ergänzt.',
     )
   })
 
   it('announces that nothing was new', () => {
-    expect(albumsLoadedAnnouncement(merged(0, 0, 0))).toBe(
+    expect(albumsLoadedAnnouncement(merged(0, 0))).toBe(
       'Daten geladen. Es war nichts Neues dabei.',
     )
   })

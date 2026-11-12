@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { albumsFileText } from './albums/api/albumsFile'
 import { createInMemoryAlbumsClient } from './albums/api/inMemoryAlbumsClient'
+import { createInMemoryCoverImageClient } from './albums/api/inMemoryCoverImageClient'
 import type { Album } from './albums/domain/album'
 import { App } from './App'
 import type { ColorInversion } from './shared/appearance/appearanceClient'
@@ -30,6 +31,7 @@ function renderApp({
       appUpdateClient={appUpdateClient}
       albumsClient={albumsClient}
       fileExportClient={fileExportClient}
+      coverImageClient={createInMemoryCoverImageClient()}
       clock={() => new Date(2026, 10, 15, 12, 0)}
     />,
   )
@@ -64,7 +66,7 @@ function areaButton(name: string) {
 }
 
 function backupEntry() {
-  return screen.getByRole('button', { name: 'Daten speichern und laden' })
+  return screen.getByRole('button', { name: 'Daten speichern / laden' })
 }
 
 async function openBackup() {
@@ -102,6 +104,8 @@ describe('App', () => {
           id: 'kind-of-blue',
           title: 'Kind of Blue',
           artist: 'Miles Davis',
+          spotifyLink: null,
+          cover: null,
           listenings: [],
         },
       ],
@@ -283,7 +287,7 @@ describe('App', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'Daten speichern und laden',
+        name: 'Daten speichern / laden',
       }),
     ).toHaveFocus()
     expect(
@@ -338,6 +342,8 @@ describe('App', () => {
               id: 'kind-of-blue',
               title: 'Kind of Blue',
               artist: 'Miles Davis',
+              spotifyLink: null,
+              cover: null,
               listenings: ['2026-11-12T18:04:00.000Z'],
             },
           ]),

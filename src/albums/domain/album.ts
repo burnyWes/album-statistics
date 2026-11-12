@@ -1,17 +1,31 @@
+import type { Cover } from './cover'
+import { parseSpotifyLink, type SpotifyLink } from './spotifyLink'
+
 export type AlbumId = string
 
 export type Listening = string
 
-export type AlbumDraft = { title: string; artist: string }
+export type AlbumDraft = {
+  title: string
+  artist: string
+  spotifyLink: string
+  cover: Cover | null
+}
 
-export type NewAlbum = { title: string; artist: string }
+export type NamedAlbum = { title: string; artist: string }
+
+export type NewAlbum = NamedAlbum & {
+  spotifyLink: SpotifyLink | null
+  cover: Cover | null
+}
 
 export type Album = NewAlbum & {
   id: AlbumId
   listenings: readonly Listening[]
 }
 
-export type InvalidAlbumReason = 'titleMissing' | 'alreadyListed'
+export type InvalidAlbumReason =
+  'titleMissing' | 'spotifyLinkInvalid' | 'alreadyListed'
 
 export class InvalidAlbum extends Error {
   reason: InvalidAlbumReason
@@ -25,7 +39,7 @@ export class InvalidAlbum extends Error {
 
 const collator = new Intl.Collator('de', { sensitivity: 'base', numeric: true })
 
-export function isSameAlbum(one: NewAlbum, other: NewAlbum): boolean {
+export function isSameAlbum(one: NamedAlbum, other: NamedAlbum): boolean {
   return (
     collator.compare(one.title, other.title) === 0 &&
     collator.compare(one.artist, other.artist) === 0
@@ -34,28 +48,30 @@ export function isSameAlbum(one: NewAlbum, other: NewAlbum): boolean {
 
 export function newAlbum(
   draft: AlbumDraft,
-  otherAlbums: readonly NewAlbum[],
+  otherAlbums: readonly NamedAlbum[],
 ): NewAlbum {
-  const album = { title: draft.title.trim(), artist: draft.artist.trim() }
-  if (album.title === '') throw new InvalidAlbum('titleMissing')
-  if (otherAlbums.some((other) => isSameAlbum(album, other)))
+  const name = { title: draft.title.trim(), artist: draft.artist.trim() }
+  if (name.title === '') throw new InvalidAlbum('titleMissing')
+  const spotifyLink = parseSpotifyLink(draft.spotifyLink)
+  if (!spotifyLink.valid) throw new InvalidAlbum('spotifyLinkInvalid')
+  if (otherAlbums.some((other) => isSameAlbum(name, other)))
     throw new InvalidAlbum('alreadyListed')
-  return album
+  return { ...name, spotifyLink: spotifyLink.link, cover: draft.cover }
 }
 
-function compareByTitle(one: NewAlbum, other: NewAlbum): number {
+function compareByTitle(one: NamedAlbum, other: NamedAlbum): number {
   return (
     collator.compare(one.title, other.title) ||
     collator.compare(one.artist, other.artist)
   )
 }
 
-export function byTitle<SortedAlbum extends NewAlbum>(
+export function byTitle<SortedAlbum extends NamedAlbum>(
   albums: readonly SortedAlbum[],
 ): SortedAlbum[] {
   return [...albums].sort(compareByTitle)
 }
 
-export function albumName(album: NewAlbum): string {
+export function albumName(album: NamedAlbum): string {
   return album.artist === '' ? album.title : `${album.title}, ${album.artist}`
 }

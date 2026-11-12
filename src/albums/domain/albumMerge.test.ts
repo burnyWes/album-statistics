@@ -21,16 +21,26 @@ const kindOfBlue: Album = {
   id: 'kind-of-blue',
   title: 'Kind of Blue',
   artist: 'Miles Davis',
+  spotifyLink: null,
+  cover: null,
   listenings: [A, A, B],
 }
+
+const LINK = 'https://open.spotify.com/album/kind-of-blue'
+const OTHER_LINK = 'https://open.spotify.com/album/other'
 
 function loaded(
   title: string,
   artist: string,
   listenings: string[] = [],
+  spotifyLink: string | null = null,
+  cover: string | null = null,
 ): LoadedAlbum {
-  return { title, artist, listenings }
+  return { title, artist, spotifyLink, cover, listenings }
 }
+
+const COVER = 'data:image/jpeg;base64,/9j/4AAQSkZJRg=='
+const OTHER_COVER = 'data:image/png;base64,iVBORw0KGgo='
 
 describe('mergeAlbums', () => {
   it('adds albums that are not present yet', () => {
@@ -45,6 +55,8 @@ describe('mergeAlbums', () => {
         id: 'loaded-1',
         title: 'The Wall',
         artist: 'Pink Floyd',
+        spotifyLink: null,
+        cover: null,
         listenings: [D],
       },
     ])
@@ -73,7 +85,6 @@ describe('mergeAlbums', () => {
 
     expect(merge.albums[0].listenings).toEqual([A, A, B, C])
     expect(merge.extendedAlbums).toBe(1)
-    expect(merge.addedListenings).toBe(1)
   })
 
   it('keeps the higher count of equal listenings', () => {
@@ -92,7 +103,7 @@ describe('mergeAlbums', () => {
     )
 
     expect(moreOnFile.albums[0].listenings).toEqual([A, A, A])
-    expect(moreOnFile.addedListenings).toBe(2)
+    expect(moreOnFile.extendedAlbums).toBe(1)
   })
 
   it('compares listenings by time, not by text', () => {
@@ -103,7 +114,7 @@ describe('mergeAlbums', () => {
     )
 
     expect(merge.albums[0].listenings).toEqual(['2026-11-12T18:00:00.000Z'])
-    expect(merge.addedListenings).toBe(0)
+    expect(merge.extendedAlbums).toBe(0)
   })
 
   it('changes nothing when merging the same albums again', () => {
@@ -115,7 +126,6 @@ describe('mergeAlbums', () => {
       albums: present,
       addedAlbums: 0,
       extendedAlbums: 0,
-      addedListenings: 0,
     })
   })
 
@@ -137,12 +147,13 @@ describe('mergeAlbums', () => {
           id: 'loaded-1',
           title: 'The Wall',
           artist: 'Pink Floyd',
+          spotifyLink: null,
+          cover: null,
           listenings: [D, E],
         },
       ],
       addedAlbums: 1,
       extendedAlbums: 1,
-      addedListenings: 1,
     })
   })
 
@@ -164,8 +175,88 @@ describe('mergeAlbums', () => {
       loadedIds(),
     )
 
-    expect(merge.addedListenings).toBe(0)
     expect(merge.extendedAlbums).toBe(0)
+  })
+
+  it('takes the link of a new album', () => {
+    const merge = mergeAlbums(
+      [],
+      [loaded('The Wall', 'Pink Floyd', [], LINK)],
+      loadedIds(),
+    )
+
+    expect(merge.albums[0].spotifyLink).toBe(LINK)
+  })
+
+  it('adds a link missing on the device without new listenings', () => {
+    const merge = mergeAlbums(
+      [kindOfBlue],
+      [loaded('Kind of Blue', 'Miles Davis', [A], LINK)],
+      loadedIds(),
+    )
+
+    expect(merge.albums).toEqual([{ ...kindOfBlue, spotifyLink: LINK }])
+    expect(merge.extendedAlbums).toBe(1)
+  })
+
+  it('keeps a link present on the device', () => {
+    const present = [{ ...kindOfBlue, spotifyLink: LINK }]
+
+    const merge = mergeAlbums(
+      present,
+      [loaded('Kind of Blue', 'Miles Davis', [], OTHER_LINK)],
+      loadedIds(),
+    )
+
+    expect(merge.albums).toEqual(present)
+    expect(merge.extendedAlbums).toBe(0)
+  })
+
+  it('adds a cover missing on the device', () => {
+    const merge = mergeAlbums(
+      [kindOfBlue],
+      [loaded('Kind of Blue', 'Miles Davis', [], null, COVER)],
+      loadedIds(),
+    )
+
+    expect(merge.albums).toEqual([{ ...kindOfBlue, cover: COVER }])
+    expect(merge.extendedAlbums).toBe(1)
+  })
+
+  it('keeps a cover present on the device', () => {
+    const present = [{ ...kindOfBlue, cover: COVER }]
+
+    const merge = mergeAlbums(
+      present,
+      [loaded('Kind of Blue', 'Miles Davis', [], null, OTHER_COVER)],
+      loadedIds(),
+    )
+
+    expect(merge.albums).toEqual(present)
+    expect(merge.extendedAlbums).toBe(0)
+  })
+
+  it('takes the cover of a new album', () => {
+    const merge = mergeAlbums(
+      [],
+      [loaded('The Wall', 'Pink Floyd', [], null, COVER)],
+      loadedIds(),
+    )
+
+    expect(merge.albums[0].cover).toBe(COVER)
+  })
+
+  it('counts an album extended by listenings and link once', () => {
+    const merge = mergeAlbums(
+      [kindOfBlue],
+      [loaded('Kind of Blue', 'Miles Davis', [C], LINK)],
+      loadedIds(),
+    )
+
+    expect(merge.albums).toEqual([
+      { ...kindOfBlue, spotifyLink: LINK, listenings: [A, A, B, C] },
+    ])
+    expect(merge.extendedAlbums).toBe(1)
   })
 })
 

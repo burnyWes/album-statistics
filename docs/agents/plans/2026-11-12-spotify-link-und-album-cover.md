@@ -303,19 +303,19 @@ Die Sicherungsseite heißt „Daten speichern / laden“, und der „Gehört“-
 Lautsprecher.
 
 **Aufgaben**:
-- [ ] Tests zuerst: `App.test.tsx:67,286`, `AlbumsBackupPage.test.tsx:85` und
+- [x] Tests zuerst: `App.test.tsx:67,286`, `AlbumsBackupPage.test.tsx:85` und
   `e2e/backup.spec.ts:13` erwarten „Daten speichern / laden“.
-- [ ] `App.tsx:99` und `AlbumsBackupPage.tsx:89` umbenennen.
-- [ ] `src/albums/ui/SpeakerIcon.tsx` anlegen (Pfade siehe oben, `className="buttonIcon"`,
+- [x] `App.tsx:99` und `AlbumsBackupPage.tsx:89` umbenennen.
+- [x] `src/albums/ui/SpeakerIcon.tsx` anlegen (Pfade siehe oben, `className="buttonIcon"`,
   `aria-hidden`, `focusable="false"` wie `ArrowUpIcon`).
-- [ ] `AlbumListRow.tsx` und `AlbumDetailPage.tsx` auf `SpeakerIcon` umstellen,
+- [x] `AlbumListRow.tsx` und `AlbumDetailPage.tsx` auf `SpeakerIcon` umstellen,
   `ArrowUpIcon.tsx` löschen.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter die umbenannten Erwartungen.
-- [ ] `grep -rn "ArrowUpIcon\|Daten speichern und laden" src e2e` findet nichts.
-- [ ] `npm run lint` und `npm run build` laufen durch.
-- [ ] `npx playwright test e2e/backup.spec.ts` grün.
+- [x] `npm run test` grün, darunter die umbenannten Erwartungen.
+- [x] `grep -rn "ArrowUpIcon\|Daten speichern und laden" src e2e` findet nichts.
+- [x] `npm run lint` und `npm run build` laufen durch.
+- [x] `npx playwright test e2e/backup.spec.ts` grün.
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy zeigen Albumzeile und Detailseite einen gut erkennbaren Lautsprecher
@@ -329,7 +329,7 @@ Ein Album kann einen Spotify-Link tragen, der gespeichert, gesichert, geladen un
 Detailseite als Button angeboten wird.
 
 **Aufgaben**:
-- [ ] `spotifyLink.test.ts` zuerst, nach dem Vorbild `WishLink.test.ts`:
+- [x] `spotifyLink.test.ts` zuerst, nach dem Vorbild `WishLink.test.ts`:
   - `''` und `'   '` → kein Link.
   - `' open.spotify.com/album/x '` → `https://open.spotify.com/album/x`.
   - `https://open.spotify.com/album/x?si=abc` bleibt samt Query erhalten.
@@ -339,57 +339,57 @@ Detailseite als Button angeboten wird.
     `https://example.com`, `https://open.spotify.com.evil.de/x`, `foo`, `https://`.
   - `isSpotifyLink` ist für normalisierte `href` wahr, für nicht normalisierte und
     fremde Adressen falsch.
-- [ ] `spotifyLink.ts` umsetzen: Schema-Erkennung wie `WishLink.ts`, dann
+- [x] `spotifyLink.ts` umsetzen: Schema-Erkennung wie `WishLink.ts`, dann
   `url.protocol ∈ {http:, https:}` und `url.hostname ∈ {open.spotify.com, spotify.link}`.
-- [ ] `album.test.ts` erweitern: `newAlbum` übernimmt den normalisierten Link, liefert
+- [x] `album.test.ts` erweitern: `newAlbum` übernimmt den normalisierten Link, liefert
   `null` für leer, wirft `InvalidAlbum('spotifyLinkInvalid')` für ungültig; ein fehlender
   Titel geht einem ungültigen Link vor.
-- [ ] `album.ts`: Typen und `newAlbum` erweitern (zunächst nur `spotifyLink`; `cover`
+- [x] `album.ts`: Typen und `newAlbum` erweitern (zunächst nur `spotifyLink`; `cover`
   folgt in Phase 3). Alle Testdaten und `draftOf` (`AlbumFormPage.tsx:23`) anpassen.
-- [ ] `albumsFile.test.ts` zuerst: Datei/Speicher ohne `spotifyLink` → `null`; gültiger
+- [x] `albumsFile.test.ts` zuerst: Datei/Speicher ohne `spotifyLink` → `null`; gültiger
   Link wird gelesen; ungültiger Link → `UnreadableAlbumsFile` bzw. Speicher wird
   beiseitegelegt; `albumsFileText` schreibt `spotifyLink`.
-- [ ] `albumsFile.ts`: `isStoredAlbum` und Normalisierung umsetzen; `albumsFromFileText`
+- [x] `albumsFile.ts`: `isStoredAlbum` und Normalisierung umsetzen; `albumsFromFileText`
   reicht `spotifyLink` in `LoadedAlbum` durch.
-- [ ] `albumMerge.test.ts` zuerst: neues Album übernimmt den Link; vorhandenes Album ohne
+- [x] `albumMerge.test.ts` zuerst: neues Album übernimmt den Link; vorhandenes Album ohne
   Link bekommt ihn **ohne neue Hörzeitpunkte** und zählt als ergänzt; vorhandener Link
   bleibt; ein Album, das Hören und Link bekommt, zählt einmal. Die bestehenden
   Erwartungen auf `addedListenings` (`albumMerge.test.ts:76,95,106,118,145,167`)
   entfallen bzw. werden auf `extendedAlbums` umgestellt.
-- [ ] `albumMerge.ts` umbauen: das frühe `continue` (`:76`) entfällt; erst Hörzeitpunkte
+- [x] `albumMerge.ts` umbauen: das frühe `continue` (`:76`) entfällt; erst Hörzeitpunkte
   ergänzen und Lücken bei Link/Cover füllen, dann vergleichen, ob sich das Album
   geändert hat, und nur dann ersetzen und zählen.
-- [ ] `albumAnnouncements.test.ts` zuerst: Meldung „Das ist kein Spotify-Link.“; Ansagen
+- [x] `albumAnnouncements.test.ts` zuerst: Meldung „Das ist kein Spotify-Link.“; Ansagen
   „Daten geladen. 2 Alben neu, 3 Alben ergänzt.“, „Daten geladen. 1 Album ergänzt.“,
   „Daten geladen. Es war nichts Neues dabei.“ Den Testhelfer
   (`albumAnnouncements.test.ts:211-242`), der `addedListenings` baut, anpassen.
-- [ ] `albumAnnouncements.ts` umsetzen.
-- [ ] `AlbumsBackupPage.test.tsx:134` von „… 1 Album um 1 Mal Hören ergänzt.“ auf
+- [x] `albumAnnouncements.ts` umsetzen.
+- [x] `AlbumsBackupPage.test.tsx:134` von „… 1 Album um 1 Mal Hören ergänzt.“ auf
   „… 1 Album ergänzt.“ umstellen; `e2e/backup.spec.ts` auf alte Formulierungen prüfen.
-- [ ] `AlbumsArea.test.tsx` zuerst:
+- [x] `AlbumsArea.test.tsx` zuerst:
   - Album mit Link anlegen → Detailseite hat den Link „Auf Spotify öffnen“ mit `href`
     `https://open.spotify.com/album/x`, `target="_blank"` und `rel="noopener"`.
   - Ohne Link gibt es ihn nicht.
   - Ungültiger Link: Meldung sichtbar und angesagt, Fokus im Link-Feld, nichts gespeichert.
   - Bearbeiten zeigt den gespeicherten Link vorbelegt; Leeren entfernt ihn.
-- [ ] `AlbumFormPage.tsx`: Feld `albumSpotifyLink` mit Label „Spotify-Link (optional)“,
+- [x] `AlbumFormPage.tsx`: Feld `albumSpotifyLink` mit Label „Spotify-Link (optional)“,
   `type="url"`, `autoCapitalize="off"`, `autoCorrect="off"`, `autoComplete="off"`,
   `aria-describedby="albumFailure"`. Den Fokus nach einem Fehler über eine benannte
   Zuordnung Grund → Feld setzen (`titleMissing`/`alreadyListed` → Titel,
   `spotifyLinkInvalid` → Link).
-- [ ] `ExternalLinkIcon.tsx` anlegen; `AlbumDetailPage.tsx`: nach `.albumDetailStats`
+- [x] `ExternalLinkIcon.tsx` anlegen; `AlbumDetailPage.tsx`: nach `.albumDetailStats`
   `<a className="linkButton" href={album.spotifyLink} target="_blank" rel="noopener">`.
-- [ ] `index.css`: `.linkButton` mit derselben Optik wie Buttons (Farben, Rahmen, Höhe
+- [x] `index.css`: `.linkButton` mit derselben Optik wie Buttons (Farben, Rahmen, Höhe
   ≥ 44px, Icon-Abstand), sodass er beide Invertierungen mitmacht.
-- [ ] `e2e/albums.spec.ts`: Album mit Link anlegen, neu laden, Detailseite hat den Link mit
+- [x] `e2e/albums.spec.ts`: Album mit Link anlegen, neu laden, Detailseite hat den Link mit
   der normalisierten Adresse.
-- [ ] `e2e/backup.spec.ts`: im Rundlauf-Test einen Link mitgeben und nach dem Laden auf
+- [x] `e2e/backup.spec.ts`: im Rundlauf-Test einen Link mitgeben und nach dem Laden auf
   der Detailseite prüfen.
 
 **Automatisierte Verifikation**:
-- [ ] `npx vitest run src/albums` grün, inklusive der neuen Fälle oben.
-- [ ] `npm run test`, `npm run lint`, `npm run build` laufen durch.
-- [ ] `npx playwright test` grün.
+- [x] `npx vitest run src/albums` grün, inklusive der neuen Fälle oben.
+- [x] `npm run test`, `npm run lint`, `npm run build` laufen durch.
+- [x] `npx playwright test` grün.
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Android-Handy einen über „Teilen → Link kopieren“ aus der Spotify-App
@@ -405,32 +405,32 @@ Ein Album kann ein Cover tragen, das in Liste und Detailseite erscheint, gesiche
 geladen wird. Eine volle Quota wird sichtbar.
 
 **Aufgaben**:
-- [ ] `cover.test.ts` zuerst: `isCover` wahr für `data:image/jpeg;base64,…` und
+- [x] `cover.test.ts` zuerst: `isCover` wahr für `data:image/jpeg;base64,…` und
   `data:image/png;base64,…`; falsch für `data:image/svg+xml;…`, `data:text/html;…`,
   `https://…`, `''`, kaputtes Base64 und Nicht-Strings.
-- [ ] `cover.ts` umsetzen.
-- [ ] `album.ts`: `cover` in `AlbumDraft`/`NewAlbum`, `newAlbum` übernimmt es
+- [x] `cover.ts` umsetzen.
+- [x] `album.ts`: `cover` in `AlbumDraft`/`NewAlbum`, `newAlbum` übernimmt es
   unverändert; Testdaten anpassen.
-- [ ] `albumsFile.test.ts` / `albumsFile.ts`: wie beim Link: fehlend → `null`, gültig
+- [x] `albumsFile.test.ts` / `albumsFile.ts`: wie beim Link: fehlend → `null`, gültig
   wird gelesen und geschrieben, ungültig → nicht lesbar.
-- [ ] `albumMerge.test.ts` / `albumMerge.ts`: Cover füllt Lücke und zählt als ergänzt;
+- [x] `albumMerge.test.ts` / `albumMerge.ts`: Cover füllt Lücke und zählt als ergänzt;
   vorhandenes Cover bleibt.
-- [ ] `localStorageAlbumsClient.test.ts` zuerst: Speicher-Fake, dessen `setItem` eine
+- [x] `localStorageAlbumsClient.test.ts` zuerst: Speicher-Fake, dessen `setItem` eine
   `DOMException('…', 'QuotaExceededError')` wirft → `writeAlbums` wirft
   `AlbumsStorageFull`; ein anderer Fehler bleibt still; `null`-Speicher bleibt still.
-- [ ] `albumsClient.ts` (`AlbumsStorageFull`) und `localStorageAlbumsClient.ts`
+- [x] `albumsClient.ts` (`AlbumsStorageFull`) und `localStorageAlbumsClient.ts`
   umsetzen; `inMemoryAlbumsClient.ts` bekommt `storageFull()`.
-- [ ] `useAlbums.ts`: Reihenfolge Schreiben → Zustand besteht schon; per Test absichern,
+- [x] `useAlbums.ts`: Reihenfolge Schreiben → Zustand besteht schon; per Test absichern,
   dass bei geworfenem `AlbumsStorageFull` der Zustand unverändert bleibt und der Fehler
   zum Aufrufer durchläuft.
-- [ ] `albumAnnouncements.test.ts` / `.ts`: „Der Speicher ist voll. Es wurde nichts
+- [x] `albumAnnouncements.test.ts` / `.ts`: „Der Speicher ist voll. Es wurde nichts
   geändert.“, „Dieses Bild konnte nicht gelesen werden.“, „Cover gewählt.“,
   „Cover entfernt.“
-- [ ] `coverImageClient.ts`, `inMemoryCoverImageClient.ts`,
+- [x] `coverImageClient.ts`, `inMemoryCoverImageClient.ts`,
   `browserCoverImageClient.ts` anlegen; `main.tsx` erzeugt den Browser-Adapter,
   `App.tsx` → `AlbumsArea` → `AlbumFormPage` reichen ihn durch; `App.test.tsx` und
   `AlbumsArea.test.tsx` nutzen den In-Memory-Fake.
-- [ ] `AlbumsArea.test.tsx` zuerst:
+- [x] `AlbumsArea.test.tsx` zuerst:
   - Cover wählen (über `userEvent.upload` auf das Datei-Input; Test-Dateien mit
     `{ type: 'image/png' }`, weil user-event 14 nach `accept` filtert) → Vorschau mit
     Alternativtext „Album-Cover“, Ansage „Cover gewählt.“, Buttons „Cover ändern“ und
@@ -448,36 +448,36 @@ geladen wird. Eine volle Quota wird sichtbar.
     offen, Fokus auf „Speichern“, Liste unverändert.
   - Voller Speicher beim „gehört“-Button in Liste und Detailseite → nur Ansage, Zähler
     unverändert, keine Rückgängig-Möglichkeit.
-- [ ] `AlbumsBackupPage.test.tsx` zuerst: voller Speicher beim Laden → Meldung sichtbar und
+- [x] `AlbumsBackupPage.test.tsx` zuerst: voller Speicher beim Laden → Meldung sichtbar und
   angesagt, Alben unverändert.
-- [ ] `CoverField.tsx`, `ImageIcon.tsx`, `AlbumCover.tsx` umsetzen; `AlbumFormPage.tsx`
+- [x] `CoverField.tsx`, `ImageIcon.tsx`, `AlbumCover.tsx` umsetzen; `AlbumFormPage.tsx`
   bindet `CoverField` nach dem Link-Feld ein, sperrt „Speichern“, solange das Cover
   verarbeitet wird, und verwirft ein spät eintreffendes Ergebnis nach dem Verlassen der
   Seite. `AlbumsStorageFull` aus `onSave` wird gefangen: Meldung sichtbar und angesagt,
   Fokus bleibt auf „Speichern“ (eigener Zweig neben `albumFailureMessage`, kein Feld-
   Fokus).
-- [ ] `AlbumsArea.tsx`: `listenTo`/`listenFromDetails` fangen `AlbumsStorageFull` und
+- [x] `AlbumsArea.tsx`: `listenTo`/`listenFromDetails` fangen `AlbumsStorageFull` und
   sagen die Meldung an; `saveAlbum` wechselt die Seite nur nach erfolgreichem Speichern.
-- [ ] `AlbumsBackupPage.tsx`: `AlbumsStorageFull` beim Laden wie `UnreadableAlbumsFile`
+- [x] `AlbumsBackupPage.tsx`: `AlbumsStorageFull` beim Laden wie `UnreadableAlbumsFile`
   behandeln, nur mit eigener Meldung.
-- [ ] `AlbumListRow.tsx`: Zeilen-Button bekommt `.albumRowContent` mit
+- [x] `AlbumListRow.tsx`: Zeilen-Button bekommt `.albumRowContent` mit
   `AlbumCoverThumbnail` links und `.albumRowText` (Name, Zahlen) rechts.
-- [ ] `AlbumDetailPage.tsx`: `AlbumDetailCover` zwischen `h1` und `.albumDetailStats`.
-- [ ] `index.css`: Vorschaubild 56 × 56 und Detailbild 160 × 160 mit `object-fit: cover`
+- [x] `AlbumDetailPage.tsx`: `AlbumDetailCover` zwischen `h1` und `.albumDetailStats`.
+- [x] `index.css`: Vorschaubild 56 × 56 und Detailbild 160 × 160 mit `object-fit: cover`
   und Rahmen in `--accentLine`; Platzhalter mit `--surface`-Hintergrund und dem
   `RecordIcon` in `--ink`; `.coverField` mit Vorschau (96 × 96) und untereinander
   stehenden Buttons.
-- [ ] `e2e/albums.spec.ts`: Cover über `setInputFiles('public/icon-192.png')` wählen,
+- [x] `e2e/albums.spec.ts`: Cover über `setInputFiles('public/icon-192.png')` wählen,
   speichern, neu laden. Liste und Detailseite zeigen ein Bild, dessen `src` mit
   `data:image/jpeg;base64,` beginnt und dessen `naturalWidth` 256 ist. Das Bild hat
   transparente Ecken; per Canvas im Browser prüfen, dass das Eckpixel weiß ist.
-- [ ] `e2e/backup.spec.ts`: Rundlauf mit Cover; nach dem Laden hat die Detailseite das
+- [x] `e2e/backup.spec.ts`: Rundlauf mit Cover; nach dem Laden hat die Detailseite das
   Cover.
 
 **Automatisierte Verifikation**:
-- [ ] `npx vitest run src/albums` grün, inklusive der neuen Fälle oben.
-- [ ] `npm run test`, `npm run lint`, `npm run build` laufen durch.
-- [ ] `npx playwright test` grün, inklusive des Browser-Adapters über das E2E-Cover.
+- [x] `npx vitest run src/albums` grün, inklusive der neuen Fälle oben.
+- [x] `npm run test`, `npm run lint`, `npm run build` laufen durch.
+- [x] `npx playwright test` grün, inklusive des Browser-Adapters über das E2E-Cover.
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Android-Handy per „Cover wählen“ einmal ein Foto mit der Kamera aufnehmen und
@@ -496,6 +496,15 @@ geladen wird. Eine volle Quota wird sichtbar.
 - Vor dem E2E-Test zur Transparenz prüfen, ob `public/icon-192.png` wirklich
   transparente Ecken hat; sonst ein kleines transparentes PNG als Testdatei unter
   `e2e/fixtures/` ablegen.
+  Geprüft: Die Ecken sind transparent (`(0, 0, 0, 0)`), die Datei taugt als Testbild.
+- Das Formular trägt `noValidate`. Sonst blockiert die native Prüfung von `type="url"`
+  Adressen ohne Schema (`open.spotify.com/…`), bevor die App `https://` ergänzen kann.
+  Die Wunschliste macht es genauso (`WishForm.svelte:138`).
+- Der Fokus nach „Cover entfernen“ und nach einer erfolgreichen Coverwahl wird direkt im
+  Handler auf den Wahl-Button gesetzt, nicht per Effekt. Der Button bleibt dabei
+  gemountet.
+- `albumName`, `isSameAlbum`, `byTitle` und die Ansagen, die nur den Namen brauchen,
+  nehmen den neuen Typ `NamedAlbum` (`{ title, artist }`) statt `NewAlbum`.
 
 ## Verweise
 

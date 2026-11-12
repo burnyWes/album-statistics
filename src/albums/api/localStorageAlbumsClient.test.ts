@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { DeviceStorage } from '../../shared/storage/deviceStorage'
 import type { Album } from '../domain/album'
+import { AlbumsStorageFull } from './albumsClient'
 import {
   ALBUMS_KEY,
   createLocalStorageAlbumsClient,
@@ -11,6 +12,8 @@ const kindOfBlue: Album = {
   id: 'kind-of-blue',
   title: 'Kind of Blue',
   artist: 'Miles Davis',
+  spotifyLink: null,
+  cover: null,
   listenings: ['2026-11-12T18:04:00.000Z'],
 }
 
@@ -32,6 +35,15 @@ const throwingStorage: DeviceStorage = {
   setItem() {
     throw new Error('storage is blocked')
   },
+}
+
+function fullStorage(errorName: string): DeviceStorage {
+  return {
+    getItem: () => null,
+    setItem() {
+      throw new DOMException('quota exceeded', errorName)
+    },
+  }
 }
 
 describe('localStorageAlbumsClient', () => {
@@ -108,6 +120,28 @@ describe('localStorageAlbumsClient', () => {
     expect(() =>
       createLocalStorageAlbumsClient(null).writeAlbums([kindOfBlue]),
     ).not.toThrow()
+  })
+
+  it.each(['QuotaExceededError', 'NS_ERROR_DOM_QUOTA_REACHED'])(
+    'tells that the storage is full on %s',
+    (errorName) => {
+      expect(() =>
+        createLocalStorageAlbumsClient(fullStorage(errorName)).writeAlbums([
+          kindOfBlue,
+        ]),
+      ).toThrow(AlbumsStorageFull)
+    },
+  )
+
+  it('keeps unreadable data aside silently even when the storage is full', () => {
+    const storage: DeviceStorage = {
+      getItem: (key) => (key === ALBUMS_KEY ? '{kaputt' : null),
+      setItem() {
+        throw new DOMException('quota exceeded', 'QuotaExceededError')
+      },
+    }
+
+    expect(createLocalStorageAlbumsClient(storage).readAlbums()).toEqual([])
   })
 
   it('creates distinct album ids', () => {

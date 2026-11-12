@@ -8,9 +8,11 @@ import {
   listeningsInTotal,
   listeningsThisMonth,
 } from '../domain/listening'
-import { ArrowUpIcon } from './ArrowUpIcon'
+import { SpeakerIcon } from './SpeakerIcon'
+import { AlbumDetailCover } from './AlbumCover'
 import { CalendarIcon } from './CalendarIcon'
 import { EditIcon } from './EditIcon'
+import { ExternalLinkIcon } from './ExternalLinkIcon'
 import { ListeningMonthSection } from './ListeningMonthSection'
 import { ListeningTime } from './ListeningTime'
 import { RecordIcon } from './RecordIcon'
@@ -54,6 +56,7 @@ export function AlbumDetailPage({
       <h1 ref={albumHeading} tabIndex={-1}>
         {albumName(album)}
       </h1>
+      <AlbumDetailCover cover={album.cover} />
       <div className="albumDetailStats">
         <p>
           <CalendarIcon />
@@ -69,6 +72,17 @@ export function AlbumDetailPage({
           </p>
         )}
       </div>
+      {album.spotifyLink !== null && (
+        <a
+          className="linkButton"
+          href={album.spotifyLink}
+          target="_blank"
+          rel="noopener"
+        >
+          <ExternalLinkIcon />
+          Auf Spotify öffnen
+        </a>
+      )}
       <h2 ref={listeningsHeadingElement} tabIndex={-1}>
         {listeningsHeading(album)}
       </h2>
@@ -85,7 +99,7 @@ export function AlbumDetailPage({
       )}
       <BottomBar>
         <button type="button" onClick={onListen}>
-          <ArrowUpIcon />
+          <SpeakerIcon />
           Gehört
         </button>
         <button type="button" onClick={onEdit}>

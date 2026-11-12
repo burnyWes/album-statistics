@@ -1,8 +1,9 @@
 import type { Album } from '../domain/album'
-import type { AlbumsClient } from './albumsClient'
+import { AlbumsStorageFull, type AlbumsClient } from './albumsClient'
 
 export type InMemoryAlbumsClient = AlbumsClient & {
   storedAlbums(): readonly Album[]
+  storageFull(): void
 }
 
 export function createInMemoryAlbumsClient(
@@ -10,10 +11,12 @@ export function createInMemoryAlbumsClient(
 ): InMemoryAlbumsClient {
   let albums = [...initialAlbums]
   let nextId = 1
+  let full = false
 
   return {
     readAlbums: () => [...albums],
     writeAlbums: (written) => {
+      if (full) throw new AlbumsStorageFull()
       albums = [...written]
     },
     createAlbumId: () => {
@@ -22,5 +25,8 @@ export function createInMemoryAlbumsClient(
       return id
     },
     storedAlbums: () => [...albums],
+    storageFull: () => {
+      full = true
+    },
   }
 }

@@ -3,6 +3,7 @@ import {
   type Album,
   type AlbumId,
   type Listening,
+  type NamedAlbum,
   type NewAlbum,
 } from './album'
 import { isListening } from './listening'
@@ -13,7 +14,6 @@ export type AlbumsMerge = {
   albums: Album[]
   addedAlbums: number
   extendedAlbums: number
-  addedListenings: number
 }
 
 export function isLoadableAlbum(album: LoadedAlbum): boolean {
@@ -46,8 +46,32 @@ function listeningsMissingIn(
   return missing
 }
 
-function trimmedName(album: NewAlbum): NewAlbum {
-  return { title: album.title.trim(), artist: album.artist.trim() }
+function withTrimmedName<Named extends NamedAlbum>(album: Named): Named {
+  return {
+    ...album,
+    title: album.title.trim(),
+    artist: album.artist.trim(),
+  }
+}
+
+function completedWith(album: Album, loaded: LoadedAlbum): Album {
+  return {
+    ...album,
+    spotifyLink: album.spotifyLink ?? loaded.spotifyLink,
+    cover: album.cover ?? loaded.cover,
+    listenings: [
+      ...album.listenings,
+      ...listeningsMissingIn(album.listenings, loaded.listenings),
+    ],
+  }
+}
+
+function hasChanged(album: Album, completed: Album): boolean {
+  return (
+    completed.listenings.length !== album.listenings.length ||
+    completed.spotifyLink !== album.spotifyLink ||
+    completed.cover !== album.cover
+  )
 }
 
 export function mergeAlbums(
@@ -58,36 +82,25 @@ export function mergeAlbums(
   const albums = [...present]
   const extendedPositions = new Set<number>()
   let addedAlbums = 0
-  let addedListenings = 0
 
   for (const loadedAlbum of loaded) {
-    const name = trimmedName(loadedAlbum)
-    let position = albums.findIndex((album) => isSameAlbum(album, name))
+    const incoming = withTrimmedName(loadedAlbum)
+    let position = albums.findIndex((album) => isSameAlbum(album, incoming))
     if (position === -1) {
-      albums.push({ ...name, id: createAlbumId(), listenings: [] })
+      albums.push({ ...incoming, id: createAlbumId(), listenings: [] })
       position = albums.length - 1
       addedAlbums += 1
     }
     const album = albums[position]
-    const missing = listeningsMissingIn(
-      album.listenings,
-      loadedAlbum.listenings,
-    )
-    if (missing.length === 0) continue
-    albums[position] = {
-      ...album,
-      listenings: [...album.listenings, ...missing],
-    }
-    if (position < present.length) {
-      extendedPositions.add(position)
-      addedListenings += missing.length
-    }
+    const completed = completedWith(album, incoming)
+    if (!hasChanged(album, completed)) continue
+    albums[position] = completed
+    if (position < present.length) extendedPositions.add(position)
   }
 
   return {
     albums,
     addedAlbums,
     extendedAlbums: extendedPositions.size,
-    addedListenings,
   }
 }

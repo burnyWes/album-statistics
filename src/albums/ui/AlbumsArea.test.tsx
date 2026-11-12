@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { accessibilityViolations } from '../../testSupport/accessibility'
@@ -6,6 +6,11 @@ import {
   createInMemoryAlbumsClient,
   type InMemoryAlbumsClient,
 } from '../api/inMemoryAlbumsClient'
+import {
+  createInMemoryCoverImageClient,
+  TEST_COVER,
+  type InMemoryCoverImageClient,
+} from '../api/inMemoryCoverImageClient'
 import type { Album } from '../domain/album'
 import { listeningAt } from '../domain/listening'
 import { AlbumsArea } from './AlbumsArea'
@@ -16,6 +21,8 @@ const kindOfBlue: Album = {
   id: 'kind-of-blue',
   title: 'Kind of Blue',
   artist: 'Miles Davis',
+  spotifyLink: null,
+  cover: null,
   listenings: [],
 }
 
@@ -24,17 +31,19 @@ function renderArea(
   albumsClient: InMemoryAlbumsClient = createInMemoryAlbumsClient(
     initialAlbums,
   ),
+  coverImageClient: InMemoryCoverImageClient = createInMemoryCoverImageClient(),
 ) {
   const announcements: string[] = []
   const rendered = render(
     <AlbumsArea
       albumsClient={albumsClient}
+      coverImageClient={coverImageClient}
       clock={() => now}
       announce={(text) => announcements.push(text)}
       navigation={<nav aria-label="Bereiche" />}
     />,
   )
-  return { ...rendered, albumsClient, announcements }
+  return { ...rendered, albumsClient, coverImageClient, announcements }
 }
 
 function addAlbumButton() {
@@ -48,6 +57,31 @@ function titleField() {
 function artistField() {
   return screen.getByRole('textbox', { name: 'Bandname (optional)' })
 }
+
+function spotifyLinkField() {
+  return screen.getByRole('textbox', { name: 'Spotify-Link (optional)' })
+}
+
+function spotifyLinkButton() {
+  return screen.queryByRole('link', { name: 'Auf Spotify öffnen' })
+}
+
+function coverInput() {
+  return document.querySelector<HTMLInputElement>('input[type="file"]')!
+}
+
+function chooseCover(fileName = 'cover.png') {
+  return userEvent.upload(
+    coverInput(),
+    new File(['png'], fileName, { type: 'image/png' }),
+  )
+}
+
+function coverImage() {
+  return screen.queryByRole('img', { name: 'Album-Cover' })
+}
+
+const storageFull = 'Der Speicher ist voll. Es wurde nichts geändert.'
 
 function saveButton() {
   return screen.getByRole('button', { name: 'Speichern' })
@@ -115,6 +149,8 @@ const theWall: Album = {
   id: 'the-wall',
   title: 'The Wall',
   artist: 'Pink Floyd',
+  spotifyLink: null,
+  cover: null,
   listenings: [],
 }
 
@@ -164,6 +200,8 @@ describe('AlbumsArea', () => {
         id: 'album-1',
         title: 'Kind of Blue',
         artist: 'Miles Davis',
+        spotifyLink: null,
+        cover: null,
         listenings: [],
       },
     ])
@@ -716,6 +754,236 @@ describe('AlbumsArea', () => {
     const { container } = renderArea([listenedOnThursdayAndInOctober])
     await openAlbum('Kind of Blue, Miles Davis')
     await userEvent.click(button(deleteThursdayListening))
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('opens a saved spotify link from the details', async () => {
+    const { albumsClient } = renderArea()
+    await userEvent.click(addAlbumButton())
+    await fillIn('Kind of Blue', 'Miles Davis')
+    await userEvent.type(spotifyLinkField(), ' open.spotify.com/album/x ')
+    await userEvent.click(saveButton())
+
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    const link = spotifyLinkButton()
+    expect(link).toHaveAttribute('href', 'https://open.spotify.com/album/x')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener')
+    expect(albumsClient.storedAlbums()[0].spotifyLink).toBe(
+      'https://open.spotify.com/album/x',
+    )
+  })
+
+  it('offers no spotify link for an album without one', async () => {
+    renderArea([kindOfBlue])
+
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(spotifyLinkButton()).not.toBeInTheDocument()
+  })
+
+  it('rejects a link that is no spotify link', async () => {
+    const { albumsClient, announcements } = renderArea()
+    await userEvent.click(addAlbumButton())
+    await fillIn('Kind of Blue', 'Miles Davis')
+    await userEvent.type(spotifyLinkField(), 'https://example.com')
+
+    await userEvent.click(saveButton())
+
+    expect(screen.getByText('Das ist kein Spotify-Link.')).toBeInTheDocument()
+    expect(announcements).toEqual(['Das ist kein Spotify-Link.'])
+    expect(spotifyLinkField()).toHaveFocus()
+    expect(spotifyLinkField()).toHaveAccessibleDescription(
+      'Das ist kein Spotify-Link.',
+    )
+    expect(albumsClient.storedAlbums()).toEqual([])
+  })
+
+  it('edits and removes a saved spotify link', async () => {
+    const link = 'https://open.spotify.com/album/x'
+    const { albumsClient } = renderArea([{ ...kindOfBlue, spotifyLink: link }])
+    await editAlbum('Kind of Blue, Miles Davis')
+
+    expect(spotifyLinkField()).toHaveValue(link)
+    await userEvent.clear(spotifyLinkField())
+    await userEvent.click(saveButton())
+
+    expect(spotifyLinkButton()).not.toBeInTheDocument()
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue])
+  })
+
+  it('has no accessibility violations on the details with a spotify link', async () => {
+    const { container } = renderArea([
+      { ...kindOfBlue, spotifyLink: 'https://open.spotify.com/album/x' },
+    ])
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('chooses a cover with a preview and announces it', async () => {
+    const { announcements } = renderArea()
+    await userEvent.click(addAlbumButton())
+    await userEvent.click(button('Cover wählen'))
+
+    await chooseCover()
+
+    expect(
+      await screen.findByRole('img', { name: 'Album-Cover' }),
+    ).toHaveAttribute('src', TEST_COVER)
+    expect(announcements).toEqual(['Cover gewählt.'])
+    expect(button('Cover ändern')).toHaveFocus()
+    expect(button('Cover entfernen')).toBeInTheDocument()
+  })
+
+  it('locks saving while the cover is processed', async () => {
+    const { coverImageClient } = renderArea()
+    coverImageClient.holdBack()
+    await userEvent.click(addAlbumButton())
+
+    await chooseCover()
+
+    expect(saveButton()).toBeDisabled()
+    coverImageClient.deliver()
+    await waitFor(() => expect(saveButton()).toBeEnabled())
+  })
+
+  it('clears a failure after choosing a cover', async () => {
+    renderArea()
+    await userEvent.click(addAlbumButton())
+    await userEvent.click(saveButton())
+
+    await chooseCover()
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Bitte einen Albumnamen eingeben.'),
+      ).not.toBeInTheDocument(),
+    )
+  })
+
+  it('shows a saved cover in the list and on the details', async () => {
+    const { albumsClient } = renderArea()
+    await userEvent.click(addAlbumButton())
+    await fillIn('Kind of Blue', 'Miles Davis')
+    await chooseCover()
+    await screen.findByRole('img', { name: 'Album-Cover' })
+
+    await userEvent.click(saveButton())
+
+    const row = albumButton('Kind of Blue, Miles Davis')
+    expect(row).toHaveAccessibleName(
+      'Kind of Blue, Miles Davis. Diesen Monat 0 Mal, insgesamt 0 Mal gehört.',
+    )
+    expect(row.querySelector('img')).toHaveAttribute('src', TEST_COVER)
+    expect(row.querySelector('img')).toHaveAttribute('alt', '')
+    expect(albumsClient.storedAlbums()[0].cover).toBe(TEST_COVER)
+    await openAlbum('Kind of Blue, Miles Davis')
+    expect(coverImage()).toHaveAttribute('src', TEST_COVER)
+  })
+
+  it('shows a placeholder for an album without cover', async () => {
+    renderArea([kindOfBlue])
+
+    expect(
+      albumButton('Kind of Blue, Miles Davis').querySelector(
+        '.albumCoverPlaceholder',
+      ),
+    ).toHaveAttribute('aria-hidden', 'true')
+    await openAlbum('Kind of Blue, Miles Davis')
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
+  })
+
+  it('removes a cover', async () => {
+    const { albumsClient, announcements } = renderArea([
+      { ...kindOfBlue, cover: TEST_COVER },
+    ])
+    await editAlbum('Kind of Blue, Miles Davis')
+
+    await userEvent.click(button('Cover entfernen'))
+
+    expect(announcements).toEqual(['Cover entfernt.'])
+    expect(button('Cover wählen')).toHaveFocus()
+    expect(coverImage()).not.toBeInTheDocument()
+    await userEvent.click(saveButton())
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue])
+  })
+
+  it('keeps the cover when an image cannot be read', async () => {
+    const { announcements } = renderArea([{ ...kindOfBlue, cover: TEST_COVER }])
+    await editAlbum('Kind of Blue, Miles Davis')
+
+    await chooseCover('unreadable.png')
+
+    expect(
+      await screen.findByText('Dieses Bild konnte nicht gelesen werden.'),
+    ).toBeInTheDocument()
+    expect(announcements).toEqual(['Dieses Bild konnte nicht gelesen werden.'])
+    expect(coverImage()).toHaveAttribute('src', TEST_COVER)
+  })
+
+  it('drops a chosen cover when going back', async () => {
+    const { albumsClient } = renderArea([kindOfBlue])
+    await editAlbum('Kind of Blue, Miles Davis')
+    await chooseCover()
+    await screen.findByRole('img', { name: 'Album-Cover' })
+
+    await userEvent.click(button('Zurück zum Album'))
+
+    expect(coverImage()).not.toBeInTheDocument()
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue])
+  })
+
+  it('keeps the form open when the storage is full', async () => {
+    const { albumsClient, announcements } = renderArea()
+    albumsClient.storageFull()
+    await userEvent.click(addAlbumButton())
+    await fillIn('Kind of Blue', 'Miles Davis{Enter}')
+
+    expect(screen.getByText(storageFull)).toBeInTheDocument()
+    expect(announcements).toEqual([storageFull])
+    expect(heading('Album hinzufügen')).toBeInTheDocument()
+    expect(saveButton()).toHaveFocus()
+    await userEvent.click(button('Zurück zu den Alben'))
+    expect(screen.getByText('Noch keine Alben.')).toBeInTheDocument()
+  })
+
+  it('only announces a full storage when counting a listening', async () => {
+    const { albumsClient, announcements } = renderArea([kindOfBlue])
+    albumsClient.storageFull()
+
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+    expect(announcements).toEqual([storageFull])
+    expect(albumButton('Kind of Blue, Miles Davis')).toHaveAccessibleName(
+      /insgesamt 0 Mal gehört/,
+    )
+    expect(undoButton('Kind of Blue, Miles Davis')).not.toBeInTheDocument()
+
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button('Gehört'))
+
+    expect(announcements).toEqual([storageFull, storageFull])
+    expect(listeningsHeading('Gehört')).toBeInTheDocument()
+  })
+
+  it('has no accessibility violations in the form with a cover', async () => {
+    const { container } = renderArea([{ ...kindOfBlue, cover: TEST_COVER }])
+    await editAlbum('Kind of Blue, Miles Davis')
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('has no accessibility violations on the list and details with a cover', async () => {
+    const { container } = renderArea([
+      { ...kindOfBlue, cover: TEST_COVER },
+      theWall,
+    ])
+    expect(await accessibilityViolations(container)).toEqual([])
+
+    await openAlbum('Kind of Blue, Miles Davis')
 
     expect(await accessibilityViolations(container)).toEqual([])
   })

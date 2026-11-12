@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
-import type { AlbumsClient } from '../api/albumsClient'
+import { AlbumsStorageFull, type AlbumsClient } from '../api/albumsClient'
+import type { CoverImageClient } from '../api/coverImageClient'
 import type { Album, AlbumId, Listening, NewAlbum } from '../domain/album'
 import {
   albumDeletedAnnouncement,
@@ -7,6 +8,7 @@ import {
   listenedAnnouncement,
   listeningDeletedAnnouncement,
   listeningTakenBackAnnouncement,
+  storageFullMessage,
   undoListeningLabel,
 } from '../domain/albumAnnouncements'
 import { withListening, withoutListening } from '../domain/listening'
@@ -32,6 +34,7 @@ type LastListening = { albumId: AlbumId; listening: Listening }
 
 type AlbumsAreaProps = {
   albumsClient: AlbumsClient
+  coverImageClient: CoverImageClient
   clock: () => Date
   announce: (text: string) => void
   navigation: ReactNode
@@ -39,6 +42,7 @@ type AlbumsAreaProps = {
 
 export function AlbumsArea({
   albumsClient,
+  coverImageClient,
   clock,
   announce,
   navigation,
@@ -98,15 +102,25 @@ export function AlbumsArea({
     announce(albumDeletedAnnouncement(album, albums.albums.length - 1))
   }
 
+  function listeningRecordedFor(album: Album): Listening | null {
+    try {
+      const listening = albums.listenTo(album.id)
+      announce(listenedAnnouncement(withListening(album, listening), clock()))
+      return listening
+    } catch (error) {
+      if (!(error instanceof AlbumsStorageFull)) throw error
+      announce(storageFullMessage)
+      return null
+    }
+  }
+
   function listenTo(album: Album) {
-    const listening = albums.listenTo(album.id)
-    setLastListening({ albumId: album.id, listening })
-    announce(listenedAnnouncement(withListening(album, listening), clock()))
+    const listening = listeningRecordedFor(album)
+    if (listening !== null) setLastListening({ albumId: album.id, listening })
   }
 
   function listenFromDetails(album: Album) {
-    const listening = albums.listenTo(album.id)
-    announce(listenedAnnouncement(withListening(album, listening), clock()))
+    listeningRecordedFor(album)
   }
 
   function deleteListening(album: Album, listening: Listening) {
@@ -151,6 +165,7 @@ export function AlbumsArea({
       <AlbumFormPage
         editedAlbum={addressedAlbum}
         otherAlbums={albums.albums.filter((album) => album.id !== editedId)}
+        coverImageClient={coverImageClient}
         onSave={(newAlbum) => saveAlbum(editedId, newAlbum)}
         onDelete={() => {
           if (editedId !== null) showPage({ kind: 'delete', id: editedId })

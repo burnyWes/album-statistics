@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import type { FileExportClient } from '../../shared/files/fileExportClient'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
-import type { AlbumsClient } from '../api/albumsClient'
+import { AlbumsStorageFull, type AlbumsClient } from '../api/albumsClient'
 import {
   albumsDownloadFile,
   albumsFromFileText,
@@ -12,6 +12,7 @@ import {
   albumsLoadedAnnouncement,
   albumsSavedAnnouncement,
   shareAnnouncement,
+  storageFullMessage,
   unreadableAlbumsFileMessage,
 } from '../domain/albumAnnouncements'
 import { useAlbums } from './useAlbums'
@@ -56,9 +57,16 @@ export function AlbumsBackupPage({
     announce(shareAnnouncement(outcome))
   }
 
-  function rejectUnreadableFile() {
-    setFailureMessage(unreadableAlbumsFileMessage)
-    announce(unreadableAlbumsFileMessage)
+  function showFailure(message: string) {
+    setFailureMessage(message)
+    announce(message)
+  }
+
+  function loadFailureMessage(error: unknown): string | null {
+    if (error instanceof UnreadableAlbumsFile)
+      return unreadableAlbumsFileMessage
+    if (error instanceof AlbumsStorageFull) return storageFullMessage
+    return null
   }
 
   async function loadData(event: ChangeEvent<HTMLInputElement>) {
@@ -72,8 +80,9 @@ export function AlbumsBackupPage({
       setFailureMessage('')
       announce(albumsLoadedAnnouncement(merge))
     } catch (error) {
-      if (!(error instanceof UnreadableAlbumsFile)) throw error
-      rejectUnreadableFile()
+      const message = loadFailureMessage(error)
+      if (message === null) throw error
+      showFailure(message)
     } finally {
       input.value = ''
       loadButton.current?.focus()
@@ -86,7 +95,7 @@ export function AlbumsBackupPage({
         Zurück zu den Einstellungen
       </button>
       <h1 ref={heading} tabIndex={-1}>
-        Daten speichern und laden
+        Daten speichern / laden
       </h1>
       <p>
         Speichern legt eine Datei mit allen Alben und Hörzeitpunkten an. Laden

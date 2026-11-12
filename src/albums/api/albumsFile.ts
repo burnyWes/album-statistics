@@ -1,6 +1,8 @@
 import type { ExportFile } from '../../shared/files/fileExportClient'
 import type { Album } from '../domain/album'
 import { isLoadableAlbum, type LoadedAlbum } from '../domain/albumMerge'
+import { isCover } from '../domain/cover'
+import { isSpotifyLink } from '../domain/spotifyLink'
 
 export const ALBUMS_FORMAT_VERSION = 1
 
@@ -20,20 +22,47 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-function isStoredAlbum(value: unknown): value is Album {
+type StoredAlbum = Omit<Album, 'spotifyLink' | 'cover'> & {
+  spotifyLink?: string | null
+  cover?: string | null
+}
+
+type StoredAlbumsFileContent = {
+  version: typeof ALBUMS_FORMAT_VERSION
+  albums: StoredAlbum[]
+}
+
+function isAbsentOr(value: unknown, isPresent: (value: unknown) => boolean) {
+  return value === undefined || value === null || isPresent(value)
+}
+
+function isStoredAlbum(value: unknown): value is StoredAlbum {
   return (
     isRecord(value) &&
     typeof value.id === 'string' &&
     typeof value.title === 'string' &&
     typeof value.artist === 'string' &&
     Array.isArray(value.listenings) &&
-    value.listenings.every((listening) => typeof listening === 'string')
+    value.listenings.every((listening) => typeof listening === 'string') &&
+    isAbsentOr(value.spotifyLink, isSpotifyLink) &&
+    isAbsentOr(value.cover, isCover)
   )
+}
+
+function albumFromStored(stored: StoredAlbum): Album {
+  return {
+    id: stored.id,
+    title: stored.title,
+    artist: stored.artist,
+    spotifyLink: stored.spotifyLink ?? null,
+    cover: stored.cover ?? null,
+    listenings: stored.listenings,
+  }
 }
 
 export function isAlbumsFileContent(
   value: unknown,
-): value is AlbumsFileContent {
+): value is StoredAlbumsFileContent {
   return (
     isRecord(value) &&
     value.version === ALBUMS_FORMAT_VERSION &&
@@ -60,17 +89,23 @@ export function albumsFileText(albums: readonly Album[]): string {
 
 export function storedAlbumsFromText(text: string): Album[] | null {
   const content = parsed(text)
-  return isAlbumsFileContent(content) ? content.albums : null
+  return isAlbumsFileContent(content)
+    ? content.albums.map(albumFromStored)
+    : null
 }
 
 export function albumsFromFileText(text: string): LoadedAlbum[] {
   const content = parsed(text)
   if (!isAlbumsFileContent(content)) throw new UnreadableAlbumsFile()
-  const loaded = content.albums.map(({ title, artist, listenings }) => ({
-    title,
-    artist,
-    listenings,
-  }))
+  const loaded: LoadedAlbum[] = content.albums
+    .map(albumFromStored)
+    .map(({ title, artist, spotifyLink, cover, listenings }) => ({
+      title,
+      artist,
+      spotifyLink,
+      cover,
+      listenings,
+    }))
   if (!loaded.every(isLoadableAlbum)) throw new UnreadableAlbumsFile()
   return loaded
 }
