@@ -123,6 +123,22 @@ async function fillIn(title: string, artist: string) {
   if (artist !== '') await userEvent.type(artistField(), artist)
 }
 
+const thursdayListening = listeningAt(new Date(2026, 10, 12, 14, 20))
+
+const octoberListening = listeningAt(new Date(2026, 9, 28, 19, 12))
+
+const listenedOnThursdayAndInOctober: Album = {
+  ...kindOfBlue,
+  listenings: [octoberListening, thursdayListening],
+}
+
+const deleteThursdayListening =
+  'Hören vom Donnerstag, 12.11.2026, 14:20 löschen'
+
+function deleteListeningButtons() {
+  return screen.getAllByRole('button', { name: /^Hören vom .* löschen$/ })
+}
+
 describe('AlbumsArea', () => {
   it('opens the form with the focus in the album name', async () => {
     renderArea()
@@ -593,6 +609,88 @@ describe('AlbumsArea', () => {
   it('has no accessibility violations on the details without listenings', async () => {
     const { container } = renderArea([kindOfBlue])
     await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+  it('asks before deleting a listening', async () => {
+    renderArea([listenedOnThursdayAndInOctober])
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    await userEvent.click(button(deleteThursdayListening))
+
+    expect(
+      heading('Hören vom Donnerstag, 12.11.2026, 14:20 löschen?'),
+    ).toHaveFocus()
+    expect(screen.getByText('Kind of Blue, Miles Davis')).toBeInTheDocument()
+  })
+
+  it('deletes a listening and announces both counts', async () => {
+    const { albumsClient, announcements } = renderArea([
+      listenedOnThursdayAndInOctober,
+    ])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button(deleteThursdayListening))
+
+    await userEvent.click(button('Löschen'))
+
+    expect(listeningsHeading('Gehört, 1 Mal')).toHaveFocus()
+    expect(announcements).toEqual([
+      'Hören vom Donnerstag, 12.11.2026, 14:20 gelöscht. Diesen Monat 0, insgesamt 1.',
+    ])
+    expect(albumsClient.storedAlbums()[0].listenings).toEqual([
+      octoberListening,
+    ])
+  })
+
+  it('deletes only one of equal listenings', async () => {
+    const { albumsClient } = renderArea([listenedKindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(deleteListeningButtons()[0])
+
+    await userEvent.click(button('Löschen'))
+
+    expect(listeningsHeading('Gehört, 13 Mal')).toHaveFocus()
+    expect(albumsClient.storedAlbums()[0].listenings).toHaveLength(13)
+  })
+
+  it('focuses the plain listenings heading after deleting the last listening', async () => {
+    renderArea([{ ...kindOfBlue, listenings: [thursdayListening] }])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button(deleteThursdayListening))
+
+    await userEvent.click(button('Löschen'))
+
+    expect(listeningsHeading('Gehört')).toHaveFocus()
+    expect(screen.getByText('Noch nicht gehört.')).toBeInTheDocument()
+  })
+
+  it('cancels deleting a listening back to the details', async () => {
+    const { albumsClient } = renderArea([listenedOnThursdayAndInOctober])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button(deleteThursdayListening))
+
+    await userEvent.click(button('Abbrechen'))
+
+    expect(heading('Kind of Blue, Miles Davis')).toHaveFocus()
+    expect(albumsClient.storedAlbums()).toEqual([
+      listenedOnThursdayAndInOctober,
+    ])
+  })
+
+  it('goes back from deleting a listening to the details', async () => {
+    renderArea([listenedOnThursdayAndInOctober])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button(deleteThursdayListening))
+
+    await userEvent.click(button('Zurück zum Album'))
+
+    expect(heading('Kind of Blue, Miles Davis')).toHaveFocus()
+  })
+
+  it('has no accessibility violations while asking before deleting a listening', async () => {
+    const { container } = renderArea([listenedOnThursdayAndInOctober])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button(deleteThursdayListening))
 
     expect(await accessibilityViolations(container)).toEqual([])
   })

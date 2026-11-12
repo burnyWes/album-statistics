@@ -6,9 +6,12 @@ import {
   albumRowLabel,
   albumSavedAnnouncement,
   albumsHeading,
+  deleteListeningLabel,
+  deleteListeningQuestion,
   deletionConsequence,
   listenedAnnouncement,
   listenedButtonLabel,
+  listeningDeletedAnnouncement,
   listeningsHeading,
   listeningTakenBackAnnouncement,
   undoListeningLabel,
@@ -166,5 +169,33 @@ describe('listeningsHeading', () => {
 
   it('names several listenings', () => {
     expect(listeningsHeading(kindOfBlueListened(14))).toBe('Gehört, 14 Mal')
+  })
+})
+
+describe('deleting a listening', () => {
+  const listening = listeningAt(new Date(2026, 10, 12, 14, 20))
+
+  it('labels deleting a listening with the spoken time', () => {
+    expect(deleteListeningLabel(listening)).toBe(
+      'Hören vom Donnerstag, 12.11.2026, 14:20 löschen',
+    )
+  })
+
+  it('asks before deleting a listening', () => {
+    expect(deleteListeningQuestion(listening)).toBe(
+      'Hören vom Donnerstag, 12.11.2026, 14:20 löschen?',
+    )
+  })
+
+  it('announces a deleted listening with both counts', () => {
+    expect(
+      listeningDeletedAnnouncement(
+        kindOfBlueListenedSince(3, 11),
+        listening,
+        now,
+      ),
+    ).toBe(
+      'Hören vom Donnerstag, 12.11.2026, 14:20 gelöscht. Diesen Monat 3, insgesamt 14.',
+    )
   })
 })

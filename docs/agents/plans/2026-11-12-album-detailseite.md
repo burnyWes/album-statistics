@@ -374,12 +374,12 @@ gehört und bearbeitet, und der Rückweg landet auf der Zeile des Albums.
 - [x] `npm run test:e2e` grün, darunter `albums.spec.ts`
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy mit TalkBack: Tipp auf ein Album öffnet die Detailseite und sagt
+- [x] Auf dem Handy mit TalkBack: Tipp auf ein Album öffnet die Detailseite und sagt
   den Albumnamen an; die Zeitpunkte werden mit ausgeschriebenem Wochentag vorgelesen;
   „Gehört“ sagt beide Zähler an und der Fokus bleibt; „Bearbeiten“ → „Zurück zum Album“
   und „Speichern“ landen auf der Detailseite; „Zurück zu den Alben“ landet auf der
   Zeile des Albums.
-- [ ] In beiden Farbschemata: Icons und Zeitpunkte gut lesbar, die feste Leiste verdeckt
+- [x] In beiden Farbschemata: Icons und Zeitpunkte gut lesbar, die feste Leiste verdeckt
   beim Scrollen keinen letzten Eintrag.
 
 ### Phase 2: Einzelnes Hören löschen
@@ -389,26 +389,26 @@ Abhängigkeiten: Phase 1
 Jeder Hörzeitpunkt lässt sich über einen Eimer nach Bestätigung löschen.
 
 **Aufgaben**:
-- [ ] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann umsetzen:
+- [x] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann umsetzen:
   `deleteListeningLabel`, `deleteListeningQuestion`,
   `listeningDeletedAnnouncement(album, listening, now)` – Texte laut
   *Akzeptanzkriterien*, Zähler über `bothCounts`.
-- [ ] `src/albums/ui/AlbumDetailPage.tsx` – Prop `onDeleteListening(listening)`; jede
+- [x] `src/albums/ui/AlbumDetailPage.tsx` – Prop `onDeleteListening(listening)`; jede
   Listenzeile bekommt die Klasse `listRow` und rechts
   `<button type="button" className="iconButton" aria-label={deleteListeningLabel(…)}>`
   mit `TrashIcon`.
-- [ ] `src/albums/ui/DeleteListeningPage.tsx` – nach `DeleteAlbumPage.tsx`: „Zurück zum
+- [x] `src/albums/ui/DeleteListeningPage.tsx` – nach `DeleteAlbumPage.tsx`: „Zurück zum
   Album“, `h1` per `useHeadingFocus` mit `deleteListeningQuestion`, `<p>` mit
   `albumName`, `BottomBar` mit „Löschen“ und „Abbrechen“. Props `album`, `listening`,
   `onDelete`, `onCancel`.
-- [ ] `src/albums/ui/AlbumsArea.tsx` – Seite
+- [x] `src/albums/ui/AlbumsArea.tsx` – Seite
   `{ kind: 'deleteListening'; id: AlbumId; listening: Listening }`. Eimer zeigt sie;
   „Abbrechen“ und „Zurück zum Album“ → `{ kind: 'detail', id, focus: 'album' }`;
   „Löschen“ ruft `albums.takeBackListening(id, listening)`, zeigt
   `{ kind: 'detail', id, focus: 'listenings' }` und sagt
   `listeningDeletedAnnouncement(withoutListening(album, listening), listening, clock())`
   an.
-- [ ] `src/albums/ui/AlbumsArea.test.tsx` zuerst ergänzen:
+- [x] `src/albums/ui/AlbumsArea.test.tsx` zuerst ergänzen:
   - `asks before deleting a listening` – Überschrift „Hören vom Donnerstag, … löschen?“
     fokussiert, Albumname sichtbar
   - `deletes a listening and announces both counts` – Fake gespeichert, Fokus auf
@@ -421,14 +421,14 @@ Jeder Hörzeitpunkt lässt sich über einen Eimer nach Bestätigung löschen.
     `goes back from deleting a listening to the details`
   - `has no accessibility violations while asking before deleting a listening` und auf
     der Detailseite mit Eimern
-- [ ] `e2e/albums.spec.ts` – neu `deletes a single listening for good`: Album anlegen,
+- [x] `e2e/albums.spec.ts` – neu `deletes a single listening for good`: Album anlegen,
   in der Liste zweimal `[↑]`, Album öffnen, ersten Eimer, „Löschen“, neu laden, Zeile
   nennt „insgesamt 1 Mal gehört“.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter die neuen Fälle in `albumAnnouncements.test.ts` und
+- [x] `npm run test` grün, darunter die neuen Fälle in `albumAnnouncements.test.ts` und
   `AlbumsArea.test.tsx`
-- [ ] `npm run lint`, `npm run build`, `npm run test:e2e` grün
+- [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy mit TalkBack: der Eimer wird als „Hören vom Donnerstag, … löschen“

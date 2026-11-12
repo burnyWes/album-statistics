@@ -5,6 +5,7 @@ import {
   albumDeletedAnnouncement,
   albumSavedAnnouncement,
   listenedAnnouncement,
+  listeningDeletedAnnouncement,
   listeningTakenBackAnnouncement,
   undoListeningLabel,
 } from '../domain/albumAnnouncements'
@@ -17,6 +18,7 @@ import {
   type UndoListening,
 } from './AlbumListPage'
 import { DeleteAlbumPage } from './DeleteAlbumPage'
+import { DeleteListeningPage } from './DeleteListeningPage'
 import { useAlbums } from './useAlbums'
 
 type AlbumsPage =
@@ -24,6 +26,7 @@ type AlbumsPage =
   | { kind: 'detail'; id: AlbumId; focus: AlbumDetailFocus }
   | { kind: 'form'; id: AlbumId | null }
   | { kind: 'delete'; id: AlbumId }
+  | { kind: 'deleteListening'; id: AlbumId; listening: Listening }
 
 type LastListening = { albumId: AlbumId; listening: Listening }
 
@@ -106,6 +109,18 @@ export function AlbumsArea({
     announce(listenedAnnouncement(withListening(album, listening), clock()))
   }
 
+  function deleteListening(album: Album, listening: Listening) {
+    albums.takeBackListening(album.id, listening)
+    showPage({ kind: 'detail', id: album.id, focus: 'listenings' })
+    announce(
+      listeningDeletedAnnouncement(
+        withoutListening(album, listening),
+        listening,
+        clock(),
+      ),
+    )
+  }
+
   function takeBackListening(album: Album, listening: Listening) {
     albums.takeBackListening(album.id, listening)
     setLastListening(null)
@@ -157,6 +172,24 @@ export function AlbumsArea({
         }
         onListen={() => listenFromDetails(addressedAlbum)}
         onEdit={() => editAlbum(addressedAlbum.id)}
+        onDeleteListening={(listening) =>
+          showPage({
+            kind: 'deleteListening',
+            id: addressedAlbum.id,
+            listening,
+          })
+        }
+      />
+    )
+  }
+
+  if (page.kind === 'deleteListening' && addressedAlbum !== null) {
+    return (
+      <DeleteListeningPage
+        album={addressedAlbum}
+        listening={page.listening}
+        onDelete={() => deleteListening(addressedAlbum, page.listening)}
+        onCancel={() => showAlbum(addressedAlbum.id)}
       />
     )
   }

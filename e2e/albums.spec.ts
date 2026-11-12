@@ -89,3 +89,29 @@ test('shows listenings on the album details after a reload', async ({
     page.getByRole('heading', { level: 2, name: 'Gehört, 1 Mal' }),
   ).toBeVisible()
 })
+
+test('deletes a single listening for good', async ({ page }) => {
+  await page.goto('./')
+  await addAlbum(page, 'Kind of Blue', 'Miles Davis')
+  const listened = page.getByRole('button', {
+    name: 'Kind of Blue, Miles Davis gehört',
+  })
+  await listened.click()
+  await listened.click()
+
+  await albumButton(page, 'Kind of Blue, Miles Davis').click()
+  await page
+    .getByRole('button', { name: /^Hören vom .* löschen$/ })
+    .first()
+    .click()
+  await page.getByRole('button', { name: 'Löschen' }).click()
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'Gehört, 1 Mal' }),
+  ).toBeFocused()
+
+  await page.reload()
+
+  await expect(
+    albumButton(page, 'Kind of Blue, Miles Davis'),
+  ).toHaveAccessibleName(/insgesamt 1 Mal gehört/)
+})

@@ -3,9 +3,11 @@ import {
   InvalidAlbum,
   type Album,
   type InvalidAlbumReason,
+  type Listening,
   type NewAlbum,
 } from './album'
 import { listeningsInTotal, listeningsThisMonth } from './listening'
+import { spokenListeningTime } from './listeningTime'
 
 const messagesByReason: Record<InvalidAlbumReason, string> = {
   titleMissing: 'Bitte einen Albumnamen eingeben.',
@@ -77,4 +79,24 @@ export function undoListeningLabel(album: NewAlbum): string {
 export function listeningsHeading(album: Album): string {
   const count = listeningsInTotal(album)
   return count === 0 ? 'Gehört' : `Gehört, ${count} Mal`
+}
+
+function listeningPhrase(listening: Listening): string {
+  return `Hören vom ${spokenListeningTime(listening)}`
+}
+
+export function deleteListeningLabel(listening: Listening): string {
+  return `${listeningPhrase(listening)} löschen`
+}
+
+export function deleteListeningQuestion(listening: Listening): string {
+  return `${listeningPhrase(listening)} löschen?`
+}
+
+export function listeningDeletedAnnouncement(
+  albumAfterDeleting: Album,
+  listening: Listening,
+  now: Date,
+): string {
+  return `${listeningPhrase(listening)} gelöscht. ${bothCounts(albumAfterDeleting, now)}`
 }

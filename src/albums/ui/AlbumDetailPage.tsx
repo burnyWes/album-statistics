@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { BottomBar } from '../../shared/ui/BottomBar'
-import { albumName, type Album } from '../domain/album'
-import { listeningsHeading } from '../domain/albumAnnouncements'
+import { TrashIcon } from '../../shared/ui/TrashIcon'
+import { albumName, type Album, type Listening } from '../domain/album'
+import {
+  deleteListeningLabel,
+  listeningsHeading,
+} from '../domain/albumAnnouncements'
 import {
   lastListening,
   listeningsInTotal,
@@ -23,6 +27,7 @@ type AlbumDetailPageProps = {
   onBack: () => void
   onListen: () => void
   onEdit: () => void
+  onDeleteListening: (listening: Listening) => void
 }
 
 export function AlbumDetailPage({
@@ -32,6 +37,7 @@ export function AlbumDetailPage({
   onBack,
   onListen,
   onEdit,
+  onDeleteListening,
 }: AlbumDetailPageProps) {
   const albumHeading = useRef<HTMLHeadingElement>(null)
   const listeningsHeadingElement = useRef<HTMLHeadingElement>(null)
@@ -74,8 +80,18 @@ export function AlbumDetailPage({
       ) : (
         <ul className="itemList listeningList">
           {listeningsNewestFirst(album).map((listening, position) => (
-            <li key={`${position}-${listening}`}>
-              <ListeningTime listening={listening} />
+            <li key={`${position}-${listening}`} className="listRow">
+              <span>
+                <ListeningTime listening={listening} />
+              </span>
+              <button
+                type="button"
+                className="iconButton"
+                aria-label={deleteListeningLabel(listening)}
+                onClick={() => onDeleteListening(listening)}
+              >
+                <TrashIcon />
+              </button>
             </li>
           ))}
         </ul>
