@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { albumsFileText } from './albums/api/albumsFile'
+import { createInMemoryAlbumOrderClient } from './albums/api/inMemoryAlbumOrderClient'
 import { createInMemoryAlbumsClient } from './albums/api/inMemoryAlbumsClient'
 import { createInMemoryCoverImageClient } from './albums/api/inMemoryCoverImageClient'
 import type { Album } from './albums/domain/album'
@@ -30,6 +31,7 @@ function renderApp({
       installOfferClient={installOfferClient}
       appUpdateClient={appUpdateClient}
       albumsClient={albumsClient}
+      albumOrderClient={createInMemoryAlbumOrderClient()}
       fileExportClient={fileExportClient}
       coverImageClient={createInMemoryCoverImageClient()}
       clock={() => new Date(2026, 10, 15, 12, 0)}

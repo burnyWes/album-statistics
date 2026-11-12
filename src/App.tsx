@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { AlbumOrderClient } from './albums/api/albumOrderClient'
 import type { AlbumsClient } from './albums/api/albumsClient'
 import type { CoverImageClient } from './albums/api/coverImageClient'
 import { AlbumsArea } from './albums/ui/AlbumsArea'
@@ -39,6 +40,7 @@ type AppProps = {
   installOfferClient: InstallOfferClient
   appUpdateClient: AppUpdateClient
   albumsClient: AlbumsClient
+  albumOrderClient: AlbumOrderClient
   fileExportClient: FileExportClient
   coverImageClient: CoverImageClient
   clock: () => Date
@@ -49,6 +51,7 @@ export function App({
   installOfferClient,
   appUpdateClient,
   albumsClient,
+  albumOrderClient,
   fileExportClient,
   coverImageClient,
   clock,
@@ -123,6 +126,7 @@ export function App({
       {activeArea === 'albums' && (
         <AlbumsArea
           albumsClient={albumsClient}
+          albumOrderClient={albumOrderClient}
           coverImageClient={coverImageClient}
           clock={clock}
           announce={announce}

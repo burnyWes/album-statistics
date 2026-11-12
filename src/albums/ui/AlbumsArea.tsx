@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from 'react'
+import type { AlbumOrderClient } from '../api/albumOrderClient'
 import { AlbumsStorageFull, type AlbumsClient } from '../api/albumsClient'
 import type { CoverImageClient } from '../api/coverImageClient'
 import type { Album, AlbumId, Listening, NewAlbum } from '../domain/album'
 import {
   albumDeletedAnnouncement,
+  albumOrderChangedAnnouncement,
   albumSavedAnnouncement,
   listenedAnnouncement,
   listeningDeletedAnnouncement,
@@ -12,6 +14,7 @@ import {
   undoListeningLabel,
 } from '../domain/albumAnnouncements'
 import { withListening, withoutListening } from '../domain/listening'
+import { inOrder, type AlbumOrder } from '../domain/albumOrder'
 import { AlbumDetailPage, type AlbumDetailFocus } from './AlbumDetailPage'
 import { AlbumFormPage } from './AlbumFormPage'
 import {
@@ -21,6 +24,7 @@ import {
 } from './AlbumListPage'
 import { DeleteAlbumPage } from './DeleteAlbumPage'
 import { DeleteListeningPage } from './DeleteListeningPage'
+import { useAlbumOrder } from './useAlbumOrder'
 import { useAlbums } from './useAlbums'
 
 type AlbumsPage =
@@ -34,6 +38,7 @@ type LastListening = { albumId: AlbumId; listening: Listening }
 
 type AlbumsAreaProps = {
   albumsClient: AlbumsClient
+  albumOrderClient: AlbumOrderClient
   coverImageClient: CoverImageClient
   clock: () => Date
   announce: (text: string) => void
@@ -42,6 +47,7 @@ type AlbumsAreaProps = {
 
 export function AlbumsArea({
   albumsClient,
+  albumOrderClient,
   coverImageClient,
   clock,
   announce,
@@ -55,6 +61,7 @@ export function AlbumsArea({
   const [lastListening, setLastListening] = useState<LastListening | null>(null)
   const [listenButtonFocusRequest, setListenButtonFocusRequest] =
     useState<ListenButtonFocusRequest | null>(null)
+  const albumOrder = useAlbumOrder(albumOrderClient)
 
   const addressedAlbum =
     page.kind === 'list' || page.id === null
@@ -114,9 +121,18 @@ export function AlbumsArea({
     }
   }
 
+  function requestListenButtonFocus(albumId: AlbumId) {
+    setListenButtonFocusRequest((previous) => ({
+      albumId,
+      request: (previous?.request ?? 0) + 1,
+    }))
+  }
+
   function listenTo(album: Album) {
     const listening = listeningRecordedFor(album)
-    if (listening !== null) setLastListening({ albumId: album.id, listening })
+    if (listening === null) return
+    setLastListening({ albumId: album.id, listening })
+    requestListenButtonFocus(album.id)
   }
 
   function listenFromDetails(album: Album) {
@@ -138,14 +154,21 @@ export function AlbumsArea({
   function takeBackListening(album: Album, listening: Listening) {
     albums.takeBackListening(album.id, listening)
     setLastListening(null)
-    setListenButtonFocusRequest((previous) => ({
-      albumId: album.id,
-      request: (previous?.request ?? 0) + 1,
-    }))
+    requestListenButtonFocus(album.id)
     announce(
       listeningTakenBackAnnouncement(
         withoutListening(album, listening),
         clock(),
+      ),
+    )
+  }
+
+  function changeOrder(wanted: AlbumOrder) {
+    albumOrder.changeOrder(wanted)
+    announce(
+      albumOrderChangedAnnouncement(
+        wanted,
+        inOrder(albums.albums, wanted, clock())[0],
       ),
     )
   }
@@ -222,14 +245,16 @@ export function AlbumsArea({
   return (
     <AlbumListPage
       navigation={navigation}
-      albums={albums.albums}
+      albums={inOrder(albums.albums, albumOrder.order, clock())}
       now={clock()}
+      order={albumOrder.order}
       focusedAlbum={page.kind === 'list' ? page.focusedAlbum : null}
       undoListening={undoListening}
       listenButtonFocusRequest={listenButtonFocusRequest}
       onAddAlbum={() => showPage({ kind: 'form', id: null })}
       onOpenAlbum={(album) => showAlbum(album.id)}
       onListen={listenTo}
+      onChangeOrder={changeOrder}
     />
   )
 }

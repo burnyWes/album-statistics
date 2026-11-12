@@ -2,7 +2,9 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { BottomBar } from '../../shared/ui/BottomBar'
 import type { Album, AlbumId } from '../domain/album'
 import { albumsHeading } from '../domain/albumAnnouncements'
+import type { AlbumOrder } from '../domain/albumOrder'
 import { AlbumListRow } from './AlbumListRow'
+import { AlbumOrderButtons } from './AlbumOrderButtons'
 
 export type UndoListening = { label: string; onUndo: () => void }
 
@@ -12,24 +14,28 @@ type AlbumListPageProps = {
   navigation: ReactNode
   albums: readonly Album[]
   now: Date
+  order: AlbumOrder
   focusedAlbum: AlbumId | null
   undoListening: UndoListening | null
   listenButtonFocusRequest: ListenButtonFocusRequest | null
   onAddAlbum: () => void
   onOpenAlbum: (album: Album) => void
   onListen: (album: Album) => void
+  onChangeOrder: (order: AlbumOrder) => void
 }
 
 export function AlbumListPage({
   navigation,
   albums,
   now,
+  order,
   focusedAlbum,
   undoListening,
   listenButtonFocusRequest,
   onAddAlbum,
   onOpenAlbum,
   onListen,
+  onChangeOrder,
 }: AlbumListPageProps) {
   const heading = useRef<HTMLHeadingElement>(null)
 
@@ -63,19 +69,22 @@ export function AlbumListPage({
         {albums.length === 0 ? (
           <p>Noch keine Alben.</p>
         ) : (
-          <ul className="itemList">
-            {albums.map((album) => (
-              <AlbumListRow
-                key={album.id}
-                album={album}
-                now={now}
-                focusOnMount={album.id === focusedAlbum}
-                listenButtonFocusRequest={focusRequestFor(album)}
-                onOpenAlbum={onOpenAlbum}
-                onListen={onListen}
-              />
-            ))}
-          </ul>
+          <>
+            <AlbumOrderButtons order={order} onChangeOrder={onChangeOrder} />
+            <ul className="itemList">
+              {albums.map((album) => (
+                <AlbumListRow
+                  key={album.id}
+                  album={album}
+                  now={now}
+                  focusOnMount={album.id === focusedAlbum}
+                  listenButtonFocusRequest={focusRequestFor(album)}
+                  onOpenAlbum={onOpenAlbum}
+                  onListen={onListen}
+                />
+              ))}
+            </ul>
+          </>
         )}
         {undoListening !== null && (
           <BottomBar>

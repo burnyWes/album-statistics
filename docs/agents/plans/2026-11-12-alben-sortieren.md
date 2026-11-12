@@ -201,7 +201,7 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
 
 **Aufgaben**:
 
-- [ ] `src/albums/domain/albumOrder.test.ts` zuerst schreiben (fehlschlagend). Fälle:
+- [x] `src/albums/domain/albumOrder.test.ts` zuerst schreiben (fehlschlagend). Fälle:
   - `alphabetical` liefert dieselbe Reihenfolge wie `byTitle`.
   - `thisMonth` sortiert absteigend nach Hören im Monat von `now`. Hören aus dem
     Vormonat und aus demselben Monat des Vorjahres zählen nicht.
@@ -210,8 +210,8 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
   - Die Eingabeliste wird nicht verändert.
   - `isAlbumOrder` akzeptiert die drei Werte und lehnt `''`, `'byTitle'` und `'INTOTAL'`
     ab.
-- [ ] `compareByTitle` in `src/albums/domain/album.ts` exportieren.
-- [ ] `src/albums/domain/albumOrder.ts` umsetzen:
+- [x] `compareByTitle` in `src/albums/domain/album.ts` exportieren.
+- [x] `src/albums/domain/albumOrder.ts` umsetzen:
   ```ts
   export const ALBUM_ORDERS = ['alphabetical', 'thisMonth', 'inTotal'] as const
   export type AlbumOrder = (typeof ALBUM_ORDERS)[number]
@@ -239,7 +239,7 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
   ```
   `listening.ts` importiert schon aus `album.ts`. `albumOrder.ts` importiert beide, es
   entsteht also kein Zyklus.
-- [ ] In `src/albums/domain/albumAnnouncements.test.ts` zuerst die Tests, dann in
+- [x] In `src/albums/domain/albumAnnouncements.test.ts` zuerst die Tests, dann in
   `albumAnnouncements.ts` die Funktionen:
   ```ts
   const labelsByAlbumOrder: Record<AlbumOrder, string> = {
@@ -251,9 +251,9 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
   export function albumOrderChangedAnnouncement(order: AlbumOrder, firstAlbum: NamedAlbum): string
   // → "Sortiert: Insgesamt am meisten gehört. Zuerst: Kind of Blue, Miles Davis."
   ```
-- [ ] `src/albums/ui/AlphabeticalIcon.tsx` anlegen: SVG nach Lucide „arrow-down-a-z“
+- [x] `src/albums/ui/AlphabeticalIcon.tsx` anlegen: SVG nach Lucide „arrow-down-a-z“
   (ISC-Lizenz, wie die übrigen Icons), Rahmen wie `CalendarIcon.tsx`.
-- [ ] `src/albums/ui/AlbumOrderButtons.tsx` anlegen:
+- [x] `src/albums/ui/AlbumOrderButtons.tsx` anlegen:
   ```tsx
   const buttonsByOrder: Record<AlbumOrder, { icon: ReactNode; text: string }> = {
     alphabetical: { icon: <AlphabeticalIcon />, text: 'A–Z' },
@@ -265,10 +265,10 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
   //                       aria-label={albumOrderLabel(shown)} onClick={() => onChangeOrder(shown)}>
   //                        {icon}<span>{text}</span></button>
   ```
-- [ ] `AlbumListPage.tsx`: Props `order: AlbumOrder` und
+- [x] `AlbumListPage.tsx`: Props `order: AlbumOrder` und
   `onChangeOrder: (order: AlbumOrder) => void`. `<AlbumOrderButtons>` steht zwischen
   `.pageHeader` und `ul.itemList`, nur im Zweig `albums.length > 0`.
-- [ ] `AlbumsArea.tsx`:
+- [x] `AlbumsArea.tsx`:
   - `const [order, setOrder] = useState<AlbumOrder>(DEFAULT_ALBUM_ORDER)`
   - `const listedAlbums = inOrder(albums.albums, order, clock())` wird an
     `AlbumListPage` übergeben.
@@ -279,7 +279,7 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
   - Das Erhöhen des Fokus-Requests aus `takeBackListening` wird in eine Funktion
     `requestListenButtonFocus(albumId)` ausgelagert. `listenTo` ruft sie auf, wenn ein
     Hören erfasst wurde.
-- [ ] `src/index.css`: neue Regeln
+- [x] `src/index.css`: neue Regeln
   ```css
   .albumOrder { display: flex; gap: 0.25rem; margin-bottom: 1rem; }
   .albumOrder button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem; }
@@ -288,7 +288,7 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
   `.navigationBar button, .rowButton` aufgenommen (heller Hintergrund, Rand
   `--accentLine`). Der gedrückte Button behält den Grundstil von `button` (rot gefüllt,
   Rand `--ink`), wie `aria-current='page'`.
-- [ ] `src/albums/ui/AlbumsArea.test.tsx` erweitern (zuerst die Tests):
+- [x] `src/albums/ui/AlbumsArea.test.tsx` erweitern (zuerst die Tests):
   - Ohne Alben gibt es keine Gruppe „Sortierung“.
   - Mit Alben ist „Alphabetisch“ gedrückt, die anderen beiden nicht.
   - „Insgesamt am meisten gehört“ ordnet die Zeilen nach Gesamtzahl, setzt
@@ -303,17 +303,17 @@ nur, solange die App läuft (`useState` in `AlbumsArea`, Start mit A–Z).
     „… gehört“-Button.
   - Die Prüfung mit `accessibilityViolations` läuft ohne Befund, wenn die Gruppe
     sichtbar ist.
-- [ ] `e2e/albums.spec.ts`: Zwei Alben anlegen, das zweite (alphabetisch hintere) als
+- [x] `e2e/albums.spec.ts`: Zwei Alben anlegen, das zweite (alphabetisch hintere) als
   gehört markieren, „Insgesamt am meisten gehört“ drücken. Es steht dann zuerst, und der
   Button hat `aria-pressed="true"`.
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test` läuft grün, darunter `albumOrder.test.ts`,
+- [x] `npm run test` läuft grün, darunter `albumOrder.test.ts`,
   `albumAnnouncements.test.ts` und `AlbumsArea.test.tsx`.
-- [ ] `npm run lint` läuft durch. Das schließt die Import-Grenze für `domain/` ein.
-- [ ] `npm run build` läuft durch (`tsc -b` einschließlich `e2e/`).
-- [ ] `npx playwright test e2e/albums.spec.ts` läuft grün.
+- [x] `npm run lint` läuft durch. Das schließt die Import-Grenze für `domain/` ein.
+- [x] `npm run build` läuft durch (`tsc -b` einschließlich `e2e/`).
+- [x] `npx playwright test e2e/albums.spec.ts` läuft grün.
 
 **Manuelle Verifikation**:
 
@@ -333,14 +333,14 @@ Die gewählte Sortierung wird auf dem Gerät gespeichert und beim Start gelesen.
 
 **Aufgaben**:
 
-- [ ] `src/albums/api/albumOrderClient.ts`:
+- [x] `src/albums/api/albumOrderClient.ts`:
   ```ts
   export interface AlbumOrderClient {
     readAlbumOrder(): AlbumOrder
     writeAlbumOrder(order: AlbumOrder): void
   }
   ```
-- [ ] `src/albums/api/localStorageAlbumOrderClient.test.ts` zuerst schreiben, nach dem
+- [x] `src/albums/api/localStorageAlbumOrderClient.test.ts` zuerst schreiben, nach dem
   Muster von `localStorageAppearanceClient.test.ts` (`storageHolding`,
   `throwingStorage`). Fälle:
   - Liest einen gespeicherten gültigen Wert.
@@ -348,38 +348,38 @@ Die gewählte Sortierung wird auf dem Gerät gespeichert und beim Start gelesen.
     der Speicher `null` ist oder `getItem` wirft.
   - Schreibt den Wert unter `ALBUM_ORDER_KEY`.
   - Ein Schreibfehler wird geschluckt.
-- [ ] `src/albums/api/localStorageAlbumOrderClient.ts`:
+- [x] `src/albums/api/localStorageAlbumOrderClient.ts`:
   `createLocalStorageAlbumOrderClient(storage: DeviceStorage | null = deviceStorage())`
   mit `ALBUM_ORDER_KEY = 'albumOrder'`. Gelesene Werte werden über `isAlbumOrder`
   geprüft.
-- [ ] `src/albums/api/inMemoryAlbumOrderClient.ts`:
+- [x] `src/albums/api/inMemoryAlbumOrderClient.ts`:
   `createInMemoryAlbumOrderClient(order = DEFAULT_ALBUM_ORDER)` mit zusätzlichem
   `storedAlbumOrder()`.
-- [ ] `src/albums/ui/useAlbumOrder.ts`: Startwert über `useState(() => client.readAlbumOrder())`.
+- [x] `src/albums/ui/useAlbumOrder.ts`: Startwert über `useState(() => client.readAlbumOrder())`.
   `changeOrder(wanted)` schreibt über den Client und setzt dann den State, wie
   `useAppearance.change`.
-- [ ] `AlbumsArea.tsx`: Neue Prop `albumOrderClient`, `useState` wird durch
+- [x] `AlbumsArea.tsx`: Neue Prop `albumOrderClient`, `useState` wird durch
   `useAlbumOrder` ersetzt.
-- [ ] `src/App.tsx`: Neue Prop `albumOrderClient: AlbumOrderClient`, wird an `AlbumsArea`
+- [x] `src/App.tsx`: Neue Prop `albumOrderClient: AlbumOrderClient`, wird an `AlbumsArea`
   weitergereicht.
-- [ ] `src/main.tsx`: `const albumOrderClient = createLocalStorageAlbumOrderClient()` und
+- [x] `src/main.tsx`: `const albumOrderClient = createLocalStorageAlbumOrderClient()` und
   an `App` übergeben.
-- [ ] `src/App.test.tsx` (`renderApp`) und `AlbumsArea.test.tsx` (`renderArea`):
+- [x] `src/App.test.tsx` (`renderApp`) und `AlbumsArea.test.tsx` (`renderArea`):
   `createInMemoryAlbumOrderClient()` übergeben.
-- [ ] `AlbumsArea.test.tsx` erweitern (zuerst die Tests):
+- [x] `AlbumsArea.test.tsx` erweitern (zuerst die Tests):
   - Ist im Client `inTotal` gespeichert, startet die Liste nach Gesamtzahl sortiert,
     und dieser Button ist gedrückt.
   - Nach einem Druck auf „Diesen Monat am meisten gehört“ liefert
     `storedAlbumOrder()` den Wert `thisMonth`.
-- [ ] `e2e/albums.spec.ts`: „Insgesamt am meisten gehört“ wählen und die Seite neu laden.
+- [x] `e2e/albums.spec.ts`: „Insgesamt am meisten gehört“ wählen und die Seite neu laden.
   Der Button ist dann weiter gedrückt, und die Reihenfolge bleibt.
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test` läuft grün, darunter `localStorageAlbumOrderClient.test.ts`.
-- [ ] `npm run lint` läuft durch.
-- [ ] `npm run build` läuft durch.
-- [ ] `npx playwright test` läuft komplett grün.
+- [x] `npm run test` läuft grün, darunter `localStorageAlbumOrderClient.test.ts`.
+- [x] `npm run lint` läuft durch.
+- [x] `npm run build` läuft durch.
+- [x] `npx playwright test` läuft komplett grün.
 
 **Manuelle Verifikation**:
 
@@ -387,6 +387,9 @@ Die gewählte Sortierung wird auf dem Gerät gespeichert und beim Start gelesen.
   öffnen. „Monat“ ist weiter gewählt.
 
 ## Notizen zur Umsetzung
+
+- Beide Phasen wurden in einem Zug umgesetzt und gepusht, damit der Nutzer die manuellen
+  Prüfungen beider Phasen gemeinsam auf dem Handy machen kann.
 
 ## Verweise
 

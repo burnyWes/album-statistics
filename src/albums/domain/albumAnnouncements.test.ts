@@ -3,6 +3,8 @@ import { InvalidAlbum, type Album } from './album'
 import {
   albumDeletedAnnouncement,
   albumFailureMessage,
+  albumOrderChangedAnnouncement,
+  albumOrderLabel,
   albumRowLabel,
   albumSavedAnnouncement,
   albumsLoadedAnnouncement,
@@ -232,6 +234,34 @@ describe('deleting a listening', () => {
     ).toBe(
       'Hören vom Donnerstag, 12.11.2026, 14:20 gelöscht. Diesen Monat 3, insgesamt 14.',
     )
+  })
+})
+
+describe('album order texts', () => {
+  it('labels the three orders', () => {
+    expect(albumOrderLabel('alphabetical')).toBe('Alphabetisch')
+    expect(albumOrderLabel('thisMonth')).toBe('Diesen Monat am meisten gehört')
+    expect(albumOrderLabel('inTotal')).toBe('Insgesamt am meisten gehört')
+  })
+
+  it('announces the order and the first album', () => {
+    expect(
+      albumOrderChangedAnnouncement('inTotal', {
+        title: 'Kind of Blue',
+        artist: 'Miles Davis',
+      }),
+    ).toBe(
+      'Sortiert: Insgesamt am meisten gehört. Zuerst: Kind of Blue, Miles Davis.',
+    )
+  })
+
+  it('announces a first album without artist', () => {
+    expect(
+      albumOrderChangedAnnouncement('alphabetical', {
+        title: 'Greatest Hits',
+        artist: '',
+      }),
+    ).toBe('Sortiert: Alphabetisch. Zuerst: Greatest Hits.')
   })
 })
 

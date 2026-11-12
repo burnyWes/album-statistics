@@ -7,6 +7,7 @@ import {
   type NamedAlbum,
 } from './album'
 import type { AlbumsMerge } from './albumMerge'
+import type { AlbumOrder } from './albumOrder'
 import { listeningsInTotal, listeningsThisMonth } from './listening'
 import { spokenListeningTime } from './listeningTime'
 
@@ -23,6 +24,23 @@ export function albumFailureMessage(error: unknown): string | null {
 
 export function albumsHeading(albumCount: number): string {
   return albumCount === 0 ? 'Alben' : `Alben, ${albumCount}`
+}
+
+const labelsByAlbumOrder: Record<AlbumOrder, string> = {
+  alphabetical: 'Alphabetisch',
+  thisMonth: 'Diesen Monat am meisten gehört',
+  inTotal: 'Insgesamt am meisten gehört',
+}
+
+export function albumOrderLabel(order: AlbumOrder): string {
+  return labelsByAlbumOrder[order]
+}
+
+export function albumOrderChangedAnnouncement(
+  order: AlbumOrder,
+  firstAlbum: NamedAlbum,
+): string {
+  return `Sortiert: ${albumOrderLabel(order)}. Zuerst: ${albumName(firstAlbum)}.`
 }
 
 export function albumSavedAnnouncement(album: NamedAlbum): string {

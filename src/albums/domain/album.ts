@@ -59,7 +59,7 @@ export function newAlbum(
   return { ...name, spotifyLink: spotifyLink.link, cover: draft.cover }
 }
 
-function compareByTitle(one: NamedAlbum, other: NamedAlbum): number {
+export function compareByTitle(one: NamedAlbum, other: NamedAlbum): number {
   return (
     collator.compare(one.title, other.title) ||
     collator.compare(one.artist, other.artist)

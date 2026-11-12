@@ -176,3 +176,42 @@ test('keeps a shrunken cover after a reload', async ({ page }) => {
   await albumButton(page, 'Kind of Blue').click()
   await expectShrunkenCover(page.getByRole('img', { name: 'Album-Cover' }))
 })
+
+test('orders the albums by listenings in total', async ({ page }) => {
+  await page.goto('./')
+  await addAlbum(page, 'Abbey Road', 'The Beatles')
+  await addAlbum(page, 'Kind of Blue', 'Miles Davis')
+  await page
+    .getByRole('button', { name: 'Kind of Blue, Miles Davis gehört' })
+    .click()
+  const inTotal = page.getByRole('button', {
+    name: 'Insgesamt am meisten gehört',
+  })
+
+  await inTotal.click()
+
+  await expect(inTotal).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.albumName').first()).toHaveText(
+    'Kind of Blue, Miles Davis',
+  )
+})
+
+test('keeps the chosen order after a reload', async ({ page }) => {
+  await page.goto('./')
+  await addAlbum(page, 'Abbey Road', 'The Beatles')
+  await addAlbum(page, 'Kind of Blue', 'Miles Davis')
+  await page
+    .getByRole('button', { name: 'Kind of Blue, Miles Davis gehört' })
+    .click()
+  const inTotal = page.getByRole('button', {
+    name: 'Insgesamt am meisten gehört',
+  })
+  await inTotal.click()
+
+  await page.reload()
+
+  await expect(inTotal).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.albumName').first()).toHaveText(
+    'Kind of Blue, Miles Davis',
+  )
+})

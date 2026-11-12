@@ -3,6 +3,10 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { accessibilityViolations } from '../../testSupport/accessibility'
 import {
+  createInMemoryAlbumOrderClient,
+  type InMemoryAlbumOrderClient,
+} from '../api/inMemoryAlbumOrderClient'
+import {
   createInMemoryAlbumsClient,
   type InMemoryAlbumsClient,
 } from '../api/inMemoryAlbumsClient'
@@ -32,18 +36,26 @@ function renderArea(
     initialAlbums,
   ),
   coverImageClient: InMemoryCoverImageClient = createInMemoryCoverImageClient(),
+  albumOrderClient: InMemoryAlbumOrderClient = createInMemoryAlbumOrderClient(),
 ) {
   const announcements: string[] = []
   const rendered = render(
     <AlbumsArea
       albumsClient={albumsClient}
+      albumOrderClient={albumOrderClient}
       coverImageClient={coverImageClient}
       clock={() => now}
       announce={(text) => announcements.push(text)}
       navigation={<nav aria-label="Bereiche" />}
     />,
   )
-  return { ...rendered, albumsClient, coverImageClient, announcements }
+  return {
+    ...rendered,
+    albumsClient,
+    coverImageClient,
+    albumOrderClient,
+    announcements,
+  }
 }
 
 function addAlbumButton() {
@@ -986,5 +998,188 @@ describe('AlbumsArea', () => {
     await openAlbum('Kind of Blue, Miles Davis')
 
     expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  describe('ordering the list', () => {
+    const abbeyRoad: Album = {
+      ...kindOfBlue,
+      id: 'abbey-road',
+      title: 'Abbey Road',
+      artist: 'The Beatles',
+      listenings: [thursdayListening],
+    }
+
+    const listenedInOctober: Album = {
+      ...theWall,
+      listenings: [octoberListening, octoberListening, octoberListening],
+    }
+
+    const listenedTwiceInNovember: Album = {
+      ...kindOfBlue,
+      listenings: [thursdayListening, thursdayListening],
+    }
+
+    function orderGroup() {
+      return screen.queryByRole('group', { name: 'Sortierung' })
+    }
+
+    function orderButton(name: string) {
+      return within(orderGroup()!).getByRole('button', { name })
+    }
+
+    it('offers no ordering without albums', () => {
+      renderArea()
+
+      expect(orderGroup()).not.toBeInTheDocument()
+    })
+
+    it('starts alphabetically', () => {
+      renderArea([kindOfBlue])
+
+      expect(orderButton('Alphabetisch')).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+      expect(orderButton('Diesen Monat am meisten gehört')).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
+      expect(orderButton('Insgesamt am meisten gehört')).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
+    })
+
+    it('orders by listenings in total and announces the first album', async () => {
+      const { announcements } = renderArea([
+        abbeyRoad,
+        kindOfBlue,
+        listenedInOctober,
+      ])
+
+      await userEvent.click(orderButton('Insgesamt am meisten gehört'))
+
+      expect(albumRows()).toEqual([
+        'The Wall, Pink Floyd',
+        'Abbey Road, The Beatles',
+        'Kind of Blue, Miles Davis',
+      ])
+      expect(orderButton('Insgesamt am meisten gehört')).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+      expect(orderButton('Alphabetisch')).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
+      expect(announcements).toEqual([
+        'Sortiert: Insgesamt am meisten gehört. Zuerst: The Wall, Pink Floyd.',
+      ])
+    })
+
+    it('orders by listenings in the current month', async () => {
+      const { announcements } = renderArea([
+        abbeyRoad,
+        listenedTwiceInNovember,
+        listenedInOctober,
+      ])
+
+      await userEvent.click(orderButton('Diesen Monat am meisten gehört'))
+
+      expect(albumRows()).toEqual([
+        'Kind of Blue, Miles Davis',
+        'Abbey Road, The Beatles',
+        'The Wall, Pink Floyd',
+      ])
+      expect(announcements).toEqual([
+        'Sortiert: Diesen Monat am meisten gehört. Zuerst: Kind of Blue, Miles Davis.',
+      ])
+    })
+
+    it('announces again when the chosen order is pressed again', async () => {
+      const { announcements } = renderArea([kindOfBlue])
+
+      await userEvent.click(orderButton('Alphabetisch'))
+
+      expect(announcements).toEqual([
+        'Sortiert: Alphabetisch. Zuerst: Kind of Blue, Miles Davis.',
+      ])
+    })
+
+    it('moves a listened album up and keeps the focus on its listened button', async () => {
+      renderArea([abbeyRoad, kindOfBlue])
+      await userEvent.click(orderButton('Insgesamt am meisten gehört'))
+
+      await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+      await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+      expect(albumRows()).toEqual([
+        'Kind of Blue, Miles Davis',
+        'Abbey Road, The Beatles',
+      ])
+      expect(listenedButton('Kind of Blue, Miles Davis')).toHaveFocus()
+    })
+
+    it('moves the album back after taking back and keeps the focus on it', async () => {
+      renderArea([
+        abbeyRoad,
+        { ...kindOfBlue, listenings: [thursdayListening] },
+      ])
+      await userEvent.click(orderButton('Insgesamt am meisten gehört'))
+      await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+      expect(albumRows()[0]).toBe('Kind of Blue, Miles Davis')
+
+      await userEvent.click(undoButton('Kind of Blue, Miles Davis')!)
+
+      expect(albumRows()).toEqual([
+        'Abbey Road, The Beatles',
+        'Kind of Blue, Miles Davis',
+      ])
+      expect(listenedButton('Kind of Blue, Miles Davis')).toHaveFocus()
+    })
+
+    function renderOrderedArea(
+      albums: readonly Album[],
+      albumOrderClient: InMemoryAlbumOrderClient,
+    ) {
+      return renderArea(
+        albums,
+        createInMemoryAlbumsClient(albums),
+        createInMemoryCoverImageClient(),
+        albumOrderClient,
+      )
+    }
+
+    it('starts with the remembered order', () => {
+      renderOrderedArea(
+        [abbeyRoad, kindOfBlue, listenedInOctober],
+        createInMemoryAlbumOrderClient('inTotal'),
+      )
+
+      expect(albumRows()).toEqual([
+        'The Wall, Pink Floyd',
+        'Abbey Road, The Beatles',
+        'Kind of Blue, Miles Davis',
+      ])
+      expect(orderButton('Insgesamt am meisten gehört')).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+    })
+
+    it('remembers the chosen order', async () => {
+      const { albumOrderClient } = renderArea([kindOfBlue])
+
+      await userEvent.click(orderButton('Diesen Monat am meisten gehört'))
+
+      expect(albumOrderClient.storedAlbumOrder()).toBe('thisMonth')
+    })
+
+    it('has no accessibility violations with the ordering', async () => {
+      const { container } = renderArea([abbeyRoad, kindOfBlue])
+      await userEvent.click(orderButton('Insgesamt am meisten gehört'))
+
+      expect(await accessibilityViolations(container)).toEqual([])
+    })
   })
 })
