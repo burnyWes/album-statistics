@@ -5,7 +5,7 @@ branch: main
 story: ALS-001
 topic: "Grunddesign: rotes Farbschema, Navigation, Einstellungen, App-Icon, Installation und Updates"
 tags: [plan, design, navigation, settings, pwa, shared-ui]
-status: ready
+status: done
 ---
 
 # PLAN: ALS-001 — Grunddesign
@@ -310,9 +310,9 @@ roten hellen Schema.
   `vite.config.ts` folgt in Phase 3)
 
 **Manuelle Verifikation**:
-- [ ] Im Browser (`npm run dev`): Navigation bleibt beim Scrollen oben, aktiver
+- [x] Im Browser (`npm run dev`): Navigation bleibt beim Scrollen oben, aktiver
   Bereich hellrot hinterlegt, `[+]` grau.
-- [ ] Mit TalkBack: Navigationsknöpfe werden als „Alben“ und „Einstellungen“
+- [x] Mit TalkBack: Navigationsknöpfe werden als „Alben“ und „Einstellungen“
   angesagt, `[+]` als „Album hinzufügen, nicht verfügbar“; nach dem Wechsel liegt der
   Fokus auf der Überschrift.
 
@@ -352,7 +352,7 @@ Der Schalter „Farben invertieren“ schaltet das dunkle rote Schema und bleibt
 - [x] `npm run test:e2e` grün, darunter `appearance.spec.ts`
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy: Schalter umlegen → schwarzer Hintergrund, dunkelrote Knöpfe mit
+- [x] Auf dem Handy: Schalter umlegen → schwarzer Hintergrund, dunkelrote Knöpfe mit
   weißem Rand, Systemleiste dunkelrot; App schließen und öffnen → dunkel ohne helles
   Aufblitzen.
 
@@ -400,7 +400,7 @@ rot.
 - [x] `grep -r "1e3a8a" .` außerhalb von `node_modules` und `dist` findet nichts
 
 **Manuelle Verifikation**:
-- [ ] Nach dem Deployment auf dem Android-Handy: Browser-Tab zeigt die Platte;
+- [x] Nach dem Deployment auf dem Android-Handy: Browser-Tab zeigt die Platte;
   installiert zeigt der Startbildschirm die schwarze Platte mit weißem Etikett auf
   rotem Grund, auch in runder Icon-Maske nicht abgeschnitten.
 
@@ -455,7 +455,7 @@ In den Einstellungen erscheint „App installieren“, sobald der Browser es anb
 - [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
-- [ ] Nach dem Deployment in Chrome auf Android (App noch nicht installiert):
+- [x] Nach dem Deployment in Chrome auf Android (App noch nicht installiert):
   Einstellungen zeigen „App installieren“, Tippen öffnet den Installationsdialog,
   TalkBack sagt das Ergebnis an, der Eintrag verschwindet; in der installierten App
   fehlt der Eintrag.
@@ -488,7 +488,7 @@ Neue Versionen werden angesagt und erst per Knopf geladen.
   `registerSW.js` mehr ein
 
 **Manuelle Verifikation**:
-- [ ] Nach zwei aufeinanderfolgenden Deployments auf dem Handy: App öffnen, TalkBack
+- [x] Nach zwei aufeinanderfolgenden Deployments auf dem Handy: App öffnen, TalkBack
   sagt „Neue Version verfügbar …“, unten steht „Neue Version laden“, Tippen lädt die
   neue Version.
 
