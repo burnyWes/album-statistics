@@ -4,14 +4,35 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 const applicationBasePath = '/album-statistics/'
 
+export const manifestIcons = [
+  {
+    src: 'icon-192.png',
+    sizes: '192x192',
+    type: 'image/png',
+    purpose: 'any',
+  },
+  {
+    src: 'icon-512.png',
+    sizes: '512x512',
+    type: 'image/png',
+    purpose: 'any',
+  },
+  {
+    src: 'icon-maskable-512.png',
+    sizes: '512x512',
+    type: 'image/png',
+    purpose: 'maskable',
+  },
+]
+
 export default defineConfig({
   base: applicationBasePath,
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'auto',
-      includeAssets: ['favicon.svg'],
+      registerType: 'prompt',
+      injectRegister: null,
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Album-Statistics',
         short_name: 'Alben',
@@ -22,16 +43,9 @@ export default defineConfig({
         scope: applicationBasePath,
         display: 'standalone',
         orientation: 'portrait',
-        theme_color: '#1e3a8a',
+        theme_color: '#b91c1c',
         background_color: '#ffffff',
-        icons: [
-          {
-            src: 'favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any',
-          },
-        ],
+        icons: manifestIcons,
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],

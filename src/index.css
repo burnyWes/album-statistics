@@ -8,7 +8,32 @@
   line-height: 1.5;
   --surface: #ffffff;
   --ink: #000000;
-  --accent: #1e3a8a;
+  --accent: #f4a3a3;
+  --accentLine: #b91c1c;
+  --systemBar: #b91c1c;
+  --checkMark: #b91c1c;
+  --divider: #d1d5db;
+  --fieldBorder: #4b5563;
+  --disabled: #f3f4f6;
+  --disabledLine: #6b7280;
+  --disabledInk: #4b5563;
+  --failure: #991b1b;
+}
+
+:root[data-inverted-colors='true'] {
+  color-scheme: dark;
+  --surface: #000000;
+  --ink: #ffffff;
+  --accent: #7f1d1d;
+  --accentLine: #f87171;
+  --systemBar: #7f1d1d;
+  --checkMark: #f87171;
+  --divider: #2e2a24;
+  --fieldBorder: #b4aa9c;
+  --disabled: #0c0b09;
+  --disabledLine: #948d7f;
+  --disabledInk: #b4aa9c;
+  --failure: #66e4e4;
 }
 
 html {
@@ -29,4 +54,232 @@ body {
   padding-right: max(1rem, env(safe-area-inset-right));
   max-width: 40rem;
   margin: 0 auto;
+}
+
+.pageBelowNavigation {
+  padding-top: 1rem;
+}
+
+.navigationBar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--divider);
+  padding-top: env(safe-area-inset-top);
+}
+
+.navigationBar ul {
+  display: flex;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0 auto;
+  padding: 0.5rem max(1rem, env(safe-area-inset-left));
+  max-width: 40rem;
+}
+
+.navigationBar li {
+  flex: 1;
+}
+
+.navigationBar button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  min-height: 44px;
+}
+
+:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 2px;
+}
+
+h1:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0 0 1rem;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--fieldBorder);
+  border-radius: 6px;
+  padding: 0.5rem;
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent);
+  color: var(--ink);
+}
+
+.navigationBar button,
+.rowButton {
+  background-color: var(--surface);
+  border-color: var(--accentLine);
+}
+
+.navigationBar button[aria-current='page'] {
+  background-color: var(--accent);
+  border-color: var(--ink);
+}
+
+button:disabled,
+button[aria-disabled='true'] {
+  background-color: var(--disabled);
+  border-color: var(--disabledLine);
+  color: var(--disabledInk);
+}
+
+.announcer {
+  min-height: 1.5rem;
+  margin: 0;
+  padding: 0.5rem max(1rem, env(safe-area-inset-left));
+  border-top: 1px solid var(--divider);
+}
+
+.appUpdate {
+  padding: 1rem max(1rem, env(safe-area-inset-left));
+  border-top: 1px solid var(--divider);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pageHeader h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.addItemButton {
+  font-size: 1.5rem;
+  line-height: 1;
+  min-width: 44px;
+}
+
+.itemList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.itemList li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--divider);
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.rowButton {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.choice,
+.settingsToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+
+.settingsToggle {
+  flex: 1;
+  justify-content: space-between;
+}
+
+input[type='checkbox']:not([role='switch']),
+input[type='radio'] {
+  appearance: none;
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-left: 3px solid var(--ink);
+  border-bottom: 3px solid var(--ink);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+input[type='checkbox']:not([role='switch']):checked::before,
+input[type='radio']:checked::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  box-sizing: border-box;
+  width: 15px;
+  height: 29px;
+  border-right: 5px solid var(--checkMark);
+  border-bottom: 5px solid var(--checkMark);
+  transform: rotate(45deg);
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.iconButton {
+  flex: none;
+  min-width: 44px;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonIcon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

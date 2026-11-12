@@ -30,6 +30,7 @@ Die Dauerregeln stehen in [CLAUDE.md](CLAUDE.md), die projektspezifischen Angabe
 | `npm run lint`      | ESLint samt Schicht- und Kontextgrenzen       |
 | `npm run format`    | Prettier                                      |
 | `npm run build`     | Typprüfung und Produktions-Build nach `dist/` |
+| `npm run icons`     | App-Icons aus dem Icon-Skript neu erzeugen    |
 
 Vor dem ersten E2E-Lauf einmalig `npx playwright install chromium`.
 

@@ -246,7 +246,7 @@ Die App zeigt Navigation, Alben-Seite und eine Einstellungen-Seite ohne Einträg
 roten hellen Schema.
 
 **Aufgaben**:
-- [ ] `src/index.css` – Grunddesign aus `Mahlzeitenplaner/src/index.css` übernehmen:
+- [x] `src/index.css` – Grunddesign aus `Mahlzeitenplaner/src/index.css` übernehmen:
   Variablen (nur helles Schema, Werte laut Tabelle), `html`/`body`, `.page`,
   `.pageBelowNavigation`, `.navigationBar` samt `button[aria-current='page']`, Knöpfe
   inklusive `button:disabled, button[aria-disabled='true']`, `:focus-visible`,
@@ -254,32 +254,32 @@ roten hellen Schema.
   `.itemList`, `.announcer`, `.iconButton`, `.buttonIcon`, `.visuallyHidden`, `h2`.
   Klassen mit Mahlzeiten-Bezug umbenennen: `.mealRow` → `.listRow`,
   `.mealNameButton` → `.rowButton`.
-- [ ] `src/index.css` – Checkbox- und Radiobutton-Stil als allgemeine Regel
+- [x] `src/index.css` – Checkbox- und Radiobutton-Stil als allgemeine Regel
   `input[type='checkbox']:not([role='switch']), input[type='radio']` (L-Form aus
   `index.css:311-350` des Mahlzeitenplaners, Häkchen in `--checkMark`) und `label`
   daneben mit `.choice` (Flex, `gap: 0.75rem`, `min-height: 44px`).
-- [ ] `src/index.css` – Schalter `.settingsToggle` übernehmen; der Schalter selbst
+- [x] `src/index.css` – Schalter `.settingsToggle` übernehmen; der Schalter selbst
   (`role="switch"`) behält das Browser-Aussehen wie im Mahlzeitenplaner.
-- [ ] `src/shared/ui/announcement.ts` und `announcement.test.ts`, `Announcer.tsx`,
+- [x] `src/shared/ui/announcement.ts` und `announcement.test.ts`, `Announcer.tsx`,
   `useAnnouncer.ts`, `useHeadingFocus.ts`, `NavigationBar.tsx`, `SettingsIcon.tsx`
   unverändert aus dem Mahlzeitenplaner übernehmen.
-- [ ] `src/shared/ui/SettingsPage.tsx` – übernehmen, `SettingsEntry` zunächst nur mit
+- [x] `src/shared/ui/SettingsPage.tsx` – übernehmen, `SettingsEntry` zunächst nur mit
   Art `toggle`; `className="mealRow"` → `listRow`.
-- [ ] `src/albums/ui/RecordIcon.tsx` – Strich-SVG im Stil von `SettingsIcon`
+- [x] `src/albums/ui/RecordIcon.tsx` – Strich-SVG im Stil von `SettingsIcon`
   (`viewBox="0 0 24 24"`, `stroke="currentColor"`, `aria-hidden`):
   ```tsx
   <circle cx="12" cy="12" r="10" />
   <circle cx="12" cy="12" r="6.5" />
   <circle cx="12" cy="12" r="2.5" />
   ```
-- [ ] `src/albums/ui/AlbumsPage.tsx` – Props `navigation: ReactNode`; Überschrift
+- [x] `src/albums/ui/AlbumsPage.tsx` – Props `navigation: ReactNode`; Überschrift
   „Alben“ mit `useHeadingFocus`, Knopf `+` mit `aria-label="Album hinzufügen"`,
   `aria-disabled="true"`, Klasse `addItemButton`, ohne `onClick`; Text
   „Noch keine Alben.“
-- [ ] `src/App.tsx` – `AREAS` mit `albums` („Alben“, `RecordIcon`) und `settings`
+- [x] `src/App.tsx` – `AREAS` mit `albums` („Alben“, `RecordIcon`) und `settings`
   („Einstellungen“, `SettingsIcon`), Zustand `activeArea` (Start `albums`),
   `useAnnouncer`, `<Announcer>` am Ende. Einstellungen zunächst mit leerer Liste.
-- [ ] `src/App.test.tsx` neu schreiben (zuerst, test-getrieben):
+- [x] `src/App.test.tsx` neu schreiben (zuerst, test-getrieben):
   - `starts on the albums page` – Überschrift „Alben“, „Noch keine Alben.“
   - `offers adding an album only as unavailable` – Knopf „Album hinzufügen“ hat
     `aria-disabled="true"`; Klick ändert nichts
@@ -287,9 +287,9 @@ roten hellen Schema.
     „Einstellungen“ nicht
   - `switches to the settings and focuses their heading`
   - `has no accessibility violations` – auf Alben- und Einstellungen-Seite
-- [ ] `index.html` – `theme-color` auf `#b91c1c`, `<meta name="color-scheme"
+- [x] `index.html` – `theme-color` auf `#b91c1c`, `<meta name="color-scheme"
   content="light" />`.
-- [ ] `test/colorContrast.test.ts` (zuerst, test-getrieben) – liest `src/index.css`,
+- [x] `test/colorContrast.test.ts` (zuerst, test-getrieben) – liest `src/index.css`,
   zieht die Variablen aus `:root` (und ab Phase 2 aus
   `:root[data-inverted-colors='true']`) und prüft per WCAG-Formel:
   `--ink`/`--surface` ≥ 4,5; `--ink`/`--accent` ≥ 4,5; `--disabledInk`/`--disabled`
@@ -297,16 +297,16 @@ roten hellen Schema.
   `--checkMark`/`--surface` ≥ 3. Die Berechnung liegt als Funktion
   `contrastRatio(foreground, background)` in `test/colorContrast.ts` und hat einen
   eigenen Fall: `#000000` zu `#ffffff` ergibt 21.
-- [ ] `e2e/app.spec.ts` – ersetzen: App öffnet auf „Alben“; Tippen auf
+- [x] `e2e/app.spec.ts` – ersetzen: App öffnet auf „Alben“; Tippen auf
   „Einstellungen“ zeigt die Überschrift „Einstellungen“.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `App.test.tsx`, `announcement.test.ts`,
+- [x] `npm run test` grün, darunter `App.test.tsx`, `announcement.test.ts`,
   `colorContrast.test.ts`, `domainLayerBoundary.test.ts`
-- [ ] `npm run lint` grün
-- [ ] `npm run build` grün
-- [ ] `npm run test:e2e` grün
-- [ ] `grep -rn "1e3a8a" src index.html` findet nichts (das Manifest in
+- [x] `npm run lint` grün
+- [x] `npm run build` grün
+- [x] `npm run test:e2e` grün
+- [x] `grep -rn "1e3a8a" src index.html` findet nichts (das Manifest in
   `vite.config.ts` folgt in Phase 3)
 
 **Manuelle Verifikation**:
@@ -323,33 +323,33 @@ Abhängigkeiten: Phase 1
 Der Schalter „Farben invertieren“ schaltet das dunkle rote Schema und bleibt erhalten.
 
 **Aufgaben**:
-- [ ] `src/shared/appearance/` – `appearanceClient.ts`,
+- [x] `src/shared/appearance/` – `appearanceClient.ts`,
   `localStorageAppearanceClient.ts` (+ Test), `inMemoryAppearanceClient.ts`,
   `useAppearance.ts` (+ Test) aus dem Mahlzeitenplaner übernehmen.
-- [ ] `useAppearance.ts` – `applyAccentToTheSystemBar` wird zu
+- [x] `useAppearance.ts` – `applyAccentToTheSystemBar` wird zu
   `applySystemBarColor` und liest `--systemBar` statt `--accent`. Test
   `useAppearance.test.tsx` zuerst anpassen: Palette mit `--systemBar` hell
   `#b91c1c`, dunkel `#7f1d1d`.
-- [ ] `src/index.css` – Block `:root[data-inverted-colors='true']` mit
+- [x] `src/index.css` – Block `:root[data-inverted-colors='true']` mit
   `color-scheme: dark` und den dunklen Werten laut Tabelle.
-- [ ] `index.html` – Inline-Skript aus `Mahlzeitenplaner/index.html` übernehmen, das
+- [x] `index.html` – Inline-Skript aus `Mahlzeitenplaner/index.html` übernehmen, das
   `data-inverted-colors` vor dem ersten Zeichnen aus `localStorage` setzt.
-- [ ] `src/App.tsx` – Prop `appearanceClient`, `useAppearance`, Einstellungseintrag
+- [x] `src/App.tsx` – Prop `appearanceClient`, `useAppearance`, Einstellungseintrag
   `{ kind: 'toggle', id: 'invertedColors', label: 'Farben invertieren', … }`.
-- [ ] `src/main.tsx` – `createLocalStorageAppearanceClient()` übergeben.
-- [ ] `src/App.test.tsx` – zuerst: `inverts the colours from the settings`
+- [x] `src/main.tsx` – `createLocalStorageAppearanceClient()` übergeben.
+- [x] `src/App.test.tsx` – zuerst: `inverts the colours from the settings`
   (Schalter an → `data-inverted-colors="true"`, Fake hat `true` gespeichert);
   `starts with remembered inverted colours` (Fake mit `true` → Schalter an).
-- [ ] `test/colorContrast.test.ts` – dieselben Paare auch für das dunkle Schema.
-- [ ] `e2e/appearance.spec.ts` – nach `Mahlzeitenplaner/e2e/appearance.spec.ts`
+- [x] `test/colorContrast.test.ts` – dieselben Paare auch für das dunkle Schema.
+- [x] `e2e/appearance.spec.ts` – nach `Mahlzeitenplaner/e2e/appearance.spec.ts`
   ohne Anmeldung: Schalter einschalten, neu laden, `data-inverted-colors="true"` und
   Schalter weiterhin an.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `localStorageAppearanceClient.test.ts`,
+- [x] `npm run test` grün, darunter `localStorageAppearanceClient.test.ts`,
   `useAppearance.test.tsx`, `colorContrast.test.ts` mit beiden Schemata
-- [ ] `npm run lint` und `npm run build` grün
-- [ ] `npm run test:e2e` grün, darunter `appearance.spec.ts`
+- [x] `npm run lint` und `npm run build` grün
+- [x] `npm run test:e2e` grün, darunter `appearance.spec.ts`
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy: Schalter umlegen → schwarzer Hintergrund, dunkelrote Knöpfe mit
@@ -364,12 +364,12 @@ Favicon, Android- und Apple-Icons zeigen die schwarze Platte auf Rot; das Manife
 rot.
 
 **Aufgaben**:
-- [ ] `test/appIcons.test.ts` (zuerst) – liest die Manifest-Icons aus der
+- [x] `test/appIcons.test.ts` (zuerst) – liest die Manifest-Icons aus der
   Vite-Konfiguration (Icon-Liste als exportierte Konstante `manifestIcons` aus
   `vite.config.ts`) und prüft für jede PNG-Datei in `public/`: existiert, PNG-Signatur,
   Breite und Höhe aus dem IHDR-Block passen zu `sizes`; dazu
   `public/apple-touch-icon.png` mit 180 × 180.
-- [ ] `scripts/generateIcons.mjs` – aus dem Mahlzeitenplaner übernehmen
+- [x] `scripts/generateIcons.mjs` – aus dem Mahlzeitenplaner übernehmen
   (Leinwand, Supersampling, Abrunden, PNG-Kodierung), Zeichnung ersetzen durch
   `renderRecordIcon({ size, cornerRadiusRatio, contentScale })`:
   - Hintergrund `#b91c1c`, abgerundet (`cornerRadiusRatio` 0,22, maskierbar und
@@ -382,22 +382,22 @@ rot.
   - Neue Hilfsfunktion `paintCircle(canvas, center, radius, color)` und
     `paintRing(canvas, center, radius, thickness, color)`; Rechteck- und
     Polylinien-Funktionen entfallen, soweit ungenutzt.
-- [ ] `package.json` – Skript `"icons": "node scripts/generateIcons.mjs"`; einmal
+- [x] `package.json` – Skript `"icons": "node scripts/generateIcons.mjs"`; einmal
   ausführen und die vier PNGs nach `public/` schreiben.
-- [ ] `public/favicon.svg` – dieselbe Zeichnung als SVG (`viewBox="0 0 512 512"`,
+- [x] `public/favicon.svg` – dieselbe Zeichnung als SVG (`viewBox="0 0 512 512"`,
   `rx="113"`, Kreise wie oben), `role="img"`, `aria-label="Album-Statistics"`.
-- [ ] `vite.config.ts` – `manifestIcons` mit 192, 512 und maskierbar 512 (PNG),
+- [x] `vite.config.ts` – `manifestIcons` mit 192, 512 und maskierbar 512 (PNG),
   `includeAssets: ['favicon.svg', 'apple-touch-icon.png']`, `theme_color: '#b91c1c'`.
-- [ ] `index.html` – `<link rel="apple-touch-icon" href="/apple-touch-icon.png" />`,
+- [x] `index.html` – `<link rel="apple-touch-icon" href="/apple-touch-icon.png" />`,
   `<meta name="apple-mobile-web-app-status-bar-style" content="default" />`.
-- [ ] `eslint.config.js` – Node-Globals zusätzlich für `scripts/**/*.mjs`.
-- [ ] `README.md` – Befehlstabelle um `npm run icons` ergänzen („App-Icons aus dem
+- [x] `eslint.config.js` – Node-Globals zusätzlich für `scripts/**/*.mjs`.
+- [x] `README.md` – Befehlstabelle um `npm run icons` ergänzen („App-Icons aus dem
   Icon-Skript neu erzeugen“).
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `appIcons.test.ts`
-- [ ] `npm run lint` und `npm run build` grün
-- [ ] `grep -r "1e3a8a" .` außerhalb von `node_modules` und `dist` findet nichts
+- [x] `npm run test` grün, darunter `appIcons.test.ts`
+- [x] `npm run lint` und `npm run build` grün
+- [x] `grep -r "1e3a8a" .` außerhalb von `node_modules` und `dist` findet nichts
 
 **Manuelle Verifikation**:
 - [ ] Nach dem Deployment auf dem Android-Handy: Browser-Tab zeigt die Platte;
@@ -411,7 +411,7 @@ Abhängigkeiten: Phase 2 (Einstellungen mit Einträgen)
 In den Einstellungen erscheint „App installieren“, sobald der Browser es anbietet.
 
 **Aufgaben**:
-- [ ] `src/shared/install/installOfferClient.ts` – Port:
+- [x] `src/shared/install/installOfferClient.ts` – Port:
   ```ts
   export type InstallOutcome = 'accepted' | 'dismissed'
 
@@ -420,39 +420,39 @@ In den Einstellungen erscheint „App installieren“, sobald der Browser es anb
     install(): Promise<InstallOutcome>
   }
   ```
-- [ ] `src/shared/install/browserInstallOfferClient.ts` – Adapter nach
+- [x] `src/shared/install/browserInstallOfferClient.ts` – Adapter nach
   `installOffer.svelte.ts`: merkt sich `beforeinstallprompt`, meldet `true`; bei `appinstalled` vergisst er das Angebot
   und meldet `false`; `install()` ruft `prompt()` auf, wartet auf `userChoice`,
   vergisst das Angebot und meldet `false`. Typ `BeforeInstallPromptEvent` mit
   Warum-Kommentar und MDN-Link wie in der Wunschliste. Parameter
   `browser: EventTarget = globalThis`.
-- [ ] `src/shared/install/browserInstallOfferClient.test.ts` (zuerst) – mit eigenem
+- [x] `src/shared/install/browserInstallOfferClient.test.ts` (zuerst) – mit eigenem
   `EventTarget` und künstlichem Ereignis: meldet das Angebot; `install()` liefert
   `accepted` bzw. `dismissed` aus `userChoice` und meldet danach `false`;
   `appinstalled` zieht das Angebot zurück; nach Abmelden keine Meldungen mehr.
-- [ ] `src/shared/install/inMemoryInstallOfferClient.ts` – Fake mit `offer()`,
+- [x] `src/shared/install/inMemoryInstallOfferClient.ts` – Fake mit `offer()`,
   `withdraw()` und einstellbarem Ergebnis von `install()`.
-- [ ] `src/shared/install/installAnnouncements.ts` (+ Test, zuerst) –
+- [x] `src/shared/install/installAnnouncements.ts` (+ Test, zuerst) –
   `installOutcomeAnnouncement(outcome)` mit den Texten aus *Logging und
   Beobachtbarkeit*.
-- [ ] `src/shared/install/useInstallOffer.ts` – Hook: `available: boolean`,
+- [x] `src/shared/install/useInstallOffer.ts` – Hook: `available: boolean`,
   `install(): Promise<InstallOutcome>`.
-- [ ] `src/shared/ui/SettingsPage.tsx` – Eintragsart
+- [x] `src/shared/ui/SettingsPage.tsx` – Eintragsart
   `{ kind: 'action'; id; label; onSelect: () => void }`, gerendert als Knopf mit Klasse
   `rowButton`. Weil der gedrückte Knopf nach der Installation verschwindet, nimmt
   `SettingsPage` die Prop `headingFocusRequest: number` und fokussiert die Überschrift
   bei jeder Änderung dieses Werts; `App` erhöht ihn nach dem Ergebnis.
-- [ ] `src/App.tsx` – Prop `installOfferClient`; Eintrag „App installieren“ nur bei
+- [x] `src/App.tsx` – Prop `installOfferClient`; Eintrag „App installieren“ nur bei
   `available`; nach `install()` Ergebnis ansagen und Fokus auf die Überschrift.
-- [ ] `src/main.tsx` – `createBrowserInstallOfferClient()` übergeben.
-- [ ] `src/App.test.tsx` – zuerst: `offers installing only while the browser offers
+- [x] `src/main.tsx` – `createBrowserInstallOfferClient()` übergeben.
+- [x] `src/App.test.tsx` – zuerst: `offers installing only while the browser offers
   it`; `announces an accepted installation and focuses the settings heading`;
   `announces a dismissed installation`.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `browserInstallOfferClient.test.ts`,
+- [x] `npm run test` grün, darunter `browserInstallOfferClient.test.ts`,
   `installAnnouncements.test.ts`, die neuen Fälle in `App.test.tsx`
-- [ ] `npm run lint`, `npm run build`, `npm run test:e2e` grün
+- [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
 - [ ] Nach dem Deployment in Chrome auf Android (App noch nicht installiert):
@@ -467,24 +467,24 @@ Abhängigkeiten: Phase 1
 Neue Versionen werden angesagt und erst per Knopf geladen.
 
 **Aufgaben**:
-- [ ] `src/shared/appUpdate/` – `appUpdateClient.ts`, `inMemoryAppUpdateClient.ts`,
+- [x] `src/shared/appUpdate/` – `appUpdateClient.ts`, `inMemoryAppUpdateClient.ts`,
   `serviceWorkerAppUpdateClient.ts`, `useAppUpdate.ts`, `AppUpdateOffer.tsx` aus dem
   Mahlzeitenplaner übernehmen.
-- [ ] `vite.config.ts` – `registerType: 'prompt'`, `injectRegister: null`.
-- [ ] `src/index.css` – `.appUpdate` übernehmen.
-- [ ] `src/App.tsx` – Prop `appUpdateClient`, `useAppUpdate(appUpdateClient,
+- [x] `vite.config.ts` – `registerType: 'prompt'`, `injectRegister: null`.
+- [x] `src/index.css` – `.appUpdate` übernehmen.
+- [x] `src/App.tsx` – Prop `appUpdateClient`, `useAppUpdate(appUpdateClient,
   announce)`, `<AppUpdateOffer>` vor dem `<Announcer>`.
-- [ ] `src/main.tsx` – `createServiceWorkerAppUpdateClient()` übergeben.
-- [ ] `src/App.test.tsx` – zuerst: `offers a waiting update and announces it`;
+- [x] `src/main.tsx` – `createServiceWorkerAppUpdateClient()` übergeben.
+- [x] `src/App.test.tsx` – zuerst: `offers a waiting update and announces it`;
   `installs the update on request` (Fake gibt Funktion frei, Klick ruft sie auf).
-- [ ] `docs/notes.txt` – erledigte Einträge „Design-Farbe = rot“ und „App-Icons =
+- [x] `docs/notes.txt` – erledigte Einträge „Design-Farbe = rot“ und „App-Icons =
   stilisierte Schallplatte“ auf `x` setzen und nach DONE verschieben; sonst nichts
   ändern.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter die neuen Fälle in `App.test.tsx`
-- [ ] `npm run lint`, `npm run build`, `npm run test:e2e` grün
-- [ ] `dist/` enthält nach dem Build `sw.js`, und `dist/index.html` bindet kein
+- [x] `npm run test` grün, darunter die neuen Fälle in `App.test.tsx`
+- [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
+- [x] `dist/` enthält nach dem Build `sw.js`, und `dist/index.html` bindet kein
   `registerSW.js` mehr ein
 
 **Manuelle Verifikation**:
@@ -495,6 +495,17 @@ Neue Versionen werden angesagt und erst per Knopf geladen.
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- `useHeadingFocus` nimmt optional `focusRequest` (Standard 0) als Effekt-Abhängigkeit.
+  So fokussiert `SettingsPage` die Überschrift beim Einhängen und bei jeder Erhöhung von
+  `headingFocusRequest`, ohne zweiten Effekt.
+- `browserInstallOfferClient.install()` liefert ohne vorliegendes Angebot `dismissed`,
+  statt zu werfen; der Knopf ist dann ohnehin nicht sichtbar.
+- Der Adapter meldet ein Angebot, das vor dem ersten Beobachter kam, beim Anmelden nach
+  (eigener Testfall), weil `beforeinstallprompt` vor dem ersten React-Rendern feuern kann.
+- `test/colorContrast.test.ts` importiert `./colorContrast.ts` mit Endung, weil
+  `tsconfig.node.json` `nodenext` verlangt.
+- Die Suche nach `1e3a8a` findet nur noch diesen Plan unter `docs/`.
 
 ## Verweise
 

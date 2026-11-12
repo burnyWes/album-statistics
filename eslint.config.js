@@ -74,7 +74,7 @@ export default tseslint.config(
   },
   ...moduleBoundaries,
   {
-    files: ['e2e/**/*.ts', '*.config.ts', 'test/**/*.ts'],
+    files: ['e2e/**/*.ts', '*.config.ts', 'test/**/*.ts', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: globals.node,
     },
