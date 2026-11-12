@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { DeviceStorage } from './appearanceClient'
+import type { DeviceStorage } from '../storage/deviceStorage'
 import {
   createLocalStorageAppearanceClient,
   INVERTED_COLORS_KEY,

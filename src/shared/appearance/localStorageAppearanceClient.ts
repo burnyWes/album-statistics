@@ -1,14 +1,7 @@
-import type { AppearanceClient, DeviceStorage } from './appearanceClient'
+import { deviceStorage, type DeviceStorage } from '../storage/deviceStorage'
+import type { AppearanceClient } from './appearanceClient'
 
 export const INVERTED_COLORS_KEY = 'invertedColors'
-
-function deviceStorage(): DeviceStorage | null {
-  try {
-    return globalThis.localStorage
-  } catch {
-    return null
-  }
-}
 
 function storedValue(storage: DeviceStorage | null): string | null {
   try {

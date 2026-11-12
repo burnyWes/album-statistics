@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import { createInMemoryAlbumsClient } from './albums/api/inMemoryAlbumsClient'
 import { App } from './App'
 import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppearanceClient'
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
@@ -15,14 +16,23 @@ function renderApp({
   const appearanceClient = createInMemoryAppearanceClient(invertedColors)
   const installOfferClient = createInMemoryInstallOfferClient(installOutcome)
   const appUpdateClient = createInMemoryAppUpdateClient()
+  const albumsClient = createInMemoryAlbumsClient()
   const rendered = render(
     <App
       appearanceClient={appearanceClient}
       installOfferClient={installOfferClient}
       appUpdateClient={appUpdateClient}
+      albumsClient={albumsClient}
+      clock={() => new Date(2026, 10, 15, 12, 0)}
     />,
   )
-  return { ...rendered, appearanceClient, installOfferClient, appUpdateClient }
+  return {
+    ...rendered,
+    appearanceClient,
+    installOfferClient,
+    appUpdateClient,
+    albumsClient,
+  }
 }
 
 function installButton() {
@@ -51,17 +61,17 @@ describe('App', () => {
     expect(screen.getByText('Noch keine Alben.')).toBeInTheDocument()
   })
 
-  it('offers adding an album only as unavailable', async () => {
+  it('opens adding an album from the albums page', async () => {
     renderApp()
-    const addAlbum = screen.getByRole('button', { name: 'Album hinzufügen' })
 
-    await userEvent.click(addAlbum)
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Album hinzufügen' }),
+    )
 
-    expect(addAlbum).toHaveAttribute('aria-disabled', 'true')
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Alben' }),
+      screen.getByRole('heading', { level: 1, name: 'Album hinzufügen' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('Noch keine Alben.')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Albumname' })).toHaveFocus()
   })
 
   it('marks the active area in the navigation', () => {

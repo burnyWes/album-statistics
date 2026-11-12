@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { AlbumsPage } from './albums/ui/AlbumsPage'
+import type { AlbumsClient } from './albums/api/albumsClient'
+import { AlbumsArea } from './albums/ui/AlbumsArea'
 import { RecordIcon } from './albums/ui/RecordIcon'
 import type { AppearanceClient } from './shared/appearance/appearanceClient'
 import { useAppearance } from './shared/appearance/useAppearance'
@@ -26,12 +27,16 @@ type AppProps = {
   appearanceClient: AppearanceClient
   installOfferClient: InstallOfferClient
   appUpdateClient: AppUpdateClient
+  albumsClient: AlbumsClient
+  clock: () => Date
 }
 
 export function App({
   appearanceClient,
   installOfferClient,
   appUpdateClient,
+  albumsClient,
+  clock,
 }: AppProps) {
   const { spokenText, announce } = useAnnouncer()
   const [activeArea, setActiveArea] = useState<AreaId>('albums')
@@ -79,7 +84,14 @@ export function App({
 
   return (
     <>
-      {activeArea === 'albums' && <AlbumsPage navigation={navigation} />}
+      {activeArea === 'albums' && (
+        <AlbumsArea
+          albumsClient={albumsClient}
+          clock={clock}
+          announce={announce}
+          navigation={navigation}
+        />
+      )}
       {activeArea === 'settings' && (
         <SettingsPage
           navigation={navigation}

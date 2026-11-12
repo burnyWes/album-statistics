@@ -1,14 +1,17 @@
 export type AlbumId = string
 
-export type Album = {
+export type Listening = string
+
+export type AlbumDraft = { title: string; artist: string }
+
+export type NewAlbum = { title: string; artist: string }
+
+export type Album = NewAlbum & {
   id: AlbumId
-  title: string
-  artist: string
+  listenings: readonly Listening[]
 }
 
-export type NewAlbum = Omit<Album, 'id'>
-
-export type InvalidAlbumReason = 'titleMissing' | 'artistMissing'
+export type InvalidAlbumReason = 'titleMissing' | 'alreadyListed'
 
 export class InvalidAlbum extends Error {
   reason: InvalidAlbumReason
@@ -20,10 +23,39 @@ export class InvalidAlbum extends Error {
   }
 }
 
-export function newAlbum(title: string, artist: string): NewAlbum {
-  const trimmedTitle = title.trim()
-  const trimmedArtist = artist.trim()
-  if (trimmedTitle === '') throw new InvalidAlbum('titleMissing')
-  if (trimmedArtist === '') throw new InvalidAlbum('artistMissing')
-  return { title: trimmedTitle, artist: trimmedArtist }
+const collator = new Intl.Collator('de', { sensitivity: 'base', numeric: true })
+
+function isSameAlbum(one: NewAlbum, other: NewAlbum): boolean {
+  return (
+    collator.compare(one.title, other.title) === 0 &&
+    collator.compare(one.artist, other.artist) === 0
+  )
+}
+
+export function newAlbum(
+  draft: AlbumDraft,
+  otherAlbums: readonly NewAlbum[],
+): NewAlbum {
+  const album = { title: draft.title.trim(), artist: draft.artist.trim() }
+  if (album.title === '') throw new InvalidAlbum('titleMissing')
+  if (otherAlbums.some((other) => isSameAlbum(album, other)))
+    throw new InvalidAlbum('alreadyListed')
+  return album
+}
+
+function compareByTitle(one: NewAlbum, other: NewAlbum): number {
+  return (
+    collator.compare(one.title, other.title) ||
+    collator.compare(one.artist, other.artist)
+  )
+}
+
+export function byTitle<SortedAlbum extends NewAlbum>(
+  albums: readonly SortedAlbum[],
+): SortedAlbum[] {
+  return [...albums].sort(compareByTitle)
+}
+
+export function albumName(album: NewAlbum): string {
+  return album.artist === '' ? album.title : `${album.title}, ${album.artist}`
 }

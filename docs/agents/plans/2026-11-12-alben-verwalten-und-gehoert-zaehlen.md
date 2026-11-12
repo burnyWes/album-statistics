@@ -330,7 +330,7 @@ Abhängigkeiten: keine
 `[+]` legt Alben an, die Liste zeigt sie sortiert, und sie überstehen einen Neustart.
 
 **Aufgaben**:
-- [ ] `src/albums/domain/album.test.ts` zuerst anpassen, dann `album.ts`:
+- [x] `src/albums/domain/album.test.ts` zuerst anpassen, dann `album.ts`:
   - `keeps title and artist without surrounding blanks`
   - `accepts an album without artist` – `artist` ist `''`
   - `rejects an album without title` – `InvalidAlbum('titleMissing')`
@@ -356,15 +356,15 @@ Abhängigkeiten: keine
   `Listening` (`export type Listening = string`) steht in `album.ts`, damit
   `album.ts` und `listening.ts` sich nicht gegenseitig importieren; die Funktionen in
   `listening.ts` folgen in Phase 3.
-- [ ] `src/albums/domain/albumAnnouncements.ts` (+ Test, zuerst):
+- [x] `src/albums/domain/albumAnnouncements.ts` (+ Test, zuerst):
   `albumsHeading(count)` („Alben“ / „Alben, 3“), `albumFailureMessage(error)`
   (Text je `InvalidAlbumReason`, `null` bei fremden Fehlern),
   `albumSavedAnnouncement(album)`.
-- [ ] `src/shared/storage/deviceStorage.ts` – `DeviceStorage` hierher verschieben;
+- [x] `src/shared/storage/deviceStorage.ts` – `DeviceStorage` hierher verschieben;
   `appearanceClient.ts`, `localStorageAppearanceClient.ts` und dessen Test importieren
   von dort.
-- [ ] `src/albums/api/albumsClient.ts` – Port wie unter *Abstraktionen*.
-- [ ] `src/albums/api/localStorageAlbumsClient.test.ts` (zuerst) – mit eigenem
+- [x] `src/albums/api/albumsClient.ts` – Port wie unter *Abstraktionen*.
+- [x] `src/albums/api/localStorageAlbumsClient.test.ts` (zuerst) – mit eigenem
   `DeviceStorage` aus einem `Map`, Muster wie `localStorageAppearanceClient.test.ts`:
   - `reads no albums from empty storage`
   - `writes and reads albums with version 1` – geschriebenes JSON hat `version: 1`
@@ -374,32 +374,32 @@ Abhängigkeiten: keine
   - `does not overwrite data already kept aside`
   - `starts empty when storage is blocked` und `ignores writes when storage is blocked`
   - `creates distinct album ids`
-- [ ] `src/albums/api/localStorageAlbumsClient.ts` – Adapter. Lesen prüft die Form
+- [x] `src/albums/api/localStorageAlbumsClient.ts` – Adapter. Lesen prüft die Form
   (`version === 1`, `albums` ist Array, jedes Album hat `id`, `title`, `artist` als
   String und `listenings` als String-Array); Fehler von `localStorage` werden wie im
   Appearance-Adapter verschluckt. Parameter `storage: DeviceStorage | null` und
   `createId: () => string = () => crypto.randomUUID()`.
-- [ ] `src/albums/api/inMemoryAlbumsClient.ts` – Fake mit Anfangsalben, Zähler-IDs
+- [x] `src/albums/api/inMemoryAlbumsClient.ts` – Fake mit Anfangsalben, Zähler-IDs
   (`album-1`, …) und `storedAlbums()`.
-- [ ] `src/shared/storage/persistentStorage.ts` –
+- [x] `src/shared/storage/persistentStorage.ts` –
   `requestPersistentStorage(storage: Pick<StorageManager, 'persist'> | undefined =
   navigator.storage)` ruft `persist()` auf, falls vorhanden, und verschluckt eine
   Ablehnung; kein Test (reine Klebe).
-- [ ] `src/shared/ui/` – `BottomBar.tsx` samt `BottomBar.test.tsx`,
+- [x] `src/shared/ui/` – `BottomBar.tsx` samt `BottomBar.test.tsx`,
   `useOnScreenKeyboard.ts`, `SaveIcon.tsx` aus dem Mahlzeitenplaner übernehmen.
-- [ ] `src/index.css` – `--bottomBarHeight`, `.pageActions`, `.bottomBar`,
+- [x] `src/index.css` – `--bottomBarHeight`, `.pageActions`, `.bottomBar`,
   `.bottomBarInFlow`, `.bottomBarContent`, `.bottomBarContent button` und die beiden
   `:has(.bottomBar…)`-Regeln aus `Mahlzeitenplaner/src/index.css:20,411-480`.
-- [ ] `src/albums/ui/useAlbums.ts` – Hook nach `useMeals.ts`, aber ohne Beobachter:
+- [x] `src/albums/ui/useAlbums.ts` – Hook nach `useMeals.ts`, aber ohne Beobachter:
   Zustand aus `client.readAlbums()`, jede Änderung schreibt per
   `client.writeAlbums()`; liefert `albums` sortiert per `byTitle`. In Phase 1:
   `addAlbum(newAlbum): Album`.
-- [ ] `src/albums/ui/AlbumListPage.tsx` – aus `AlbumsPage.tsx` (umbenennen):
+- [x] `src/albums/ui/AlbumListPage.tsx` – aus `AlbumsPage.tsx` (umbenennen):
   Überschrift `albumsHeading`, `[+]` ohne `aria-disabled` mit `onClick={onAddAlbum}`,
   Leertext oder `<ul className="itemList">` mit `AlbumListRow`.
-- [ ] `src/albums/ui/AlbumListRow.tsx` – zunächst einzeilig: `li.listRow` mit
+- [x] `src/albums/ui/AlbumListRow.tsx` – zunächst einzeilig: `li.listRow` mit
   `button.rowButton`, Text `albumName(album)`. `onOpenAlbum` folgt in Phase 2.
-- [ ] `src/albums/ui/AlbumFormPage.tsx` – nach `MealFormPage.tsx`: `<form>` mit
+- [x] `src/albums/ui/AlbumFormPage.tsx` – nach `MealFormPage.tsx`: `<form>` mit
   `onSubmit` (verhindert das Neuladen), „Zurück zu den Alben“, Überschrift
   „Album hinzufügen“, Felder `albumTitle` („Albumname“, Fokus beim Öffnen) und
   `albumArtist` („Bandname (optional)“), `<p id="albumFailure" className="failure">`,
@@ -408,10 +408,10 @@ Abhängigkeiten: keine
   setzen, ansagen, Fokus ins Feld Albumname. Props: `otherAlbums: readonly NewAlbum[]`,
   `onSave(newAlbum: NewAlbum)`, `onBack`, `announce`; das Formular ruft
   `newAlbum(draft, otherAlbums)` selbst auf, wie `MealFormPage` `createMeal`.
-- [ ] `src/albums/ui/AlbumsArea.tsx` – Seiten `{ kind: 'list' } | { kind: 'form' }`;
+- [x] `src/albums/ui/AlbumsArea.tsx` – Seiten `{ kind: 'list' } | { kind: 'form' }`;
   übergibt dem Formular alle Alben als `otherAlbums`; `onSave` ruft `addAlbum`, sagt
   `albumSavedAnnouncement` an und zeigt die Liste.
-- [ ] `src/albums/ui/AlbumsArea.test.tsx` (zuerst) – mit `inMemoryAlbumsClient`, fester
+- [x] `src/albums/ui/AlbumsArea.test.tsx` (zuerst) – mit `inMemoryAlbumsClient`, fester
   Uhr und einer `announce`-Funktion, die die Ansagen in einem Array sammelt:
   - `opens the form with the focus in the album name`
   - `adds an album and announces it` – Liste zeigt es, Fake hat es gespeichert,
@@ -423,24 +423,24 @@ Abhängigkeiten: keine
   - `goes back without saving`
   - `lists albums alphabetically`
   - `has no accessibility violations` – Liste und Formular
-- [ ] `src/App.tsx` – Props `albumsClient: AlbumsClient` und `clock: () => Date`;
+- [x] `src/App.tsx` – Props `albumsClient: AlbumsClient` und `clock: () => Date`;
   rendert `<AlbumsArea albumsClient clock announce navigation />`.
-- [ ] `src/main.tsx` – `createLocalStorageAlbumsClient()`, `() => new Date()`,
+- [x] `src/main.tsx` – `createLocalStorageAlbumsClient()`, `() => new Date()`,
   `void requestPersistentStorage()`.
-- [ ] `src/App.test.tsx` – `renderApp` mit `createInMemoryAlbumsClient()` und fester
+- [x] `src/App.test.tsx` – `renderApp` mit `createInMemoryAlbumsClient()` und fester
   Uhr; Test `offers adding an album only as unavailable` ersetzen durch
   `opens adding an album from the albums page`.
-- [ ] `e2e/albums.spec.ts` – Album „Kind of Blue“ / „Miles Davis“ anlegen, Seite neu
+- [x] `e2e/albums.spec.ts` – Album „Kind of Blue“ / „Miles Davis“ anlegen, Seite neu
   laden, Zeile „Kind of Blue, Miles Davis“ ist noch da.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `album.test.ts`, `albumAnnouncements.test.ts`,
+- [x] `npm run test` grün, darunter `album.test.ts`, `albumAnnouncements.test.ts`,
   `localStorageAlbumsClient.test.ts`, `BottomBar.test.tsx`, `AlbumsArea.test.tsx`,
   `App.test.tsx`, `domainLayerBoundary.test.ts`
-- [ ] `npm run lint` grün
-- [ ] `npm run build` grün
-- [ ] `npm run test:e2e` grün, darunter `albums.spec.ts`
-- [ ] `grep -rn "aria-disabled" src/albums` findet nichts
+- [x] `npm run lint` grün
+- [x] `npm run build` grün
+- [x] `npm run test:e2e` grün, darunter `albums.spec.ts`
+- [x] `grep -rn "aria-disabled" src/albums` findet nichts
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy mit TalkBack: `[+]` wird ohne „nicht verfügbar“ angesagt; im
