@@ -6,6 +6,7 @@ import {
   type Listening,
   type NewAlbum,
 } from './album'
+import type { AlbumsMerge } from './albumMerge'
 import { listeningsInTotal, listeningsThisMonth } from './listening'
 import { spokenListeningTime } from './listeningTime'
 
@@ -99,4 +100,42 @@ export function listeningDeletedAnnouncement(
   now: Date,
 ): string {
   return `${listeningPhrase(listening)} gelöscht. ${bothCounts(albumAfterDeleting, now)}`
+}
+
+export function albumsSavedAnnouncement(fileName: string): string {
+  return `Daten gespeichert als ${fileName}.`
+}
+
+function albumCountPhrase(count: number): string {
+  return count === 1 ? '1 Album' : `${count} Alben`
+}
+
+export function albumsLoadedAnnouncement(merge: AlbumsMerge): string {
+  const changes = [
+    ...(merge.addedAlbums > 0
+      ? [`${albumCountPhrase(merge.addedAlbums)} neu`]
+      : []),
+    ...(merge.extendedAlbums > 0
+      ? [
+          `${albumCountPhrase(merge.extendedAlbums)} um ${merge.addedListenings} Mal Hören ergänzt`,
+        ]
+      : []),
+  ]
+  if (changes.length === 0) return 'Daten geladen. Es war nichts Neues dabei.'
+  return `Daten geladen. ${changes.join(', ')}.`
+}
+
+export const unreadableAlbumsFileMessage =
+  'Diese Datei enthält keine lesbaren Album-Daten. Es wurde nichts geändert.'
+
+export type ShareResult = 'shared' | 'dismissed' | 'failed'
+
+const announcementsByShareResult: Record<ShareResult, string> = {
+  shared: 'Daten geteilt.',
+  dismissed: 'Teilen abgebrochen.',
+  failed: 'Teilen hat nicht geklappt.',
+}
+
+export function shareAnnouncement(result: ShareResult): string {
+  return announcementsByShareResult[result]
 }

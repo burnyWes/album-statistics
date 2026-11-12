@@ -288,7 +288,7 @@ Aus den Einstellungen führt „Daten speichern und laden“ auf die neue Seite;
 speichern“ lädt die Sicherungsdatei herunter.
 
 **Aufgaben**:
-- [ ] `src/albums/api/albumsFile.test.ts` (zuerst), dann `albumsFile.ts`:
+- [x] `src/albums/api/albumsFile.test.ts` (zuerst), dann `albumsFile.ts`:
   - `writes all albums with version 1` – `JSON.parse(albumsFileText([kindOfBlue]))`
     ergibt `{ version: 1, albums: [kindOfBlue] }`
   - `reads stored albums back` / `reads nothing from unreadable text` /
@@ -304,13 +304,13 @@ speichern“ lädt die Sicherungsdatei herunter.
     return `${today.getFullYear()}-${month}-${day}`
   }
   ```
-- [ ] `src/albums/api/localStorageAlbumsClient.ts` – `isStoredAlbum`, `isStoredAlbums`,
+- [x] `src/albums/api/localStorageAlbumsClient.ts` – `isStoredAlbum`, `isStoredAlbums`,
   `parsed` und `STORAGE_VERSION` durch `storedAlbumsFromText` und
   `ALBUMS_FORMAT_VERSION` aus `albumsFile.ts` ersetzen; `writeAlbums` schreibt
   `albumsFileText(albums)`. `localStorageAlbumsClient.test.ts` bleibt unverändert grün
   (Import von `STORAGE_VERSION` dort ggf. auf `ALBUMS_FORMAT_VERSION` umstellen).
-- [ ] `src/shared/files/fileExportClient.ts` – Port wie unter *Abstraktionen*.
-- [ ] `src/shared/files/browserFileExportClient.test.ts` (zuerst), dann
+- [x] `src/shared/files/fileExportClient.ts` – Port wie unter *Abstraktionen*.
+- [x] `src/shared/files/browserFileExportClient.test.ts` (zuerst), dann
   `browserFileExportClient.ts` mit Parameter
   `environment: FileExportEnvironment = { document, navigator, URL }` (`navigator` und
   `URL` als `Pick` der benötigten Teile). In Phase 1:
@@ -334,22 +334,22 @@ speichern“ lädt die Sicherungsdatei herunter.
   }
   ```
   `canShare` liefert in Phase 1 `false`, `share` `'failed'` (Phase 3 füllt beides).
-- [ ] `src/shared/files/inMemoryFileExportClient.ts` – Fake: `download` merkt sich die
+- [x] `src/shared/files/inMemoryFileExportClient.ts` – Fake: `download` merkt sich die
   Datei, `downloadedFiles()`; `canShare`/`share` folgen in Phase 3 (zunächst `false`
   bzw. `'failed'`).
-- [ ] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann
+- [x] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann
   `albumsSavedAnnouncement(fileName)` → „Daten gespeichert als <fileName>.“
-- [ ] `src/shared/ui/SettingsPage.tsx` – Prop `focusedEntry: string | null`. Statt
+- [x] `src/shared/ui/SettingsPage.tsx` – Prop `focusedEntry: string | null`. Statt
   `useHeadingFocus` ein Effekt mit Abhängigkeit `headingFocusRequest`: liegt ein
   `action`-Knopf mit `entry.id === focusedEntry` vor, bekommt er den Fokus (Ref per
   Rückruf-Ref in einer `Map`), sonst die Überschrift.
-- [ ] `src/albums/ui/AlbumsBackupPage.tsx` – Props `albumsClient`, `clock`,
+- [x] `src/albums/ui/AlbumsBackupPage.tsx` – Props `albumsClient`, `clock`,
   `fileExportClient`, `announce`, `onBack`. Aufbau laut *Zielbild*: Knopf
   „Zurück zu den Einstellungen“, `h1` per `useHeadingFocus`, `<p>` mit Erklärtext,
   `<ul className="itemList">` mit `li.listRow` und `button.rowButton` „Daten speichern“.
   Speichern: `albumsDownloadFile(albums, clock())` an `fileExportClient.download`,
   `albumsSavedAnnouncement` ansagen. Alben über `useAlbums(albumsClient, clock)`.
-- [ ] `src/albums/ui/AlbumsBackupPage.test.tsx` (zuerst) – mit `inMemoryAlbumsClient`,
+- [x] `src/albums/ui/AlbumsBackupPage.test.tsx` (zuerst) – mit `inMemoryAlbumsClient`,
   `inMemoryFileExportClient`, fester Uhr `new Date(2026, 10, 15, 12, 0)` und
   gesammelten Ansagen:
   - `focuses the heading when opened`
@@ -357,15 +357,15 @@ speichern“ lädt die Sicherungsdatei herunter.
     `album-statistics-2026-11-15.json` mit beiden Testalben, Ansage
   - `goes back to the settings` – `onBack` aufgerufen
   - `has no accessibility violations`
-- [ ] `src/App.tsx` – Prop `fileExportClient: FileExportClient`; Zustand
+- [x] `src/App.tsx` – Prop `fileExportClient: FileExportClient`; Zustand
   `settingsPage` laut Entscheidung 7, Start `{ kind: 'overview', focusedEntry: null }`.
   Eintrag `{ kind: 'action', id: 'albumsBackup', label: 'Daten speichern und laden',
   onSelect: () => setSettingsPage({ kind: 'backup' }) }` nach den Schaltern, vor
   `installEntries`. `onBack` der Seite →
   `{ kind: 'overview', focusedEntry: 'albumsBackup' }`. `onSelectArea` setzt zusätzlich
   `{ kind: 'overview', focusedEntry: null }`.
-- [ ] `src/main.tsx` – `createBrowserFileExportClient()` übergeben.
-- [ ] `src/App.test.tsx` – `renderApp` mit `createInMemoryFileExportClient()`; zuerst
+- [x] `src/main.tsx` – `createBrowserFileExportClient()` übergeben.
+- [x] `src/App.test.tsx` – `renderApp` mit `createInMemoryFileExportClient()`; zuerst
   neue Fälle:
   - `opens saving and loading data from the settings` – Überschrift
     „Daten speichern und laden“ fokussiert, keine Navigationsleiste
@@ -375,20 +375,20 @@ speichern“ lädt die Sicherungsdatei herunter.
     offen, über „Alben“ und zurück über „Einstellungen“: Überschrift „Einstellungen“
     fokussiert
   - `has no accessibility violations on saving and loading data`
-- [ ] `e2e/backup.spec.ts` – `downloads the albums as a file`: Album „Kind of Blue“ /
+- [x] `e2e/backup.spec.ts` – `downloads the albums as a file`: Album „Kind of Blue“ /
   „Miles Davis“ anlegen, „Einstellungen“, „Daten speichern und laden“,
   `page.waitForEvent('download')` beim Klick auf „Daten speichern“;
   `download.suggestedFilename()` passt auf `/^album-statistics-\d{4}-\d{2}-\d{2}\.json$/`,
   der gelesene Inhalt enthält das Album mit `version: 1`.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `albumsFile.test.ts`,
+- [x] `npm run test` grün, darunter `albumsFile.test.ts`,
   `localStorageAlbumsClient.test.ts`, `browserFileExportClient.test.ts`,
   `albumAnnouncements.test.ts`, `AlbumsBackupPage.test.tsx`, `App.test.tsx`,
   `domainLayerBoundary.test.ts`
-- [ ] `npm run lint` grün
-- [ ] `npm run build` grün
-- [ ] `npm run test:e2e` grün, darunter `backup.spec.ts`
+- [x] `npm run lint` grün
+- [x] `npm run build` grün
+- [x] `npm run test:e2e` grün, darunter `backup.spec.ts`
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy mit TalkBack: In den Einstellungen wird „Daten speichern und laden“
@@ -405,12 +405,12 @@ Abhängigkeiten: Phase 1
 lehnt eine ungültige Datei ab, ohne etwas zu ändern.
 
 **Aufgaben**:
-- [ ] `src/albums/domain/listening.test.ts` zuerst ergänzen, dann `isListening`:
+- [x] `src/albums/domain/listening.test.ts` zuerst ergänzen, dann `isListening`:
   - `accepts a readable timestamp` – `'2026-11-12T18:04:00.000Z'` und
     `'2026-11-12T19:00:00+01:00'`
   - `rejects an unreadable timestamp` – `'gestern'`, `''`
-- [ ] `src/albums/domain/album.ts` – `isSameAlbum` exportieren.
-- [ ] `src/albums/domain/albumMerge.test.ts` (zuerst), dann `albumMerge.ts`. IDs im Test
+- [x] `src/albums/domain/album.ts` – `isSameAlbum` exportieren.
+- [x] `src/albums/domain/albumMerge.test.ts` (zuerst), dann `albumMerge.ts`. IDs im Test
   über einen Zähler `loaded-1`, `loaded-2`, …:
   - `adds albums that are not present yet` – neue ID, Titel und Band getrimmt,
     `addedAlbums` 1
@@ -444,11 +444,11 @@ lehnt eine ungültige Datei ab, ohne etwas zu ändern.
   aufgenommen und dann wie vorhandene behandelt, damit gleiche Alben innerhalb der
   Datei verschmelzen; gezählt werden sie nur in `addedAlbums`. `extendedAlbums` und
   `addedListenings` zählen nur Alben, die schon vor dem Laden auf dem Gerät waren.
-- [ ] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann umsetzen:
+- [x] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann umsetzen:
   - `albumsLoadedAnnouncement(merge)` – alle Varianten aus den *Akzeptanzkriterien*,
     Einzahl „1 Album neu“, „1 Album um 1 Mal Hören ergänzt“
   - `unreadableAlbumsFileMessage` – Konstante mit dem Fehlertext
-- [ ] `src/albums/api/albumsFile.test.ts` zuerst ergänzen, dann
+- [x] `src/albums/api/albumsFile.test.ts` zuerst ergänzen, dann
   `albumsFromFileText(text): LoadedAlbum[]`:
   - `reads albums from a saved file` – Rückgabe ohne `id`-Bedeutung, Titel, Band,
     Zeitpunkte erhalten
@@ -457,10 +457,10 @@ lehnt eine ungültige Datei ab, ohne etwas zu ändern.
     `UnreadableAlbumsFile`
   Ablauf: `JSON.parse` (Fehler → `UnreadableAlbumsFile`), `isAlbumsFileContent`,
   `every(isLoadableAlbum)`, dann `{ title, artist, listenings }` je Album.
-- [ ] `src/albums/ui/useAlbums.ts` – `mergeLoadedAlbums(loaded)` ruft
+- [x] `src/albums/ui/useAlbums.ts` – `mergeLoadedAlbums(loaded)` ruft
   `mergeAlbums(knownAlbums, loaded, client.createAlbumId)`, speichert `merge.albums`
   per `store` und liefert das `AlbumsMerge`.
-- [ ] `src/albums/ui/AlbumsBackupPage.tsx` – Knopf „Daten laden“ und
+- [x] `src/albums/ui/AlbumsBackupPage.tsx` – Knopf „Daten laden“ und
   `<input type="file" accept=".json,.txt,application/json,text/plain"
   className="visuallyHidden" tabIndex={-1} aria-hidden="true"
   aria-label="Datei mit Album-Daten">` (Ref; das Label nur für Lint- und axe-Regeln,
@@ -471,7 +471,7 @@ lehnt eine ungültige Datei ab, ohne etwas zu ändern.
   und ansagen. Danach `input.value = ''` (dieselbe Datei lässt sich erneut wählen) und
   Fokus auf „Daten laden“. Eine erfolgreiche Aktion (Speichern, Laden) leert die
   Meldung.
-- [ ] `src/albums/ui/AlbumsBackupPage.test.tsx` zuerst ergänzen; Upload per
+- [x] `src/albums/ui/AlbumsBackupPage.test.tsx` zuerst ergänzen; Upload per
   `userEvent.upload(fileInput, new File([text], 'album-statistics-2026-11-15.json',
   { type: 'application/json' }))`, `fileInput` über
   `document.querySelector('input[type="file"]')`:
@@ -485,9 +485,9 @@ lehnt eine ungültige Datei ab, ohne etwas zu ändern.
     sichtbar und angesagt
   - `clears the failure after a successful load`
   - `has no accessibility violations` – mit sichtbarer Fehlermeldung
-- [ ] `src/App.test.tsx` – `shows loaded albums in the album list` – Datei laden, zurück,
+- [x] `src/App.test.tsx` – `shows loaded albums in the album list` – Datei laden, zurück,
   „Alben“: Überschrift „Alben, n“ und neue Zeile sichtbar.
-- [ ] `e2e/backup.spec.ts` – `brings saved albums back after loading the file`: Album
+- [x] `e2e/backup.spec.ts` – `brings saved albums back after loading the file`: Album
   anlegen, einmal `[↑]`, Datei herunterladen (`download.path()`),
   `page.evaluate(() => localStorage.clear())`, neu laden, „Noch keine Alben.“, in den
   Einstellungen „Daten speichern und laden“, `page.waitForEvent('filechooser')` beim
@@ -495,10 +495,10 @@ lehnt eine ungültige Datei ab, ohne etwas zu ändern.
   unter „Alben“ nennt die Zeile „insgesamt 1 Mal gehört“; nach Neuladen weiterhin.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `listening.test.ts`, `albumMerge.test.ts`,
+- [x] `npm run test` grün, darunter `listening.test.ts`, `albumMerge.test.ts`,
   `albumAnnouncements.test.ts`, `albumsFile.test.ts`, `AlbumsBackupPage.test.tsx`,
   `App.test.tsx`
-- [ ] `npm run lint`, `npm run build`, `npm run test:e2e` grün
+- [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy mit TalkBack: „Daten laden“ öffnet die Android-Dateiauswahl, die
@@ -516,10 +516,10 @@ Abhängigkeiten: Phase 1
 Browser die Datei teilen kann.
 
 **Aufgaben**:
-- [ ] `src/albums/api/albumsFile.test.ts` zuerst ergänzen, dann `albumsShareFile` –
+- [x] `src/albums/api/albumsFile.test.ts` zuerst ergänzen, dann `albumsShareFile` –
   `album-statistics-<Datum>.txt`, `mimeType` `text/plain`, gleicher Text wie der
   Download.
-- [ ] `src/shared/files/browserFileExportClient.test.ts` zuerst ergänzen, dann umsetzen
+- [x] `src/shared/files/browserFileExportClient.test.ts` zuerst ergänzen, dann umsetzen
   (eigener `navigator`-Ersatz mit `canShare` und `share`):
   - `can share a file the browser accepts` – `canShare` erhält `{ files: [File] }` mit
     Name und Typ der Datei
@@ -531,18 +531,18 @@ Browser die Datei teilen kann.
     return new File([file.text], file.name, { type: file.mimeType })
   }
   ```
-- [ ] `src/shared/files/inMemoryFileExportClient.ts` – Optionen
+- [x] `src/shared/files/inMemoryFileExportClient.ts` – Optionen
   `{ shareable = false, shareOutcome = 'shared' }`; `share` merkt sich die Datei,
   `sharedFiles()`.
-- [ ] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann
+- [x] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann
   `shareAnnouncement(outcome)` – „Daten geteilt.“, „Teilen abgebrochen.“,
   „Teilen hat nicht geklappt.“ Der Typ der Ergebnisse wird in der Domäne als
   `'shared' | 'dismissed' | 'failed'` benannt (`ShareResult`), weil die Domäne
   `shared/files` nicht importieren darf; `ShareOutcome` ist strukturell gleich.
-- [ ] `src/albums/ui/AlbumsBackupPage.tsx` – zwischen „Daten speichern“ und „Daten laden“
+- [x] `src/albums/ui/AlbumsBackupPage.tsx` – zwischen „Daten speichern“ und „Daten laden“
   der Knopf „Daten teilen“, nur wenn `fileExportClient.canShare(albumsShareFile(albums,
   clock()))`; Klick: `await share`, Ansage per `shareAnnouncement`.
-- [ ] `src/albums/ui/AlbumsBackupPage.test.tsx` zuerst ergänzen:
+- [x] `src/albums/ui/AlbumsBackupPage.test.tsx` zuerst ergänzen:
   - `offers sharing only when the browser can share the file`
   - `shares the albums as a dated text file and announces it` – Fake hat
     `album-statistics-2026-11-15.txt`
@@ -550,10 +550,10 @@ Browser die Datei teilen kann.
   - `has no accessibility violations` – mit „Daten teilen“
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `albumsFile.test.ts`,
+- [x] `npm run test` grün, darunter `albumsFile.test.ts`,
   `browserFileExportClient.test.ts`, `albumAnnouncements.test.ts`,
   `AlbumsBackupPage.test.tsx`
-- [ ] `npm run lint`, `npm run build`, `npm run test:e2e` grün
+- [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
 - [ ] In Chrome auf Android: „Daten teilen“ ist sichtbar und öffnet das Teilen-Menü;
@@ -564,6 +564,16 @@ Browser die Datei teilen kann.
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Alle drei Phasen in einem Zug umgesetzt (Wunsch des Nutzers); manuelle Prüfungen
+  stehen noch aus.
+- `browserFileExportClient.test.ts` läuft im Projekt `unit` (Node). Statt eines
+  Klick-Beobachters am echten `document` nutzt er einen kleinen Dokument-Ersatz, der
+  geklickte Links samt `href`, `download` und Einhängezustand festhält.
+- Ein erfolgreiches Teilen leert die Fehlermeldung ebenfalls; Abbruch und Fehler beim
+  Teilen lassen sie stehen.
+- `App` setzt nach „App installieren“ die Einstellungen auf die Übersicht ohne
+  Fokusziel zurück, damit der Fokus wie bisher auf der Überschrift landet.
 
 ## Verweise
 

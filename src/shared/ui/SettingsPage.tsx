@@ -1,5 +1,4 @@
-import type { ReactNode } from 'react'
-import { useHeadingFocus } from './useHeadingFocus'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 export type SettingsEntry =
   | {
@@ -15,14 +14,23 @@ type SettingsPageProps = {
   navigation: ReactNode
   entries: readonly SettingsEntry[]
   headingFocusRequest: number
+  focusedEntry: string | null
 }
 
 export function SettingsPage({
   navigation,
   entries,
   headingFocusRequest,
+  focusedEntry,
 }: SettingsPageProps) {
-  const heading = useHeadingFocus(headingFocusRequest)
+  const heading = useRef<HTMLHeadingElement>(null)
+  const entryButtons = useRef(new Map<string, HTMLButtonElement>())
+
+  useEffect(() => {
+    const focusedButton =
+      focusedEntry === null ? undefined : entryButtons.current.get(focusedEntry)
+    ;(focusedButton ?? heading.current)?.focus()
+  }, [headingFocusRequest, focusedEntry])
 
   function entryControl(entry: SettingsEntry) {
     switch (entry.kind) {
@@ -39,7 +47,18 @@ export function SettingsPage({
         )
       case 'action':
         return (
-          <button type="button" className="rowButton" onClick={entry.onSelect}>
+          <button
+            type="button"
+            className="rowButton"
+            onClick={entry.onSelect}
+            ref={(button) => {
+              if (button === null) return
+              entryButtons.current.set(entry.id, button)
+              return () => {
+                entryButtons.current.delete(entry.id)
+              }
+            }}
+          >
             {entry.label}
           </button>
         )

@@ -4,44 +4,10 @@ import {
 } from '../../shared/storage/deviceStorage'
 import type { Album } from '../domain/album'
 import type { AlbumsClient } from './albumsClient'
+import { albumsFileText, storedAlbumsFromText } from './albumsFile'
 
 export const ALBUMS_KEY = 'albums'
 export const UNREADABLE_ALBUMS_KEY = 'albums.unreadable'
-export const STORAGE_VERSION = 1
-
-type StoredAlbums = { version: typeof STORAGE_VERSION; albums: Album[] }
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
-
-function isStoredAlbum(value: unknown): value is Album {
-  return (
-    isRecord(value) &&
-    typeof value.id === 'string' &&
-    typeof value.title === 'string' &&
-    typeof value.artist === 'string' &&
-    Array.isArray(value.listenings) &&
-    value.listenings.every((listening) => typeof listening === 'string')
-  )
-}
-
-function isStoredAlbums(value: unknown): value is StoredAlbums {
-  return (
-    isRecord(value) &&
-    value.version === STORAGE_VERSION &&
-    Array.isArray(value.albums) &&
-    value.albums.every(isStoredAlbum)
-  )
-}
-
-function parsed(text: string): unknown {
-  try {
-    return JSON.parse(text)
-  } catch {
-    return null
-  }
-}
 
 function storedText(storage: DeviceStorage | null, key: string): string | null {
   try {
@@ -67,18 +33,14 @@ function keepAside(storage: DeviceStorage | null, unreadable: string) {
 function readAlbums(storage: DeviceStorage | null): readonly Album[] {
   const text = storedText(storage, ALBUMS_KEY)
   if (text === null) return []
-  const content = parsed(text)
-  if (isStoredAlbums(content)) return content.albums
+  const albums = storedAlbumsFromText(text)
+  if (albums !== null) return albums
   keepAside(storage, text)
   return []
 }
 
 function writeAlbums(storage: DeviceStorage | null, albums: readonly Album[]) {
-  const content: StoredAlbums = {
-    version: STORAGE_VERSION,
-    albums: [...albums],
-  }
-  store(storage, ALBUMS_KEY, JSON.stringify(content))
+  store(storage, ALBUMS_KEY, albumsFileText(albums))
 }
 
 export function createLocalStorageAlbumsClient(

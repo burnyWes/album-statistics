@@ -8,6 +8,11 @@ import {
   type NewAlbum,
 } from '../domain/album'
 import {
+  mergeAlbums,
+  type AlbumsMerge,
+  type LoadedAlbum,
+} from '../domain/albumMerge'
+import {
   listeningAt,
   withListening,
   withoutListening,
@@ -20,6 +25,7 @@ export type Albums = {
   removeAlbum: (id: AlbumId) => void
   listenTo: (id: AlbumId) => Listening
   takeBackListening: (id: AlbumId, listening: Listening) => void
+  mergeLoadedAlbums: (loaded: readonly LoadedAlbum[]) => AlbumsMerge
 }
 
 export function useAlbums(client: AlbumsClient, clock: () => Date): Albums {
@@ -62,6 +68,12 @@ export function useAlbums(client: AlbumsClient, clock: () => Date): Albums {
     storeChanged(id, (album) => withoutListening(album, listening))
   }
 
+  function mergeLoadedAlbums(loaded: readonly LoadedAlbum[]): AlbumsMerge {
+    const merge = mergeAlbums(knownAlbums, loaded, client.createAlbumId)
+    store(merge.albums)
+    return merge
+  }
+
   return {
     albums: byTitle(knownAlbums),
     addAlbum,
@@ -69,5 +81,6 @@ export function useAlbums(client: AlbumsClient, clock: () => Date): Albums {
     removeAlbum,
     listenTo,
     takeBackListening,
+    mergeLoadedAlbums,
   }
 }

@@ -5,6 +5,8 @@ import {
   albumFailureMessage,
   albumRowLabel,
   albumSavedAnnouncement,
+  albumsLoadedAnnouncement,
+  albumsSavedAnnouncement,
   albumsHeading,
   deleteListeningLabel,
   deleteListeningQuestion,
@@ -14,7 +16,9 @@ import {
   listeningDeletedAnnouncement,
   listeningsHeading,
   listeningTakenBackAnnouncement,
+  shareAnnouncement,
   undoListeningLabel,
+  unreadableAlbumsFileMessage,
 } from './albumAnnouncements'
 import { listeningAt } from './listening'
 
@@ -197,5 +201,63 @@ describe('deleting a listening', () => {
     ).toBe(
       'Hören vom Donnerstag, 12.11.2026, 14:20 gelöscht. Diesen Monat 3, insgesamt 14.',
     )
+  })
+})
+
+describe('saving and loading data', () => {
+  function merged(
+    addedAlbums: number,
+    extendedAlbums: number,
+    addedListenings: number,
+  ) {
+    return { albums: [], addedAlbums, extendedAlbums, addedListenings }
+  }
+
+  it('announces the saved file', () => {
+    expect(albumsSavedAnnouncement('album-statistics-2026-11-15.json')).toBe(
+      'Daten gespeichert als album-statistics-2026-11-15.json.',
+    )
+  })
+
+  it('announces new and extended albums', () => {
+    expect(albumsLoadedAnnouncement(merged(3, 2, 25))).toBe(
+      'Daten geladen. 3 Alben neu, 2 Alben um 25 Mal Hören ergänzt.',
+    )
+  })
+
+  it('announces only new albums', () => {
+    expect(albumsLoadedAnnouncement(merged(3, 0, 0))).toBe(
+      'Daten geladen. 3 Alben neu.',
+    )
+  })
+
+  it('announces only extended albums', () => {
+    expect(albumsLoadedAnnouncement(merged(0, 2, 25))).toBe(
+      'Daten geladen. 2 Alben um 25 Mal Hören ergänzt.',
+    )
+  })
+
+  it('names a single album and listening', () => {
+    expect(albumsLoadedAnnouncement(merged(1, 1, 1))).toBe(
+      'Daten geladen. 1 Album neu, 1 Album um 1 Mal Hören ergänzt.',
+    )
+  })
+
+  it('announces that nothing was new', () => {
+    expect(albumsLoadedAnnouncement(merged(0, 0, 0))).toBe(
+      'Daten geladen. Es war nichts Neues dabei.',
+    )
+  })
+
+  it('names an unreadable file', () => {
+    expect(unreadableAlbumsFileMessage).toBe(
+      'Diese Datei enthält keine lesbaren Album-Daten. Es wurde nichts geändert.',
+    )
+  })
+
+  it('announces the share results', () => {
+    expect(shareAnnouncement('shared')).toBe('Daten geteilt.')
+    expect(shareAnnouncement('dismissed')).toBe('Teilen abgebrochen.')
+    expect(shareAnnouncement('failed')).toBe('Teilen hat nicht geklappt.')
   })
 })

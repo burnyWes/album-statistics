@@ -25,7 +25,7 @@ export class InvalidAlbum extends Error {
 
 const collator = new Intl.Collator('de', { sensitivity: 'base', numeric: true })
 
-function isSameAlbum(one: NewAlbum, other: NewAlbum): boolean {
+export function isSameAlbum(one: NewAlbum, other: NewAlbum): boolean {
   return (
     collator.compare(one.title, other.title) === 0 &&
     collator.compare(one.artist, other.artist) === 0

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Album } from './album'
 import {
+  isListening,
   lastListening,
   listeningAt,
   listeningMonthsNewestFirst,
@@ -168,5 +169,17 @@ describe('listening months', () => {
 
   it('has no months without listenings', () => {
     expect(listeningMonthsNewestFirst(albumListenedAt())).toEqual([])
+  })
+})
+
+describe('isListening', () => {
+  it('accepts a readable timestamp', () => {
+    expect(isListening('2026-11-12T18:04:00.000Z')).toBe(true)
+    expect(isListening('2026-11-12T19:00:00+01:00')).toBe(true)
+  })
+
+  it('rejects an unreadable timestamp', () => {
+    expect(isListening('gestern')).toBe(false)
+    expect(isListening('')).toBe(false)
   })
 })

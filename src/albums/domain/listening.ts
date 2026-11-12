@@ -1,5 +1,9 @@
 import type { Album, Listening } from './album'
 
+export function isListening(text: string): boolean {
+  return !Number.isNaN(Date.parse(text))
+}
+
 export function listeningAt(moment: Date): Listening {
   return moment.toISOString()
 }

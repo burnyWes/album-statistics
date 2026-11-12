@@ -1,12 +1,14 @@
-import { act, render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
+import { albumsFileText } from './albums/api/albumsFile'
 import { createInMemoryAlbumsClient } from './albums/api/inMemoryAlbumsClient'
 import type { Album } from './albums/domain/album'
 import { App } from './App'
 import type { ColorInversion } from './shared/appearance/appearanceClient'
 import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppearanceClient'
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
+import { createInMemoryFileExportClient } from './shared/files/inMemoryFileExportClient'
 import type { InstallOutcome } from './shared/install/installOfferClient'
 import { createInMemoryInstallOfferClient } from './shared/install/inMemoryInstallOfferClient'
 import { accessibilityViolations } from './testSupport/accessibility'
@@ -20,12 +22,14 @@ function renderApp({
   const installOfferClient = createInMemoryInstallOfferClient(installOutcome)
   const appUpdateClient = createInMemoryAppUpdateClient()
   const albumsClient = createInMemoryAlbumsClient(albums)
+  const fileExportClient = createInMemoryFileExportClient()
   const rendered = render(
     <App
       appearanceClient={appearanceClient}
       installOfferClient={installOfferClient}
       appUpdateClient={appUpdateClient}
       albumsClient={albumsClient}
+      fileExportClient={fileExportClient}
       clock={() => new Date(2026, 10, 15, 12, 0)}
     />,
   )
@@ -35,6 +39,7 @@ function renderApp({
     installOfferClient,
     appUpdateClient,
     albumsClient,
+    fileExportClient,
   }
 }
 
@@ -56,6 +61,15 @@ function invertedButtonsCheckbox() {
 
 function areaButton(name: string) {
   return screen.getByRole('button', { name })
+}
+
+function backupEntry() {
+  return screen.getByRole('button', { name: 'Daten speichern und laden' })
+}
+
+async function openBackup() {
+  await userEvent.click(areaButton('Einstellungen'))
+  await userEvent.click(backupEntry())
 }
 
 describe('App', () => {
@@ -259,5 +273,96 @@ describe('App', () => {
     )
 
     expect(installedUpdates).toEqual(['installed'])
+  })
+
+  it('opens saving and loading data from the settings', async () => {
+    renderApp()
+
+    await openBackup()
+
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Daten speichern und laden',
+      }),
+    ).toHaveFocus()
+    expect(
+      screen.queryByRole('button', { name: 'Alben' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('returns to the settings entry for saving and loading data', async () => {
+    renderApp()
+    await openBackup()
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Zurück zu den Einstellungen' }),
+    )
+
+    expect(backupEntry()).toHaveFocus()
+  })
+
+  it('opens the settings at their heading after switching the area', async () => {
+    renderApp()
+    await openBackup()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Zurück zu den Einstellungen' }),
+    )
+
+    await userEvent.click(areaButton('Alben'))
+    await userEvent.click(areaButton('Einstellungen'))
+
+    expect(settingsHeading()).toHaveFocus()
+  })
+
+  it('has no accessibility violations on saving and loading data', async () => {
+    const { container } = renderApp()
+
+    await openBackup()
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('shows loaded albums in the album list', async () => {
+    renderApp()
+    await openBackup()
+    const fileInput =
+      document.querySelector<HTMLInputElement>('input[type="file"]')!
+
+    await userEvent.upload(
+      fileInput,
+      new File(
+        [
+          albumsFileText([
+            {
+              id: 'kind-of-blue',
+              title: 'Kind of Blue',
+              artist: 'Miles Davis',
+              listenings: ['2026-11-12T18:04:00.000Z'],
+            },
+          ]),
+        ],
+        'album-statistics-2026-11-15.json',
+        { type: 'application/json' },
+      ),
+    )
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'Daten geladen. 1 Album neu.',
+      ),
+    )
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Zurück zu den Einstellungen' }),
+    )
+    await userEvent.click(areaButton('Alben'))
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Alben, 1' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: 'Kind of Blue, Miles Davis. Diesen Monat 1 Mal, insgesamt 1 Mal gehört.',
+      }),
+    ).toBeInTheDocument()
   })
 })
