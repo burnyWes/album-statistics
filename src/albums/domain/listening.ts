@@ -33,3 +33,15 @@ export function listeningsThisMonth(album: Album, now: Date): number {
 export function listeningsInTotal(album: Album): number {
   return album.listenings.length
 }
+
+function newerFirst(one: Listening, other: Listening): number {
+  return Date.parse(other) - Date.parse(one)
+}
+
+export function listeningsNewestFirst(album: Album): Listening[] {
+  return [...album.listenings].sort(newerFirst)
+}
+
+export function lastListening(album: Album): Listening | null {
+  return listeningsNewestFirst(album)[0] ?? null
+}

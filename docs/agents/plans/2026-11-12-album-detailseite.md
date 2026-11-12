@@ -268,14 +268,14 @@ Ein Tipp auf ein Album öffnet die Detailseite mit Zählern und Hörverlauf; von
 gehört und bearbeitet, und der Rückweg landet auf der Zeile des Albums.
 
 **Aufgaben**:
-- [ ] `src/albums/domain/listening.test.ts` zuerst ergänzen, dann `listening.ts`
+- [x] `src/albums/domain/listening.test.ts` zuerst ergänzen, dann `listening.ts`
   (Zeiten per `listeningAt(new Date(2026, 10, …))`, Ortszeit):
   - `lists listenings newest first` – Eingabe ungeordnet
   - `orders listenings by time, not by text` – `'2026-11-12T19:00:00+01:00'`
     (= 18:00 UTC) steht hinter `'2026-11-12T18:30:00.000Z'`, obwohl der Text größer ist
   - `keeps the album listenings untouched when sorting`
   - `finds the last listening` / `has no last listening without listenings`
-- [ ] `src/albums/domain/listeningTime.test.ts` (zuerst), dann `listeningTime.ts`:
+- [x] `src/albums/domain/listeningTime.test.ts` (zuerst), dann `listeningTime.ts`:
   - `formats a listening short with weekday in local time` –
     `listeningAt(new Date(2026, 10, 12, 14, 20))` → „Do., 12.11.2026, 14:20“
   - `pads day, month, hour and minute` – 4. Januar 2026, 09:05 → „So., 04.01.2026, 09:05“
@@ -289,12 +289,12 @@ gehört und bearbeitet, und der Rückweg landet auf der Zeile des Albums.
   const shortFormat = new Intl.DateTimeFormat('de', { ...timeParts, weekday: 'short' })
   const spokenFormat = new Intl.DateTimeFormat('de', { ...timeParts, weekday: 'long' })
   ```
-- [ ] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann
+- [x] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann
   `listeningsHeading(album)` (0 / 1 / n).
-- [ ] `src/albums/ui/ListeningTime.tsx` – `<span aria-hidden="true">{short}</span>` und
+- [x] `src/albums/ui/ListeningTime.tsx` – `<span aria-hidden="true">{short}</span>` und
   `<span className="visuallyHidden">{spoken}</span>`.
-- [ ] `src/albums/ui/EditIcon.tsx` – aus dem Mahlzeitenplaner übernehmen.
-- [ ] `src/albums/ui/AlbumDetailPage.tsx` – Props `album`, `now`,
+- [x] `src/albums/ui/EditIcon.tsx` – aus dem Mahlzeitenplaner übernehmen.
+- [x] `src/albums/ui/AlbumDetailPage.tsx` – Props `album`, `now`,
   `focus: 'album' | 'listenings'`, `onBack`, `onListen`, `onEdit`. Aufbau laut
   *Zielbild*: Knopf „Zurück zu den Alben“, `h1` (`tabIndex={-1}`) mit `albumName`,
   `<div className="albumDetailStats">` mit zwei Absätzen
@@ -307,15 +307,15 @@ gehört und bearbeitet, und der Rückweg landet auf der Zeile des Albums.
   `<button type="button"><ArrowUpIcon />Gehört</button>` und
   `<button type="button"><EditIcon />Bearbeiten</button>`. Ein Effekt beim Einhängen
   fokussiert je nach `focus` die `h1` oder die `h2`.
-- [ ] `src/albums/ui/AlbumListPage.tsx` – Prop `focusedAlbum: AlbumId | null`;
+- [x] `src/albums/ui/AlbumListPage.tsx` – Prop `focusedAlbum: AlbumId | null`;
   `useHeadingFocus` ersetzen durch einen Effekt beim Einhängen, der die Überschrift nur
   bei `focusedAlbum === null` fokussiert (Grund: Entscheidung 6); an `AlbumListRow`
   `focusOnMount={album.id === focusedAlbum}` durchreichen.
-- [ ] `src/albums/ui/AlbumListRow.tsx` – Prop `focusOnMount: boolean`; Ref am
+- [x] `src/albums/ui/AlbumListRow.tsx` – Prop `focusOnMount: boolean`; Ref am
   `rowButton`, Effekt beim Einhängen fokussiert ihn, wenn `focusOnMount`.
-- [ ] `src/albums/ui/AlbumFormPage.tsx` – Text des Zurück-Knopfs: „Zurück zu den Alben“
+- [x] `src/albums/ui/AlbumFormPage.tsx` – Text des Zurück-Knopfs: „Zurück zu den Alben“
   ohne `editedAlbum`, sonst „Zurück zum Album“.
-- [ ] `src/albums/ui/AlbumsArea.tsx`:
+- [x] `src/albums/ui/AlbumsArea.tsx`:
   ```ts
   type AlbumsPage =
     | { kind: 'list'; focusedAlbum: AlbumId | null }
@@ -333,11 +333,11 @@ gehört und bearbeitet, und der Rückweg landet auf der Zeile des Albums.
     `albumSavedAnnouncement` an. Hinzufügen bleibt bei der Liste.
   - `addressedAlbum` für alle Seiten mit `id` ermitteln; fehlt das Album, wird die Liste
     gezeigt (wie heute).
-- [ ] `src/index.css` – `.albumDetailStats p` (Flex, `align-items: center`,
+- [x] `src/index.css` – `.albumDetailStats p` (Flex, `align-items: center`,
   `gap: 0.5rem`, `margin: 0.25rem 0`) und `.albumDetailStats .buttonIcon` (1.25rem wie
   `.albumStats .buttonIcon`); `.listeningList li` mit `min-height: 44px`,
   `align-items: center`.
-- [ ] `src/albums/ui/AlbumsArea.test.tsx` zuerst anpassen:
+- [x] `src/albums/ui/AlbumsArea.test.tsx` zuerst anpassen:
   - Hilfsfunktion `editAlbum(name)` = `openAlbum(name)` + Klick auf „Bearbeiten“; alle
     Tests, die heute über `openAlbum` ins Formular gehen (Zeilen 234–357), nutzen sie.
   - `renames an album and keeps its listenings` – erwartet jetzt die fokussierte
@@ -357,8 +357,8 @@ gehört und bearbeitet, und der Rückweg landet auf der Zeile des Albums.
     - `keeps the way back to the albums while adding` – Hinzufügen zeigt weiterhin
       „Zurück zu den Alben“
     - `has no accessibility violations on the details` – mit und ohne Hören
-- [ ] `src/App.test.tsx` – unverändert grün (Rückgängig beim Bereichswechsel).
-- [ ] `e2e/albums.spec.ts`:
+- [x] `src/App.test.tsx` – unverändert grün (Rückgängig beim Bereichswechsel).
+- [x] `e2e/albums.spec.ts`:
   - `renames and deletes an album for good` – nach `albumButton(…).click()` auf
     „Bearbeiten“ klicken; nach dem Speichern steht die Detailseite, dort erneut
     „Bearbeiten“, dann „Löschen“.
@@ -366,12 +366,12 @@ gehört und bearbeitet, und der Rückweg landet auf der Zeile des Albums.
     Liste einmal `[↑]`, neu laden, Album öffnen, Überschrift „Gehört, 1 Mal“ sichtbar.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter `listening.test.ts`, `listeningTime.test.ts`,
+- [x] `npm run test` grün, darunter `listening.test.ts`, `listeningTime.test.ts`,
   `albumAnnouncements.test.ts`, `AlbumsArea.test.tsx`, `App.test.tsx`,
   `domainLayerBoundary.test.ts`, `colorContrast.test.ts`
-- [ ] `npm run lint` grün
-- [ ] `npm run build` grün
-- [ ] `npm run test:e2e` grün, darunter `albums.spec.ts`
+- [x] `npm run lint` grün
+- [x] `npm run build` grün
+- [x] `npm run test:e2e` grün, darunter `albums.spec.ts`
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy mit TalkBack: Tipp auf ein Album öffnet die Detailseite und sagt
@@ -439,6 +439,11 @@ Jeder Hörzeitpunkt lässt sich über einen Eimer nach Bestätigung löschen.
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Phase 1: Der 2.11.2026 ist ein Montag. Der Entwurf im *Zielbild* zeigt dort „So.“; der
+  Test `lists all listenings newest first` erwartet richtig „Mo., 02.11.2026, 21:30“.
+- Phase 1: `.albumDetailStats p` bekommt zusätzlich `flex-wrap: wrap`, damit
+  „Zuletzt gehört: <kurz>“ auf schmalen Geräten umbrechen kann.
 
 ## Verweise
 

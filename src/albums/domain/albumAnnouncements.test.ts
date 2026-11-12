@@ -9,6 +9,7 @@ import {
   deletionConsequence,
   listenedAnnouncement,
   listenedButtonLabel,
+  listeningsHeading,
   listeningTakenBackAnnouncement,
   undoListeningLabel,
 } from './albumAnnouncements'
@@ -151,5 +152,19 @@ describe('listening texts', () => {
     expect(undoListeningLabel({ title: 'Greatest Hits', artist: '' })).toBe(
       'Rückgängig: Greatest Hits',
     )
+  })
+})
+
+describe('listeningsHeading', () => {
+  it('names only the listenings while there are none', () => {
+    expect(listeningsHeading(kindOfBlueListened(0))).toBe('Gehört')
+  })
+
+  it('names a single listening', () => {
+    expect(listeningsHeading(kindOfBlueListened(1))).toBe('Gehört, 1 Mal')
+  })
+
+  it('names several listenings', () => {
+    expect(listeningsHeading(kindOfBlueListened(14))).toBe('Gehört, 14 Mal')
   })
 })

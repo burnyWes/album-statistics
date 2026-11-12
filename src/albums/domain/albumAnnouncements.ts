@@ -73,3 +73,8 @@ export function listeningTakenBackAnnouncement(
 export function undoListeningLabel(album: NewAlbum): string {
   return `Rückgängig: ${albumName(album)}`
 }
+
+export function listeningsHeading(album: Album): string {
+  const count = listeningsInTotal(album)
+  return count === 0 ? 'Gehört' : `Gehört, ${count} Mal`
+}

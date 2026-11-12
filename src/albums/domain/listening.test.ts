@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { Album } from './album'
 import {
+  lastListening,
   listeningAt,
   listeningsInTotal,
+  listeningsNewestFirst,
   listeningsThisMonth,
   withListening,
   withoutListening,
@@ -70,5 +72,53 @@ describe('listening', () => {
     expect(
       withoutListening(album, listeningAt(new Date(2020, 0, 1))).listenings,
     ).toEqual([listeningAt(now)])
+  })
+})
+
+describe('listening history', () => {
+  const earliest = new Date(2026, 10, 2, 21, 30)
+  const middle = new Date(2026, 10, 10, 8, 0)
+  const latest = new Date(2026, 10, 12, 14, 20)
+
+  it('lists listenings newest first', () => {
+    const album = albumListenedAt(middle, latest, earliest)
+
+    expect(listeningsNewestFirst(album)).toEqual([
+      listeningAt(latest),
+      listeningAt(middle),
+      listeningAt(earliest),
+    ])
+  })
+
+  it('orders listenings by time, not by text', () => {
+    const album: Album = {
+      ...albumListenedAt(),
+      listenings: ['2026-11-12T19:00:00+01:00', '2026-11-12T18:30:00.000Z'],
+    }
+
+    expect(listeningsNewestFirst(album)).toEqual([
+      '2026-11-12T18:30:00.000Z',
+      '2026-11-12T19:00:00+01:00',
+    ])
+  })
+
+  it('keeps the album listenings untouched when sorting', () => {
+    const album = albumListenedAt(middle, latest, earliest)
+
+    listeningsNewestFirst(album)
+
+    expect(album.listenings).toEqual(
+      [middle, latest, earliest].map(listeningAt),
+    )
+  })
+
+  it('finds the last listening', () => {
+    expect(lastListening(albumListenedAt(middle, latest, earliest))).toBe(
+      listeningAt(latest),
+    )
+  })
+
+  it('has no last listening without listenings', () => {
+    expect(lastListening(albumListenedAt())).toBeNull()
   })
 })

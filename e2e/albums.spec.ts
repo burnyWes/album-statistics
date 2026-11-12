@@ -30,10 +30,14 @@ test('renames and deletes an album for good', async ({ page }) => {
   await addAlbum(page, 'Kind of Blue', 'Miles Davis')
 
   await albumButton(page, 'Kind of Blue, Miles Davis').click()
+  await page.getByRole('button', { name: 'Bearbeiten' }).click()
   await page.getByRole('textbox', { name: 'Albumname' }).fill('Blue Train')
   await page.getByRole('button', { name: 'Speichern' }).click()
 
-  await albumButton(page, 'Blue Train, Miles Davis').click()
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Blue Train, Miles Davis' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Bearbeiten' }).click()
   await page.getByRole('button', { name: 'Löschen' }).click()
   await expect(
     page.getByRole('heading', { name: 'Blue Train, Miles Davis löschen?' }),
@@ -67,4 +71,21 @@ test('keeps listenings and taking one back after a reload', async ({
   await expect(
     albumButton(page, 'Kind of Blue, Miles Davis'),
   ).toHaveAccessibleName(/insgesamt 1 Mal gehört/)
+})
+
+test('shows listenings on the album details after a reload', async ({
+  page,
+}) => {
+  await page.goto('./')
+  await addAlbum(page, 'Kind of Blue', 'Miles Davis')
+  await page
+    .getByRole('button', { name: 'Kind of Blue, Miles Davis gehört' })
+    .click()
+
+  await page.reload()
+  await albumButton(page, 'Kind of Blue, Miles Davis').click()
+
+  await expect(
+    page.getByRole('heading', { level: 2, name: 'Gehört, 1 Mal' }),
+  ).toBeVisible()
 })

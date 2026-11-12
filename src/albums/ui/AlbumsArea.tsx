@@ -9,6 +9,7 @@ import {
   undoListeningLabel,
 } from '../domain/albumAnnouncements'
 import { withListening, withoutListening } from '../domain/listening'
+import { AlbumDetailPage, type AlbumDetailFocus } from './AlbumDetailPage'
 import { AlbumFormPage } from './AlbumFormPage'
 import {
   AlbumListPage,
@@ -19,7 +20,8 @@ import { DeleteAlbumPage } from './DeleteAlbumPage'
 import { useAlbums } from './useAlbums'
 
 type AlbumsPage =
-  | { kind: 'list' }
+  | { kind: 'list'; focusedAlbum: AlbumId | null }
+  | { kind: 'detail'; id: AlbumId; focus: AlbumDetailFocus }
   | { kind: 'form'; id: AlbumId | null }
   | { kind: 'delete'; id: AlbumId }
 
@@ -39,7 +41,10 @@ export function AlbumsArea({
   navigation,
 }: AlbumsAreaProps) {
   const albums = useAlbums(albumsClient, clock)
-  const [page, setPage] = useState<AlbumsPage>({ kind: 'list' })
+  const [page, setPage] = useState<AlbumsPage>({
+    kind: 'list',
+    focusedAlbum: null,
+  })
   const [lastListening, setLastListening] = useState<LastListening | null>(null)
   const [listenButtonFocusRequest, setListenButtonFocusRequest] =
     useState<ListenButtonFocusRequest | null>(null)
@@ -62,7 +67,11 @@ export function AlbumsArea({
   }
 
   function showList() {
-    showPage({ kind: 'list' })
+    showPage({ kind: 'list', focusedAlbum: null })
+  }
+
+  function showAlbum(id: AlbumId) {
+    showPage({ kind: 'detail', id, focus: 'album' })
   }
 
   function editAlbum(id: AlbumId) {
@@ -72,10 +81,11 @@ export function AlbumsArea({
   function saveAlbum(editedId: AlbumId | null, newAlbum: NewAlbum) {
     if (editedId === null) {
       albums.addAlbum(newAlbum)
+      showList()
     } else {
       albums.changeAlbum(editedId, newAlbum)
+      showAlbum(editedId)
     }
-    showList()
     announce(albumSavedAnnouncement(newAlbum))
   }
 
@@ -88,6 +98,11 @@ export function AlbumsArea({
   function listenTo(album: Album) {
     const listening = albums.listenTo(album.id)
     setLastListening({ albumId: album.id, listening })
+    announce(listenedAnnouncement(withListening(album, listening), clock()))
+  }
+
+  function listenFromDetails(album: Album) {
+    const listening = albums.listenTo(album.id)
     announce(listenedAnnouncement(withListening(album, listening), clock()))
   }
 
@@ -125,8 +140,23 @@ export function AlbumsArea({
         onDelete={() => {
           if (editedId !== null) showPage({ kind: 'delete', id: editedId })
         }}
-        onBack={showList}
+        onBack={() => (editedId === null ? showList() : showAlbum(editedId))}
         announce={announce}
+      />
+    )
+  }
+
+  if (page.kind === 'detail' && addressedAlbum !== null) {
+    return (
+      <AlbumDetailPage
+        album={addressedAlbum}
+        now={clock()}
+        focus={page.focus}
+        onBack={() =>
+          showPage({ kind: 'list', focusedAlbum: addressedAlbum.id })
+        }
+        onListen={() => listenFromDetails(addressedAlbum)}
+        onEdit={() => editAlbum(addressedAlbum.id)}
       />
     )
   }
@@ -146,10 +176,11 @@ export function AlbumsArea({
       navigation={navigation}
       albums={albums.albums}
       now={clock()}
+      focusedAlbum={page.kind === 'list' ? page.focusedAlbum : null}
       undoListening={undoListening}
       listenButtonFocusRequest={listenButtonFocusRequest}
       onAddAlbum={() => showPage({ kind: 'form', id: null })}
-      onOpenAlbum={(album) => editAlbum(album.id)}
+      onOpenAlbum={(album) => showAlbum(album.id)}
       onListen={listenTo}
     />
   )

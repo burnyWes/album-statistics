@@ -61,7 +61,7 @@ export function AlbumFormPage({
     <main className="page">
       <form onSubmit={saveAlbum}>
         <button type="button" onClick={onBack}>
-          Zurück zu den Alben
+          {editedAlbum === null ? 'Zurück zu den Alben' : 'Zurück zum Album'}
         </button>
         <h1>
           {editedAlbum === null ? 'Album hinzufügen' : 'Album bearbeiten'}

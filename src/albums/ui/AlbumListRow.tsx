@@ -12,6 +12,7 @@ import { RecordIcon } from './RecordIcon'
 type AlbumListRowProps = {
   album: Album
   now: Date
+  focusOnMount: boolean
   listenButtonFocusRequest: number
   onOpenAlbum: (album: Album) => void
   onListen: (album: Album) => void
@@ -20,11 +21,17 @@ type AlbumListRowProps = {
 export function AlbumListRow({
   album,
   now,
+  focusOnMount,
   listenButtonFocusRequest,
   onOpenAlbum,
   onListen,
 }: AlbumListRowProps) {
+  const rowButton = useRef<HTMLButtonElement>(null)
   const listenButton = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (focusOnMount) rowButton.current?.focus()
+  }, [focusOnMount])
 
   useEffect(() => {
     if (listenButtonFocusRequest > 0) listenButton.current?.focus()
@@ -34,6 +41,7 @@ export function AlbumListRow({
     <li className="listRow">
       <button
         type="button"
+        ref={rowButton}
         className="rowButton"
         aria-label={albumRowLabel(album, now)}
         onClick={() => onOpenAlbum(album)}

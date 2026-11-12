@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { BottomBar } from '../../shared/ui/BottomBar'
-import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
 import type { Album, AlbumId } from '../domain/album'
 import { albumsHeading } from '../domain/albumAnnouncements'
 import { AlbumListRow } from './AlbumListRow'
@@ -13,6 +12,7 @@ type AlbumListPageProps = {
   navigation: ReactNode
   albums: readonly Album[]
   now: Date
+  focusedAlbum: AlbumId | null
   undoListening: UndoListening | null
   listenButtonFocusRequest: ListenButtonFocusRequest | null
   onAddAlbum: () => void
@@ -24,13 +24,18 @@ export function AlbumListPage({
   navigation,
   albums,
   now,
+  focusedAlbum,
   undoListening,
   listenButtonFocusRequest,
   onAddAlbum,
   onOpenAlbum,
   onListen,
 }: AlbumListPageProps) {
-  const heading = useHeadingFocus()
+  const heading = useRef<HTMLHeadingElement>(null)
+
+  useEffect(() => {
+    if (focusedAlbum === null) heading.current?.focus()
+  }, [focusedAlbum])
 
   function focusRequestFor(album: Album): number {
     return listenButtonFocusRequest?.albumId === album.id
@@ -64,6 +69,7 @@ export function AlbumListPage({
                 key={album.id}
                 album={album}
                 now={now}
+                focusOnMount={album.id === focusedAlbum}
                 listenButtonFocusRequest={focusRequestFor(album)}
                 onOpenAlbum={onOpenAlbum}
                 onListen={onListen}
