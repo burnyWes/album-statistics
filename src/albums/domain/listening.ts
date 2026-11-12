@@ -45,3 +45,34 @@ export function listeningsNewestFirst(album: Album): Listening[] {
 export function lastListening(album: Album): Listening | null {
   return listeningsNewestFirst(album)[0] ?? null
 }
+
+export type ListeningMonth = {
+  year: number
+  monthIndex: number
+  listenings: Listening[]
+}
+
+function isSameMonth(month: ListeningMonth, moment: Date): boolean {
+  return (
+    month.year === moment.getFullYear() &&
+    month.monthIndex === moment.getMonth()
+  )
+}
+
+export function listeningMonthsNewestFirst(album: Album): ListeningMonth[] {
+  const months: ListeningMonth[] = []
+  for (const listening of listeningsNewestFirst(album)) {
+    const moment = new Date(listening)
+    const currentMonth = months.at(-1)
+    if (currentMonth !== undefined && isSameMonth(currentMonth, moment)) {
+      currentMonth.listenings.push(listening)
+    } else {
+      months.push({
+        year: moment.getFullYear(),
+        monthIndex: moment.getMonth(),
+        listenings: [listening],
+      })
+    }
+  }
+  return months
+}

@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { listeningAt } from './listening'
-import { shortListeningTime, spokenListeningTime } from './listeningTime'
+import {
+  listeningMonthName,
+  shortListeningTime,
+  spokenListeningTime,
+} from './listeningTime'
 
 describe('listening time', () => {
   it('formats a listening short with weekday in local time', () => {
@@ -19,5 +23,19 @@ describe('listening time', () => {
     expect(
       spokenListeningTime(listeningAt(new Date(2026, 10, 12, 14, 20))),
     ).toBe('Donnerstag, 12.11.2026, 14:20')
+  })
+})
+
+describe('listening month name', () => {
+  it('names month and year', () => {
+    expect(
+      listeningMonthName({ year: 2026, monthIndex: 10, listenings: [] }),
+    ).toBe('November 2026')
+  })
+
+  it('names January', () => {
+    expect(
+      listeningMonthName({ year: 2027, monthIndex: 0, listenings: [] }),
+    ).toBe('Januar 2027')
   })
 })

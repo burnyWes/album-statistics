@@ -3,6 +3,7 @@ import type { Album } from './album'
 import {
   lastListening,
   listeningAt,
+  listeningMonthsNewestFirst,
   listeningsInTotal,
   listeningsNewestFirst,
   listeningsThisMonth,
@@ -120,5 +121,52 @@ describe('listening history', () => {
 
   it('has no last listening without listenings', () => {
     expect(lastListening(albumListenedAt())).toBeNull()
+  })
+})
+
+describe('listening months', () => {
+  it('groups listenings by month, newest month and listening first', () => {
+    const album = albumListenedAt(
+      new Date(2026, 9, 28, 19, 12),
+      new Date(2026, 10, 2, 21, 30),
+      new Date(2025, 11, 31, 23, 59),
+      new Date(2026, 10, 12, 14, 20),
+    )
+
+    expect(listeningMonthsNewestFirst(album)).toEqual([
+      {
+        year: 2026,
+        monthIndex: 10,
+        listenings: [
+          listeningAt(new Date(2026, 10, 12, 14, 20)),
+          listeningAt(new Date(2026, 10, 2, 21, 30)),
+        ],
+      },
+      {
+        year: 2026,
+        monthIndex: 9,
+        listenings: [listeningAt(new Date(2026, 9, 28, 19, 12))],
+      },
+      {
+        year: 2025,
+        monthIndex: 11,
+        listenings: [listeningAt(new Date(2025, 11, 31, 23, 59))],
+      },
+    ])
+  })
+
+  it('leaves out months without listenings', () => {
+    const album = albumListenedAt(
+      new Date(2026, 10, 1, 0, 0),
+      new Date(2026, 7, 31, 23, 59),
+    )
+
+    expect(
+      listeningMonthsNewestFirst(album).map(({ monthIndex }) => monthIndex),
+    ).toEqual([10, 7])
+  })
+
+  it('has no months without listenings', () => {
+    expect(listeningMonthsNewestFirst(albumListenedAt())).toEqual([])
   })
 })

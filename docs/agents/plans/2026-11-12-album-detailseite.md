@@ -5,7 +5,7 @@ branch: main
 story: ALS-003
 topic: "Album-Detailseite mit Hörverlauf und Löschen einzelner Hörzeitpunkte"
 tags: [plan, albums, domain, ui]
-status: ready
+status: done
 ---
 
 # PLAN: ALS-003 — Album-Detailseite
@@ -431,7 +431,7 @@ Jeder Hörzeitpunkt lässt sich über einen Eimer nach Bestätigung löschen.
 - [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy mit TalkBack: der Eimer wird als „Hören vom Donnerstag, … löschen“
+- [x] Auf dem Handy mit TalkBack: der Eimer wird als „Hören vom Donnerstag, … löschen“
   angesagt; die Rückfrage nennt Zeitpunkt und Album; nach dem Löschen kommen beide
   Zähler in der Ansage und der Fokus liegt auf „Gehört, n Mal“; „Abbrechen“ führt zur
   Detailseite zurück.
@@ -444,6 +444,11 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   Test `lists all listenings newest first` erwartet richtig „Mo., 02.11.2026, 21:30“.
 - Phase 1: `.albumDetailStats p` bekommt zusätzlich `flex-wrap: wrap`, damit
   „Zuletzt gehört: <kurz>“ auf schmalen Geräten umbrechen kann.
+- Nachtrag nach der Abnahme (Wunsch des Nutzers): Die Hörzeitpunkte stehen unter
+  `h3`-Überschriften je Monat („November 2026“), nur für Monate mit Hören. Domäne:
+  `listeningMonthsNewestFirst` (`listening.ts`) und `listeningMonthName`
+  (`listeningTime.ts`); UI: `ListeningMonthSection.tsx`, je Monat eine eigene Liste mit
+  `aria-labelledby` auf die Monatsüberschrift.
 
 ## Verweise
 

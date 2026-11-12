@@ -1,4 +1,5 @@
 import type { Listening } from './album'
+import type { ListeningMonth } from './listening'
 
 const timeParts = {
   day: '2-digit',
@@ -24,4 +25,13 @@ export function shortListeningTime(listening: Listening): string {
 
 export function spokenListeningTime(listening: Listening): string {
   return spokenFormat.format(new Date(listening))
+}
+
+const monthFormat = new Intl.DateTimeFormat('de', {
+  month: 'long',
+  year: 'numeric',
+})
+
+export function listeningMonthName(month: ListeningMonth): string {
+  return monthFormat.format(new Date(month.year, month.monthIndex))
 }

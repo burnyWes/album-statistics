@@ -530,6 +530,31 @@ describe('AlbumsArea', () => {
     ])
   })
 
+  it('groups the listenings under headings for each month listened in', async () => {
+    renderArea([
+      {
+        ...kindOfBlue,
+        listenings: [
+          listeningAt(new Date(2026, 7, 14, 20, 0)),
+          listeningAt(new Date(2026, 10, 2, 21, 30)),
+          listeningAt(new Date(2026, 10, 12, 14, 20)),
+        ],
+      },
+    ])
+
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(
+      screen
+        .getAllByRole('heading', { level: 3 })
+        .map((monthHeading) => monthHeading.textContent),
+    ).toEqual(['November 2026', 'August 2026'])
+    const november = screen.getByRole('list', { name: 'November 2026' })
+    expect(within(november).getAllByRole('listitem')).toHaveLength(2)
+    const august = screen.getByRole('list', { name: 'August 2026' })
+    expect(within(august).getAllByRole('listitem')).toHaveLength(1)
+  })
+
   it('shows that an album was not listened to yet', async () => {
     renderArea([kindOfBlue])
 

@@ -378,6 +378,15 @@ html:has(.bottomBar:not(.bottomBarInFlow)) {
   height: 1.25rem;
 }
 
+h3 {
+  font-size: 1.1rem;
+  margin: 1.25rem 0 0;
+}
+
+.listeningList {
+  margin-top: 0.25rem;
+}
+
 .listeningList li {
   display: flex;
   align-items: center;

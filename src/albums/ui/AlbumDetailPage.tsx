@@ -1,20 +1,17 @@
 import { useEffect, useRef } from 'react'
 import { BottomBar } from '../../shared/ui/BottomBar'
-import { TrashIcon } from '../../shared/ui/TrashIcon'
 import { albumName, type Album, type Listening } from '../domain/album'
-import {
-  deleteListeningLabel,
-  listeningsHeading,
-} from '../domain/albumAnnouncements'
+import { listeningsHeading } from '../domain/albumAnnouncements'
 import {
   lastListening,
+  listeningMonthsNewestFirst,
   listeningsInTotal,
-  listeningsNewestFirst,
   listeningsThisMonth,
 } from '../domain/listening'
 import { ArrowUpIcon } from './ArrowUpIcon'
 import { CalendarIcon } from './CalendarIcon'
 import { EditIcon } from './EditIcon'
+import { ListeningMonthSection } from './ListeningMonthSection'
 import { ListeningTime } from './ListeningTime'
 import { RecordIcon } from './RecordIcon'
 
@@ -78,23 +75,13 @@ export function AlbumDetailPage({
       {lastListened === null ? (
         <p>Noch nicht gehört.</p>
       ) : (
-        <ul className="itemList listeningList">
-          {listeningsNewestFirst(album).map((listening, position) => (
-            <li key={`${position}-${listening}`} className="listRow">
-              <span>
-                <ListeningTime listening={listening} />
-              </span>
-              <button
-                type="button"
-                className="iconButton"
-                aria-label={deleteListeningLabel(listening)}
-                onClick={() => onDeleteListening(listening)}
-              >
-                <TrashIcon />
-              </button>
-            </li>
-          ))}
-        </ul>
+        listeningMonthsNewestFirst(album).map((month) => (
+          <ListeningMonthSection
+            key={`${month.year}-${month.monthIndex}`}
+            month={month}
+            onDeleteListening={onDeleteListening}
+          />
+        ))
       )}
       <BottomBar>
         <button type="button" onClick={onListen}>
