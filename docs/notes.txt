@@ -20,3 +20,35 @@ DONE
 ----------------------------------------------------------------------------------------------------------------------------------
 TODO 
 ----------------------------------------------------------------------------------------------------------------------------------
+
+- Design-Farbe = rot
+- App-Icons = stilisierte Schallplatte
+- Grunddesign aus Mahlzeitenplaner übernehmen
+  - Buttonstyle,
+  - Navigation oben fixiert
+  - Checkboxstyle / Radiobuttonstyle
+  - Navigation hat 2 Buttons: "Alben" und "Songs" und "Einstellungen"
+  - Einstellungenseite:
+    - Farben invertieren (wie im Mahlzeitenplaner)
+    - Installationsbutton für Android (wie in der Wunschlisten-App, frag nach Projektpfad)
+    - Daten speichern/laden button
+      - führt auf neue Seite
+      - man kann eine Datei auf dem Handy speichern mit allen notwendigen Daten, um sie auf bzw. einem neuen Handy
+      wieder laden zu können.
+  - Alben-Seite:
+    - [+]-Icon oben rechts "Album hinzufügen"
+    - Alben alphabetisch aufgelistet
+    - rechts neben einem Album [Pfeil hoch]-Button "Album gehört"
+    - Album selbst klickbar, um auf Detailseite zu kommen
+    - Albumzeile Desigen:
+      | <Albumname>, <Bandname> |
+      | [icon1] 3 [icon2] 14    |
+
+      icon1 = in diesem Monat so oft gehört,
+      icon2 = insgesamt gehört
+  - Album hinzufügen/bearbeiten-Seite:
+    - Albumname
+    - Bandname (optional)
+    - Tracks (optional)
+    |Speichern||Löschen|
+
