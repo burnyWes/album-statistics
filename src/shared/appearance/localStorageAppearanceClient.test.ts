@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest'
 import type { DeviceStorage } from '../storage/deviceStorage'
 import {
   createLocalStorageAppearanceClient,
+  INVERTED_BUTTONS_KEY,
   INVERTED_COLORS_KEY,
 } from './localStorageAppearanceClient'
 
-function storageHolding(storedValue: string | null) {
+function storageHolding(stored: Record<string, string> = {}) {
   const written: Record<string, string> = {}
   const storage: DeviceStorage = {
-    getItem: (key) => (key === INVERTED_COLORS_KEY ? storedValue : null),
+    getItem: (key) => stored[key] ?? null,
     setItem: (key, value) => {
       written[key] = value
     },
@@ -26,70 +27,104 @@ const throwingStorage: DeviceStorage = {
 }
 
 describe('localStorageAppearanceClient', () => {
-  it('reads a remembered switch as turned on', () => {
-    const { storage } = storageHolding('true')
+  it('reads remembered inverted colours as inverting everything', () => {
+    const { storage } = storageHolding({ [INVERTED_COLORS_KEY]: 'true' })
 
     const client = createLocalStorageAppearanceClient(storage)
 
-    expect(client.readInvertedColors()).toBe(true)
+    expect(client.readColorInversion()).toBe('everything')
   })
 
-  it('reads a remembered switch as turned off', () => {
-    const { storage } = storageHolding('false')
+  it('reads remembered inverted buttons as inverting the buttons only', () => {
+    const { storage } = storageHolding({ [INVERTED_BUTTONS_KEY]: 'true' })
 
     const client = createLocalStorageAppearanceClient(storage)
 
-    expect(client.readInvertedColors()).toBe(false)
+    expect(client.readColorInversion()).toBe('buttonsOnly')
   })
 
-  it('reads an unknown value as turned off', () => {
-    const { storage } = storageHolding('maybe')
+  it('reads both switches turned off as no inversion', () => {
+    const { storage } = storageHolding({
+      [INVERTED_COLORS_KEY]: 'false',
+      [INVERTED_BUTTONS_KEY]: 'false',
+    })
 
     const client = createLocalStorageAppearanceClient(storage)
 
-    expect(client.readInvertedColors()).toBe(false)
+    expect(client.readColorInversion()).toBe('none')
   })
 
-  it('reads nothing remembered as turned off', () => {
-    const { storage } = storageHolding(null)
+  it('reads an unknown value as no inversion', () => {
+    const { storage } = storageHolding({ [INVERTED_COLORS_KEY]: 'maybe' })
 
     const client = createLocalStorageAppearanceClient(storage)
 
-    expect(client.readInvertedColors()).toBe(false)
+    expect(client.readColorInversion()).toBe('none')
   })
 
-  it('remembers the switch turned on', () => {
-    const { storage, written } = storageHolding(null)
+  it('reads nothing remembered as no inversion', () => {
+    const { storage } = storageHolding()
 
-    createLocalStorageAppearanceClient(storage).writeInvertedColors(true)
+    const client = createLocalStorageAppearanceClient(storage)
 
-    expect(written).toEqual({ [INVERTED_COLORS_KEY]: 'true' })
+    expect(client.readColorInversion()).toBe('none')
   })
 
-  it('remembers the switch turned off', () => {
-    const { storage, written } = storageHolding('true')
+  it('remembers inverting everything', () => {
+    const { storage, written } = storageHolding()
 
-    createLocalStorageAppearanceClient(storage).writeInvertedColors(false)
+    createLocalStorageAppearanceClient(storage).writeColorInversion(
+      'everything',
+    )
 
-    expect(written).toEqual({ [INVERTED_COLORS_KEY]: 'false' })
+    expect(written).toEqual({
+      [INVERTED_COLORS_KEY]: 'true',
+      [INVERTED_BUTTONS_KEY]: 'false',
+    })
+  })
+
+  it('remembers inverting the buttons only', () => {
+    const { storage, written } = storageHolding()
+
+    createLocalStorageAppearanceClient(storage).writeColorInversion(
+      'buttonsOnly',
+    )
+
+    expect(written).toEqual({
+      [INVERTED_COLORS_KEY]: 'false',
+      [INVERTED_BUTTONS_KEY]: 'true',
+    })
+  })
+
+  it('remembers no inversion', () => {
+    const { storage, written } = storageHolding({
+      [INVERTED_COLORS_KEY]: 'true',
+    })
+
+    createLocalStorageAppearanceClient(storage).writeColorInversion('none')
+
+    expect(written).toEqual({
+      [INVERTED_COLORS_KEY]: 'false',
+      [INVERTED_BUTTONS_KEY]: 'false',
+    })
   })
 
   it('stays usable without any storage', () => {
     const client = createLocalStorageAppearanceClient(null)
 
-    expect(client.readInvertedColors()).toBe(false)
-    expect(() => client.writeInvertedColors(true)).not.toThrow()
+    expect(client.readColorInversion()).toBe('none')
+    expect(() => client.writeColorInversion('everything')).not.toThrow()
   })
 
   it('stays usable while the storage refuses to be read', () => {
     const client = createLocalStorageAppearanceClient(throwingStorage)
 
-    expect(client.readInvertedColors()).toBe(false)
+    expect(client.readColorInversion()).toBe('none')
   })
 
   it('stays usable while the storage refuses to be written', () => {
     const client = createLocalStorageAppearanceClient(throwingStorage)
 
-    expect(() => client.writeInvertedColors(true)).not.toThrow()
+    expect(() => client.writeColorInversion('buttonsOnly')).not.toThrow()
   })
 })

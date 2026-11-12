@@ -1,4 +1,6 @@
+export type ColorInversion = 'none' | 'everything' | 'buttonsOnly'
+
 export interface AppearanceClient {
-  readInvertedColors(): boolean
-  writeInvertedColors(invertedColors: boolean): void
+  readColorInversion(): ColorInversion
+  writeColorInversion(colorInversion: ColorInversion): void
 }

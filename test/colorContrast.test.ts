@@ -7,10 +7,20 @@ const GRAPHICS_CONTRAST = 3
 
 const stylesheet = readFileSync('src/index.css', 'utf8')
 
-const SCHEMES = [
-  { name: 'light', selector: ':root' },
-  { name: 'dark', selector: ":root[data-inverted-colors='true']" },
-] as const
+const LIGHT_SELECTOR = ':root'
+const DARK_SELECTOR = ":root[data-inverted-colors='true']"
+const INVERTED_BUTTONS_SELECTOR = ":root[data-inverted-buttons='true']"
+
+const BUTTON_COLORS = [
+  '--accent',
+  '--accentInk',
+  '--accentLine',
+  '--quietButton',
+  '--quietButtonInk',
+  '--disabled',
+  '--disabledLine',
+  '--disabledInk',
+]
 
 function escapedForPattern(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -43,8 +53,13 @@ const REQUIRED_PAIRS = [
   },
   { foreground: '--failure', background: '--surface', minimum: TEXT_CONTRAST },
   {
+    foreground: '--quietButtonInk',
+    background: '--quietButton',
+    minimum: TEXT_CONTRAST,
+  },
+  {
     foreground: '--accentLine',
-    background: '--surface',
+    background: '--quietButton',
     minimum: GRAPHICS_CONTRAST,
   },
   {
@@ -69,25 +84,47 @@ function inverted(hexColor: string): string {
   return `#${channels.join('')}`
 }
 
+function invertedPalette(
+  palette: Record<string, string>,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(palette).map(([variable, color]) => [
+      variable,
+      inverted(color),
+    ]),
+  )
+}
+
+const lightPalette = paletteOf(LIGHT_SELECTOR)
+
 describe('the dark colour scheme', () => {
   it('inverts every colour of the light scheme exactly', () => {
-    const light = paletteOf(':root')
-    const invertedLight = Object.fromEntries(
-      Object.entries(light).map(([variable, color]) => [
-        variable,
-        inverted(color),
-      ]),
+    expect(paletteOf(DARK_SELECTOR)).toEqual(invertedPalette(lightPalette))
+  })
+})
+
+describe('the inverted buttons', () => {
+  it('invert exactly the button colours of the light scheme', () => {
+    const lightButtonColors = Object.fromEntries(
+      BUTTON_COLORS.map((variable) => [variable, lightPalette[variable]]),
     )
 
-    expect(paletteOf(":root[data-inverted-colors='true']")).toEqual(
-      invertedLight,
+    expect(paletteOf(INVERTED_BUTTONS_SELECTOR)).toEqual(
+      invertedPalette(lightButtonColors),
     )
   })
 })
 
-describe.each(SCHEMES)('the $name colour scheme', ({ selector }) => {
-  const palette = paletteOf(selector)
+const SCHEMES = [
+  { name: 'light', palette: lightPalette },
+  { name: 'dark', palette: paletteOf(DARK_SELECTOR) },
+  {
+    name: 'inverted buttons',
+    palette: { ...lightPalette, ...paletteOf(INVERTED_BUTTONS_SELECTOR) },
+  },
+]
 
+describe.each(SCHEMES)('the $name colour scheme', ({ palette }) => {
   it.each(REQUIRED_PAIRS)(
     '$foreground on $background reaches $minimum : 1',
     ({ foreground, background, minimum }) => {

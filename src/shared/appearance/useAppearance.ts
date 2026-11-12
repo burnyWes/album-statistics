@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import type { AppearanceClient } from './appearanceClient'
+import type { AppearanceClient, ColorInversion } from './appearanceClient'
+
+export type ChosenColorInversion = Exclude<ColorInversion, 'none'>
 
 export type Appearance = {
-  invertedColors: boolean
-  toggleInvertedColors: () => void
+  colorInversion: ColorInversion
+  toggleColorInversion: (chosen: ChosenColorInversion) => void
 }
 
 function applySystemBarColor() {
@@ -15,22 +17,35 @@ function applySystemBarColor() {
     systemBar.setAttribute('content', systemBarColor)
 }
 
+function markTheRoot(colorInversion: ColorInversion) {
+  const { dataset } = document.documentElement
+  dataset.invertedColors = String(colorInversion === 'everything')
+  dataset.invertedButtons = String(colorInversion === 'buttonsOnly')
+}
+
+function toggled(
+  current: ColorInversion,
+  chosen: ChosenColorInversion,
+): ColorInversion {
+  return current === chosen ? 'none' : chosen
+}
+
 export function useAppearance(appearanceClient: AppearanceClient): Appearance {
-  const [invertedColors, setInvertedColors] = useState(() =>
-    appearanceClient.readInvertedColors(),
+  const [colorInversion, setColorInversion] = useState(() =>
+    appearanceClient.readColorInversion(),
   )
 
   useEffect(() => {
-    document.documentElement.dataset.invertedColors = String(invertedColors)
+    markTheRoot(colorInversion)
     applySystemBarColor()
-  }, [invertedColors])
+  }, [colorInversion])
 
   return {
-    invertedColors,
-    toggleInvertedColors() {
-      const wanted = !invertedColors
-      appearanceClient.writeInvertedColors(wanted)
-      setInvertedColors(wanted)
+    colorInversion,
+    toggleColorInversion(chosen) {
+      const wanted = toggled(colorInversion, chosen)
+      appearanceClient.writeColorInversion(wanted)
+      setColorInversion(wanted)
     },
   }
 }

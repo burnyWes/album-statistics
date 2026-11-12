@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { createInMemoryAlbumsClient } from './albums/api/inMemoryAlbumsClient'
 import type { Album } from './albums/domain/album'
 import { App } from './App'
+import type { ColorInversion } from './shared/appearance/appearanceClient'
 import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppearanceClient'
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
 import type { InstallOutcome } from './shared/install/installOfferClient'
@@ -11,11 +12,11 @@ import { createInMemoryInstallOfferClient } from './shared/install/inMemoryInsta
 import { accessibilityViolations } from './testSupport/accessibility'
 
 function renderApp({
-  invertedColors = false,
+  colorInversion = 'none' as ColorInversion,
   installOutcome = 'accepted' as InstallOutcome,
   albums = [] as readonly Album[],
 } = {}) {
-  const appearanceClient = createInMemoryAppearanceClient(invertedColors)
+  const appearanceClient = createInMemoryAppearanceClient(colorInversion)
   const installOfferClient = createInMemoryInstallOfferClient(installOutcome)
   const appUpdateClient = createInMemoryAppUpdateClient()
   const albumsClient = createInMemoryAlbumsClient(albums)
@@ -45,8 +46,12 @@ function settingsHeading() {
   return screen.getByRole('heading', { level: 1, name: 'Einstellungen' })
 }
 
-function invertedColorsSwitch() {
-  return screen.getByRole('switch', { name: 'Farben invertieren' })
+function invertedColorsCheckbox() {
+  return screen.getByRole('checkbox', { name: 'Farben invertieren' })
+}
+
+function invertedButtonsCheckbox() {
+  return screen.getByRole('checkbox', { name: 'Nur Buttons invertieren' })
 }
 
 function areaButton(name: string) {
@@ -142,19 +147,54 @@ describe('App', () => {
     const { appearanceClient } = renderApp()
     await userEvent.click(areaButton('Einstellungen'))
 
-    await userEvent.click(invertedColorsSwitch())
+    await userEvent.click(invertedColorsCheckbox())
 
     expect(document.documentElement.dataset.invertedColors).toBe('true')
-    expect(appearanceClient.storedInvertedColors()).toBe(true)
+    expect(appearanceClient.storedColorInversion()).toBe('everything')
   })
 
   it('starts with remembered inverted colours', async () => {
-    renderApp({ invertedColors: true })
+    renderApp({ colorInversion: 'everything' })
 
     await userEvent.click(areaButton('Einstellungen'))
 
-    expect(invertedColorsSwitch()).toBeChecked()
+    expect(invertedColorsCheckbox()).toBeChecked()
+    expect(invertedButtonsCheckbox()).not.toBeChecked()
     expect(document.documentElement.dataset.invertedColors).toBe('true')
+  })
+
+  it('inverts only the buttons instead of all colours', async () => {
+    const { appearanceClient } = renderApp({ colorInversion: 'everything' })
+    await userEvent.click(areaButton('Einstellungen'))
+
+    await userEvent.click(invertedButtonsCheckbox())
+
+    expect(invertedButtonsCheckbox()).toBeChecked()
+    expect(invertedColorsCheckbox()).not.toBeChecked()
+    expect(document.documentElement.dataset.invertedButtons).toBe('true')
+    expect(document.documentElement.dataset.invertedColors).toBe('false')
+    expect(appearanceClient.storedColorInversion()).toBe('buttonsOnly')
+  })
+
+  it('groups both inversions under one name', async () => {
+    renderApp()
+
+    await userEvent.click(areaButton('Einstellungen'))
+
+    expect(screen.getByRole('group', { name: 'Farbumkehr' })).toContainElement(
+      invertedButtonsCheckbox(),
+    )
+  })
+
+  it('turns the chosen inversion off again', async () => {
+    const { appearanceClient } = renderApp({ colorInversion: 'buttonsOnly' })
+    await userEvent.click(areaButton('Einstellungen'))
+
+    await userEvent.click(invertedButtonsCheckbox())
+
+    expect(invertedButtonsCheckbox()).not.toBeChecked()
+    expect(invertedColorsCheckbox()).not.toBeChecked()
+    expect(appearanceClient.storedColorInversion()).toBe('none')
   })
 
   it('offers installing only while the browser offers it', async () => {

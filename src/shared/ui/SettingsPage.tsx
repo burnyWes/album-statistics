@@ -1,13 +1,19 @@
 import type { ReactNode } from 'react'
 import { useHeadingFocus } from './useHeadingFocus'
 
+export type SettingsToggle = {
+  id: string
+  label: string
+  enabled: boolean
+  onToggle: () => void
+}
+
 export type SettingsEntry =
   | {
-      kind: 'toggle'
+      kind: 'toggleGroup'
       id: string
       label: string
-      enabled: boolean
-      onToggle: () => void
+      toggles: readonly SettingsToggle[]
     }
   | { kind: 'action'; id: string; label: string; onSelect: () => void }
 
@@ -26,17 +32,24 @@ export function SettingsPage({
 
   function entryControl(entry: SettingsEntry) {
     switch (entry.kind) {
-      case 'toggle':
+      case 'toggleGroup':
         return (
-          <label className="settingsToggle">
-            <span>{entry.label}</span>
-            <input
-              type="checkbox"
-              role="switch"
-              checked={entry.enabled}
-              onChange={entry.onToggle}
-            />
-          </label>
+          <div
+            role="group"
+            aria-label={entry.label}
+            className="settingsToggleGroup"
+          >
+            {entry.toggles.map((toggle) => (
+              <label key={toggle.id} className="settingsToggle">
+                <span>{toggle.label}</span>
+                <input
+                  type="checkbox"
+                  checked={toggle.enabled}
+                  onChange={toggle.onToggle}
+                />
+              </label>
+            ))}
+          </div>
         )
       case 'action':
         return (
