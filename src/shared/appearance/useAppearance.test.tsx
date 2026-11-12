@@ -4,7 +4,7 @@ import { createInMemoryAppearanceClient } from './inMemoryAppearanceClient'
 import { useAppearance } from './useAppearance'
 
 const LIGHT_SYSTEM_BAR = '#b91c1c'
-const INVERTED_SYSTEM_BAR = '#7f1d1d'
+const INVERTED_SYSTEM_BAR = '#46e3e3'
 
 function systemBar() {
   return document.querySelector('meta[name="theme-color"]')

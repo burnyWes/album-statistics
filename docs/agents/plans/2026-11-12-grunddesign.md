@@ -506,6 +506,11 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - `test/colorContrast.test.ts` importiert `./colorContrast.ts` mit Endung, weil
   `tsconfig.node.json` `nodenext` verlangt.
 - Die Suche nach `1e3a8a` findet nur noch diesen Plan unter `docs/`.
+- Nach der Abnahme geändert (Wunsch des Nutzers), Entscheidung 3 ist damit überholt:
+  Knöpfe hell satt rot `#dc2626` mit weißer Schrift über die neue Variable
+  `--accentInk`; das dunkle Schema ist die exakte Umkehrung des hellen (Akzent
+  `#23d9d9`, Linie und Systemleiste `#46e3e3`). `colorContrast.test.ts` prüft die
+  Umkehrung und `--accentInk` auf `--accent`.
 
 ## Verweise
 

@@ -8,7 +8,8 @@
   line-height: 1.5;
   --surface: #ffffff;
   --ink: #000000;
-  --accent: #f4a3a3;
+  --accent: #dc2626;
+  --accentInk: #ffffff;
   --accentLine: #b91c1c;
   --systemBar: #b91c1c;
   --checkMark: #b91c1c;
@@ -24,10 +25,11 @@
   color-scheme: dark;
   --surface: #000000;
   --ink: #ffffff;
-  --accent: #7f1d1d;
-  --accentLine: #f87171;
-  --systemBar: #7f1d1d;
-  --checkMark: #f87171;
+  --accent: #23d9d9;
+  --accentInk: #000000;
+  --accentLine: #46e3e3;
+  --systemBar: #46e3e3;
+  --checkMark: #46e3e3;
   --divider: #2e2a24;
   --fieldBorder: #b4aa9c;
   --disabled: #0c0b09;
@@ -133,18 +135,20 @@ button {
   border-radius: 6px;
   padding: 0.5rem 1rem;
   background-color: var(--accent);
-  color: var(--ink);
+  color: var(--accentInk);
 }
 
 .navigationBar button,
 .rowButton {
   background-color: var(--surface);
   border-color: var(--accentLine);
+  color: var(--ink);
 }
 
 .navigationBar button[aria-current='page'] {
   background-color: var(--accent);
   border-color: var(--ink);
+  color: var(--accentInk);
 }
 
 button:disabled,

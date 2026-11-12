@@ -31,7 +31,11 @@ function paletteOf(selector: string): Record<string, string> {
 
 const REQUIRED_PAIRS = [
   { foreground: '--ink', background: '--surface', minimum: TEXT_CONTRAST },
-  { foreground: '--ink', background: '--accent', minimum: TEXT_CONTRAST },
+  {
+    foreground: '--accentInk',
+    background: '--accent',
+    minimum: TEXT_CONTRAST,
+  },
   {
     foreground: '--disabledInk',
     background: '--disabled',
@@ -53,6 +57,31 @@ const REQUIRED_PAIRS = [
 describe('contrastRatio', () => {
   it('rates black on white as the strongest contrast', () => {
     expect(contrastRatio('#000000', '#ffffff')).toBeCloseTo(21)
+  })
+})
+
+function inverted(hexColor: string): string {
+  const channels = [1, 3, 5].map((start) =>
+    (255 - Number.parseInt(hexColor.slice(start, start + 2), 16))
+      .toString(16)
+      .padStart(2, '0'),
+  )
+  return `#${channels.join('')}`
+}
+
+describe('the dark colour scheme', () => {
+  it('inverts every colour of the light scheme exactly', () => {
+    const light = paletteOf(':root')
+    const invertedLight = Object.fromEntries(
+      Object.entries(light).map(([variable, color]) => [
+        variable,
+        inverted(color),
+      ]),
+    )
+
+    expect(paletteOf(":root[data-inverted-colors='true']")).toEqual(
+      invertedLight,
+    )
   })
 })
 
