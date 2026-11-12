@@ -20,3 +20,25 @@ test('keeps an added album after a reload', async ({ page }) => {
 
   await expect(page.getByText('Kind of Blue, Miles Davis')).toBeVisible()
 })
+
+test('renames and deletes an album for good', async ({ page }) => {
+  await page.goto('./')
+  await addAlbum(page, 'Kind of Blue', 'Miles Davis')
+
+  await page.getByRole('button', { name: 'Kind of Blue, Miles Davis' }).click()
+  await page.getByRole('textbox', { name: 'Albumname' }).fill('Blue Train')
+  await page.getByRole('button', { name: 'Speichern' }).click()
+
+  await page.getByRole('button', { name: 'Blue Train, Miles Davis' }).click()
+  await page.getByRole('button', { name: 'Löschen' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Blue Train, Miles Davis löschen?' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Löschen' }).click()
+
+  await expect(page.getByText('Noch keine Alben.')).toBeVisible()
+
+  await page.reload()
+
+  await expect(page.getByText('Noch keine Alben.')).toBeVisible()
+})

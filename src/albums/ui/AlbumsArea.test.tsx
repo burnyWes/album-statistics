@@ -55,6 +55,31 @@ function albumRows() {
     .map((row) => row.querySelector('.rowButton')?.textContent)
 }
 
+function openAlbum(name: string) {
+  return userEvent.click(screen.getByRole('button', { name }))
+}
+
+function button(name: string) {
+  return screen.getByRole('button', { name })
+}
+
+async function replaceTitle(title: string) {
+  await userEvent.clear(titleField())
+  await userEvent.type(titleField(), title)
+}
+
+const listenedKindOfBlue: Album = {
+  ...kindOfBlue,
+  listenings: Array.from({ length: 14 }, () => '2026-11-12T18:04:00.000Z'),
+}
+
+const theWall: Album = {
+  id: 'the-wall',
+  title: 'The Wall',
+  artist: 'Pink Floyd',
+  listenings: [],
+}
+
 async function fillIn(title: string, artist: string) {
   if (title !== '') await userEvent.type(titleField(), title)
   if (artist !== '') await userEvent.type(artistField(), artist)
@@ -180,6 +205,131 @@ describe('AlbumsArea', () => {
     const { container } = renderArea()
     await userEvent.click(addAlbumButton())
     await userEvent.click(saveButton())
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('opens an album for editing with its values', async () => {
+    renderArea([kindOfBlue])
+
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(heading('Album bearbeiten')).toBeInTheDocument()
+    expect(titleField()).toHaveValue('Kind of Blue')
+    expect(artistField()).toHaveValue('Miles Davis')
+    expect(titleField()).toHaveFocus()
+  })
+
+  it('renames an album and keeps its listenings', async () => {
+    const { albumsClient, announcements } = renderArea([listenedKindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await replaceTitle('Kind of Blue (Legacy Edition)')
+
+    await userEvent.click(saveButton())
+
+    expect(heading('Alben, 1')).toHaveFocus()
+    expect(albumRows()).toEqual(['Kind of Blue (Legacy Edition), Miles Davis'])
+    expect(announcements).toEqual([
+      'Kind of Blue (Legacy Edition), Miles Davis gespeichert.',
+    ])
+    expect(albumsClient.storedAlbums()).toEqual([
+      { ...listenedKindOfBlue, title: 'Kind of Blue (Legacy Edition)' },
+    ])
+  })
+
+  it('allows saving an album unchanged', async () => {
+    const { albumsClient, announcements } = renderArea([kindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    await userEvent.click(saveButton())
+
+    expect(announcements).toEqual(['Kind of Blue, Miles Davis gespeichert.'])
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue])
+  })
+
+  it('rejects renaming to another listed album', async () => {
+    const { albumsClient, announcements } = renderArea([kindOfBlue, theWall])
+    await openAlbum('The Wall, Pink Floyd')
+    await replaceTitle('Kind of Blue')
+    await userEvent.clear(artistField())
+    await userEvent.type(artistField(), 'Miles Davis')
+
+    await userEvent.click(saveButton())
+
+    expect(announcements).toEqual(['Dieses Album gibt es schon.'])
+    expect(titleField()).toHaveFocus()
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue, theWall])
+  })
+
+  it('asks before deleting and names the lost listenings', async () => {
+    renderArea([listenedKindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    await userEvent.click(button('Löschen'))
+
+    expect(heading('Kind of Blue, Miles Davis löschen?')).toHaveFocus()
+    expect(
+      screen.getByText('Damit gehen auch 14 Mal Hören verloren.'),
+    ).toBeInTheDocument()
+  })
+
+  it('deletes an album and announces the remaining count', async () => {
+    const { albumsClient, announcements } = renderArea([kindOfBlue, theWall])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button('Löschen'))
+
+    await userEvent.click(button('Löschen'))
+
+    expect(heading('Alben, 1')).toHaveFocus()
+    expect(albumRows()).toEqual(['The Wall, Pink Floyd'])
+    expect(announcements).toEqual([
+      'Kind of Blue, Miles Davis gelöscht. Noch 1 Album.',
+    ])
+    expect(albumsClient.storedAlbums()).toEqual([theWall])
+  })
+
+  it('cancels deleting back to editing', async () => {
+    const { albumsClient } = renderArea([kindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button('Löschen'))
+
+    await userEvent.click(button('Abbrechen'))
+
+    expect(heading('Album bearbeiten')).toBeInTheDocument()
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue])
+  })
+
+  it('goes back from deleting to editing', async () => {
+    renderArea([kindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button('Löschen'))
+
+    await userEvent.click(button('Zurück zum Album'))
+
+    expect(heading('Album bearbeiten')).toBeInTheDocument()
+  })
+
+  it('offers no deleting while adding', async () => {
+    renderArea()
+
+    await userEvent.click(addAlbumButton())
+
+    expect(
+      screen.queryByRole('button', { name: 'Löschen' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('has no accessibility violations while editing', async () => {
+    const { container } = renderArea([kindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('has no accessibility violations while asking before deleting', async () => {
+    const { container } = renderArea([kindOfBlue])
+    await openAlbum('Kind of Blue, Miles Davis')
+    await userEvent.click(button('Löschen'))
 
     expect(await accessibilityViolations(container)).toEqual([])
   })

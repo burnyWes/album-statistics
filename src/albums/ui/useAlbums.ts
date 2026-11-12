@@ -1,10 +1,17 @@
 import { useState } from 'react'
 import type { AlbumsClient } from '../api/albumsClient'
-import { byTitle, type Album, type NewAlbum } from '../domain/album'
+import {
+  byTitle,
+  type Album,
+  type AlbumId,
+  type NewAlbum,
+} from '../domain/album'
 
 export type Albums = {
   albums: readonly Album[]
   addAlbum: (album: NewAlbum) => Album
+  changeAlbum: (id: AlbumId, album: NewAlbum) => void
+  removeAlbum: (id: AlbumId) => void
 }
 
 export function useAlbums(client: AlbumsClient): Albums {
@@ -25,5 +32,17 @@ export function useAlbums(client: AlbumsClient): Albums {
     return album
   }
 
-  return { albums: byTitle(knownAlbums), addAlbum }
+  function changeAlbum(id: AlbumId, changed: NewAlbum) {
+    store(
+      knownAlbums.map((album) =>
+        album.id === id ? { ...album, ...changed } : album,
+      ),
+    )
+  }
+
+  function removeAlbum(id: AlbumId) {
+    store(knownAlbums.filter((album) => album.id !== id))
+  }
+
+  return { albums: byTitle(knownAlbums), addAlbum, changeAlbum, removeAlbum }
 }

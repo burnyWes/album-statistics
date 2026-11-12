@@ -8,12 +8,14 @@ type AlbumListPageProps = {
   navigation: ReactNode
   albums: readonly Album[]
   onAddAlbum: () => void
+  onOpenAlbum: (album: Album) => void
 }
 
 export function AlbumListPage({
   navigation,
   albums,
   onAddAlbum,
+  onOpenAlbum,
 }: AlbumListPageProps) {
   const heading = useHeadingFocus()
 
@@ -39,7 +41,11 @@ export function AlbumListPage({
         ) : (
           <ul className="itemList">
             {albums.map((album) => (
-              <AlbumListRow key={album.id} album={album} />
+              <AlbumListRow
+                key={album.id}
+                album={album}
+                onOpenAlbum={onOpenAlbum}
+              />
             ))}
           </ul>
         )}

@@ -1,25 +1,38 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { BottomBar } from '../../shared/ui/BottomBar'
 import { SaveIcon } from '../../shared/ui/SaveIcon'
-import { newAlbum, type AlbumDraft, type NewAlbum } from '../domain/album'
+import { TrashIcon } from '../../shared/ui/TrashIcon'
+import {
+  newAlbum,
+  type Album,
+  type AlbumDraft,
+  type NewAlbum,
+} from '../domain/album'
 import { albumFailureMessage } from '../domain/albumAnnouncements'
 
 type AlbumFormPageProps = {
+  editedAlbum: Album | null
   otherAlbums: readonly NewAlbum[]
   onSave: (album: NewAlbum) => void
+  onDelete: () => void
   onBack: () => void
   announce: (text: string) => void
 }
 
-const EMPTY_DRAFT: AlbumDraft = { title: '', artist: '' }
+function draftOf(album: Album | null): AlbumDraft {
+  if (album === null) return { title: '', artist: '' }
+  return { title: album.title, artist: album.artist }
+}
 
 export function AlbumFormPage({
+  editedAlbum,
   otherAlbums,
   onSave,
+  onDelete,
   onBack,
   announce,
 }: AlbumFormPageProps) {
-  const [draft, setDraft] = useState(EMPTY_DRAFT)
+  const [draft, setDraft] = useState(() => draftOf(editedAlbum))
   const [failureMessage, setFailureMessage] = useState('')
   const titleField = useRef<HTMLInputElement>(null)
 
@@ -50,7 +63,9 @@ export function AlbumFormPage({
         <button type="button" onClick={onBack}>
           Zurück zu den Alben
         </button>
-        <h1>Album hinzufügen</h1>
+        <h1>
+          {editedAlbum === null ? 'Album hinzufügen' : 'Album bearbeiten'}
+        </h1>
         <p className="field">
           <label htmlFor="albumTitle">Albumname</label>
           <input
@@ -78,6 +93,12 @@ export function AlbumFormPage({
             <SaveIcon />
             Speichern
           </button>
+          {editedAlbum !== null && (
+            <button type="button" onClick={onDelete}>
+              <TrashIcon />
+              Löschen
+            </button>
+          )}
         </BottomBar>
       </form>
     </main>

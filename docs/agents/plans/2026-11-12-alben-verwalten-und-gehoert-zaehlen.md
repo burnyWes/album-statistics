@@ -443,7 +443,7 @@ Abhängigkeiten: keine
 - [x] `grep -rn "aria-disabled" src/albums` findet nichts
 
 **Manuelle Verifikation**:
-- [ ] Auf dem Handy mit TalkBack: `[+]` wird ohne „nicht verfügbar“ angesagt; im
+- [x] Auf dem Handy mit TalkBack: `[+]` wird ohne „nicht verfügbar“ angesagt; im
   Formular liegt der Fokus im Albumnamen; die Leiste mit „Speichern“ steht bei offener
   Tastatur unter den Feldern und sonst fest unten; nach dem Speichern wird
   „<Album> gespeichert.“ angesagt; nach App-Neustart ist das Album noch da.
@@ -456,24 +456,24 @@ Ein Tipp auf das Album öffnet „Album bearbeiten“; von dort lässt es sich �
 nach Bestätigung löschen.
 
 **Aufgaben**:
-- [ ] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann umsetzen:
+- [x] `src/albums/domain/albumAnnouncements.test.ts` zuerst ergänzen, dann umsetzen:
   `albumDeletedAnnouncement(album, remainingCount)` (n Alben / 1 Album / keine mehr),
   `deletionConsequence(album)` (0 / 1 / n, Texte laut *Zielbild*).
-- [ ] `src/albums/ui/useAlbums.ts` – `changeAlbum(id, newAlbum)` (behält `listenings`)
+- [x] `src/albums/ui/useAlbums.ts` – `changeAlbum(id, newAlbum)` (behält `listenings`)
   und `removeAlbum(id)`.
-- [ ] `src/albums/ui/AlbumFormPage.tsx` – Prop `editedAlbum: Album | null`: Felder
+- [x] `src/albums/ui/AlbumFormPage.tsx` – Prop `editedAlbum: Album | null`: Felder
   vorbefüllen, Überschrift „Album bearbeiten“, in der Leiste zusätzlich
   `<button type="button"><TrashIcon />Löschen</button>` mit `onDelete`. Das Prüfen auf
   Doppel bekommt von `AlbumsArea` als `otherAlbums` alle Alben außer dem bearbeiteten.
-- [ ] `src/shared/ui/TrashIcon.tsx` – aus dem Mahlzeitenplaner übernehmen.
-- [ ] `src/albums/ui/DeleteAlbumPage.tsx` – nach `DeleteMealPage.tsx`: „Zurück zum
+- [x] `src/shared/ui/TrashIcon.tsx` – aus dem Mahlzeitenplaner übernehmen.
+- [x] `src/albums/ui/DeleteAlbumPage.tsx` – nach `DeleteMealPage.tsx`: „Zurück zum
   Album“, Überschrift „<Album> löschen?“, `deletionConsequence`, `BottomBar` mit
   „Löschen“ und „Abbrechen“.
-- [ ] `src/albums/ui/AlbumListRow.tsx` – `onOpenAlbum` am `rowButton`.
-- [ ] `src/albums/ui/AlbumsArea.tsx` – Seiten `{ kind: 'form'; id: AlbumId | null }`
+- [x] `src/albums/ui/AlbumListRow.tsx` – `onOpenAlbum` am `rowButton`.
+- [x] `src/albums/ui/AlbumsArea.tsx` – Seiten `{ kind: 'form'; id: AlbumId | null }`
   und `{ kind: 'delete'; id: AlbumId }`; Speichern im Bearbeiten ruft `changeAlbum`;
   Löschen ruft `removeAlbum`, sagt `albumDeletedAnnouncement` an, zeigt die Liste.
-- [ ] `src/albums/ui/AlbumsArea.test.tsx` zuerst ergänzen:
+- [x] `src/albums/ui/AlbumsArea.test.tsx` zuerst ergänzen:
   - `opens an album for editing with its values`
   - `renames an album and keeps its listenings`
   - `allows saving an album unchanged` (kein Doppel mit sich selbst)
@@ -483,13 +483,13 @@ nach Bestätigung löschen.
   - `cancels deleting back to editing`
   - `offers no deleting while adding`
   - `has no accessibility violations` – Bearbeiten und Löschseite
-- [ ] `e2e/albums.spec.ts` – zweiter Test: anlegen, öffnen, umbenennen, löschen
+- [x] `e2e/albums.spec.ts` – zweiter Test: anlegen, öffnen, umbenennen, löschen
   bestätigen, „Noch keine Alben.“ sichtbar, nach Neuladen weiterhin leer.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün, darunter die neuen Fälle in `albumAnnouncements.test.ts`
+- [x] `npm run test` grün, darunter die neuen Fälle in `albumAnnouncements.test.ts`
   und `AlbumsArea.test.tsx`
-- [ ] `npm run lint`, `npm run build`, `npm run test:e2e` grün
+- [x] `npm run lint`, `npm run build`, `npm run test:e2e` grün
 
 **Manuelle Verifikation**:
 - [ ] Auf dem Handy mit TalkBack: Tipp auf ein Album öffnet „Album bearbeiten“ mit
