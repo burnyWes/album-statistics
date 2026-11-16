@@ -5,7 +5,7 @@ branch: main
 story: ALS-007
 topic: "Optionale Spieldauer je Album und daraus berechnete Hördauer"
 tags: [plan, albums, domain, ui, storage]
-status: ready
+status: done
 ---
 
 # PLAN: ALS-007 — Spieldauer und Hördauer
@@ -408,9 +408,9 @@ gesichert und beim Laden ergänzt, und die Detailseite zeigt sie an.
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem Handy mit TalkBack: Das Feld wird als „Spieldauer (optional)“ mit dem
+- [x] Auf dem Handy mit TalkBack: Das Feld wird als „Spieldauer (optional)“ mit dem
   Hinweis angesagt. Die Tastatur bietet einen Doppelpunkt.
-- [ ] Eine ungültige Eingabe ergibt Meldung, Ansage und Fokus im Feld.
+- [x] Eine ungültige Eingabe ergibt Meldung, Ansage und Fokus im Feld.
 
 ### Phase 2: Hördauer je Album
 
@@ -478,10 +478,10 @@ nennt die Hördauer.
 
 **Manuelle Verifikation**:
 
-- [ ] Bei ca. 360 px Breite bricht eine Zeile mit großen Werten (z. B.
+- [x] Bei ca. 360 px Breite bricht eine Zeile mit großen Werten (z. B.
   `📅 12 × 14:11:00  ◎ 140 × 165:30:20`) sauber um. Das gilt auch mit invertierten
   Farben.
-- [ ] Mit TalkBack wird die Zeile mit ausgeschriebener Hördauer vorgelesen.
+- [x] Mit TalkBack wird die Zeile mit ausgeschriebener Hördauer vorgelesen.
 
 ### Phase 3: Hördauer-Summe auf der Übersicht
 
@@ -548,10 +548,10 @@ auf Alben ohne Spieldauer.
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem Handy: Die Summenzeile steht unter „Alben, N“ und über den
+- [x] Auf dem Handy: Die Summenzeile steht unter „Alben, N“ und über den
   Sortier-Buttons. Sie wird mit TalkBack als „Hördauer diesen Monat …, insgesamt …“
   vorgelesen.
-- [ ] Nach dem Nachtragen der letzten fehlenden Spieldauer verschwindet der Hinweis.
+- [x] Nach dem Nachtragen der letzten fehlenden Spieldauer verschwindet der Hinweis.
 
 ## Notizen zur Umsetzung
 
