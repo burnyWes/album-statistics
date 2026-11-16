@@ -1,4 +1,5 @@
 import type { Cover } from './cover'
+import { parsePlayingTime, type PlayingTime } from './playingTime'
 import { parseSpotifyLink, type SpotifyLink } from './spotifyLink'
 
 export type AlbumId = string
@@ -10,6 +11,7 @@ export type AlbumDraft = {
   artist: string
   spotifyLink: string
   cover: Cover | null
+  playingTime: string
 }
 
 export type NamedAlbum = { title: string; artist: string }
@@ -17,6 +19,7 @@ export type NamedAlbum = { title: string; artist: string }
 export type NewAlbum = NamedAlbum & {
   spotifyLink: SpotifyLink | null
   cover: Cover | null
+  playingTime: PlayingTime | null
 }
 
 export type Album = NewAlbum & {
@@ -25,7 +28,7 @@ export type Album = NewAlbum & {
 }
 
 export type InvalidAlbumReason =
-  'titleMissing' | 'spotifyLinkInvalid' | 'alreadyListed'
+  'titleMissing' | 'spotifyLinkInvalid' | 'playingTimeInvalid' | 'alreadyListed'
 
 export class InvalidAlbum extends Error {
   reason: InvalidAlbumReason
@@ -54,9 +57,16 @@ export function newAlbum(
   if (name.title === '') throw new InvalidAlbum('titleMissing')
   const spotifyLink = parseSpotifyLink(draft.spotifyLink)
   if (!spotifyLink.valid) throw new InvalidAlbum('spotifyLinkInvalid')
+  const playingTime = parsePlayingTime(draft.playingTime)
+  if (!playingTime.valid) throw new InvalidAlbum('playingTimeInvalid')
   if (otherAlbums.some((other) => isSameAlbum(name, other)))
     throw new InvalidAlbum('alreadyListed')
-  return { ...name, spotifyLink: spotifyLink.link, cover: draft.cover }
+  return {
+    ...name,
+    spotifyLink: spotifyLink.link,
+    cover: draft.cover,
+    playingTime: playingTime.playingTime,
+  }
 }
 
 export function compareByTitle(one: NamedAlbum, other: NamedAlbum): number {

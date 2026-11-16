@@ -2,6 +2,7 @@ import type { ExportFile } from '../../shared/files/fileExportClient'
 import type { Album } from '../domain/album'
 import { isLoadableAlbum, type LoadedAlbum } from '../domain/albumMerge'
 import { isCover } from '../domain/cover'
+import { isPlayingTime } from '../domain/playingTime'
 import { isSpotifyLink } from '../domain/spotifyLink'
 
 export const ALBUMS_FORMAT_VERSION = 1
@@ -22,9 +23,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-type StoredAlbum = Omit<Album, 'spotifyLink' | 'cover'> & {
+type StoredAlbum = Omit<Album, 'spotifyLink' | 'cover' | 'playingTime'> & {
   spotifyLink?: string | null
   cover?: string | null
+  playingTime?: number | null
 }
 
 type StoredAlbumsFileContent = {
@@ -45,7 +47,8 @@ function isStoredAlbum(value: unknown): value is StoredAlbum {
     Array.isArray(value.listenings) &&
     value.listenings.every((listening) => typeof listening === 'string') &&
     isAbsentOr(value.spotifyLink, isSpotifyLink) &&
-    isAbsentOr(value.cover, isCover)
+    isAbsentOr(value.cover, isCover) &&
+    isAbsentOr(value.playingTime, isPlayingTime)
   )
 }
 
@@ -56,6 +59,7 @@ function albumFromStored(stored: StoredAlbum): Album {
     artist: stored.artist,
     spotifyLink: stored.spotifyLink ?? null,
     cover: stored.cover ?? null,
+    playingTime: stored.playingTime ?? null,
     listenings: stored.listenings,
   }
 }
@@ -99,11 +103,12 @@ export function albumsFromFileText(text: string): LoadedAlbum[] {
   if (!isAlbumsFileContent(content)) throw new UnreadableAlbumsFile()
   const loaded: LoadedAlbum[] = content.albums
     .map(albumFromStored)
-    .map(({ title, artist, spotifyLink, cover, listenings }) => ({
+    .map(({ title, artist, spotifyLink, cover, playingTime, listenings }) => ({
       title,
       artist,
       spotifyLink,
       cover,
+      playingTime,
       listenings,
     }))
   if (!loaded.every(isLoadableAlbum)) throw new UnreadableAlbumsFile()

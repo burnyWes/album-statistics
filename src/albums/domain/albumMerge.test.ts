@@ -23,6 +23,7 @@ const kindOfBlue: Album = {
   artist: 'Miles Davis',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: [A, A, B],
 }
 
@@ -35,8 +36,9 @@ function loaded(
   listenings: string[] = [],
   spotifyLink: string | null = null,
   cover: string | null = null,
+  playingTime: number | null = null,
 ): LoadedAlbum {
-  return { title, artist, spotifyLink, cover, listenings }
+  return { title, artist, spotifyLink, cover, playingTime, listenings }
 }
 
 const COVER = 'data:image/jpeg;base64,/9j/4AAQSkZJRg=='
@@ -57,6 +59,7 @@ describe('mergeAlbums', () => {
         artist: 'Pink Floyd',
         spotifyLink: null,
         cover: null,
+        playingTime: null,
         listenings: [D],
       },
     ])
@@ -149,6 +152,7 @@ describe('mergeAlbums', () => {
           artist: 'Pink Floyd',
           spotifyLink: null,
           cover: null,
+          playingTime: null,
           listenings: [D, E],
         },
       ],
@@ -244,6 +248,40 @@ describe('mergeAlbums', () => {
     )
 
     expect(merge.albums[0].cover).toBe(COVER)
+  })
+
+  it('adds a playing time missing on the device', () => {
+    const merge = mergeAlbums(
+      [kindOfBlue],
+      [loaded('Kind of Blue', 'Miles Davis', [], null, null, 2553)],
+      loadedIds(),
+    )
+
+    expect(merge.albums).toEqual([{ ...kindOfBlue, playingTime: 2553 }])
+    expect(merge.extendedAlbums).toBe(1)
+  })
+
+  it('keeps a playing time present on the device', () => {
+    const present = [{ ...kindOfBlue, playingTime: 2553 }]
+
+    const merge = mergeAlbums(
+      present,
+      [loaded('Kind of Blue', 'Miles Davis', [], null, null, 2520)],
+      loadedIds(),
+    )
+
+    expect(merge.albums).toEqual(present)
+    expect(merge.extendedAlbums).toBe(0)
+  })
+
+  it('takes the playing time of a new album', () => {
+    const merge = mergeAlbums(
+      [],
+      [loaded('The Wall', 'Pink Floyd', [], null, null, 4840)],
+      loadedIds(),
+    )
+
+    expect(merge.albums[0].playingTime).toBe(4840)
   })
 
   it('counts an album extended by listenings and link once', () => {

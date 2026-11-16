@@ -17,6 +17,7 @@ const kindOfBlue: Album = {
   artist: 'Miles Davis',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: ['2026-11-12T18:04:00.000Z'],
 }
 
@@ -26,6 +27,7 @@ const theWall: Album = {
   artist: 'Pink Floyd',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: [],
 }
 
@@ -35,6 +37,7 @@ const blueTrain: Album = {
   artist: 'John Coltrane',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: ['2026-11-10T20:00:00.000Z'],
 }
 
@@ -153,6 +156,23 @@ describe('AlbumsBackupPage', () => {
       { ...blueTrain, id: 'album-1' },
     ])
     expect(button('Daten laden')).toHaveFocus()
+  })
+
+  it('adds a playing time missing on the device from a loaded file', async () => {
+    const { albumsClient, announcements } = renderPage()
+
+    await userEvent.upload(
+      fileInput(),
+      backupFile([{ ...theWall, playingTime: 4840 }]),
+    )
+
+    await waitFor(() =>
+      expect(announcements).toEqual(['Daten geladen. 1 Album ergänzt.']),
+    )
+    expect(albumsClient.storedAlbums()).toEqual([
+      kindOfBlue,
+      { ...theWall, playingTime: 4840 },
+    ])
   })
 
   it('announces that a loaded file brought nothing new', async () => {

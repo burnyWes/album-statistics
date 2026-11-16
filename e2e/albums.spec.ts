@@ -215,3 +215,38 @@ test('keeps the chosen order after a reload', async ({ page }) => {
     'Kind of Blue, Miles Davis',
   )
 })
+
+test('keeps a playing time after a reload', async ({ page }) => {
+  await page.goto('./')
+  await page.getByRole('button', { name: 'Album hinzufügen' }).click()
+  await page.getByRole('textbox', { name: 'Albumname' }).fill('Kind of Blue')
+  await page
+    .getByRole('textbox', { name: 'Spieldauer (optional)' })
+    .fill('42:33')
+  await page.getByRole('button', { name: 'Speichern' }).click()
+
+  await page.reload()
+  await albumButton(page, 'Kind of Blue').click()
+
+  await expect(page.getByText(/^Spieldauer/)).toContainText('0:42:33')
+})
+
+test('sums up the listening durations after a reload', async ({ page }) => {
+  await page.goto('./')
+  await page.getByRole('button', { name: 'Album hinzufügen' }).click()
+  await page.getByRole('textbox', { name: 'Albumname' }).fill('Kind of Blue')
+  await page.getByRole('textbox', { name: 'Spieldauer (optional)' }).fill('40')
+  await page.getByRole('button', { name: 'Speichern' }).click()
+  await addAlbum(page, 'The Wall', 'Pink Floyd')
+  const listened = page.getByRole('button', { name: 'Kind of Blue gehört' })
+  await listened.click()
+  await listened.click()
+
+  await page.reload()
+
+  await expect(page.locator('.listeningDurations .sum')).toHaveText([
+    '1:20:00',
+    '1:20:00',
+  ])
+  await expect(page.getByText('1 Album ohne Spieldauer')).toBeVisible()
+})

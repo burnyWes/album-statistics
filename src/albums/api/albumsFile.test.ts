@@ -15,6 +15,7 @@ const kindOfBlue: Album = {
   artist: 'Miles Davis',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: ['2026-11-12T18:04:00.000Z'],
 }
 
@@ -86,6 +87,22 @@ describe('albums file', () => {
     ).toBeNull()
   })
 
+  it('writes and reads a playing time', () => {
+    const timed = { ...kindOfBlue, playingTime: 2553 }
+
+    expect(JSON.parse(albumsFileText([timed])).albums[0].playingTime).toBe(2553)
+    expect(storedAlbumsFromText(albumsFileText([timed]))).toEqual([timed])
+  })
+
+  it.each([0, -5, 2.5, '42'])(
+    'reads nothing from stored albums with the playing time %j',
+    (playingTime) => {
+      expect(
+        storedAlbumsFromText(fileTextWith([{ ...kindOfBlue, playingTime }])),
+      ).toBeNull()
+    },
+  )
+
   it('reads nothing from unreadable text', () => {
     expect(storedAlbumsFromText('{kaputt')).toBeNull()
   })
@@ -123,6 +140,7 @@ describe('albumsFromFileText', () => {
         artist: 'Miles Davis',
         spotifyLink: null,
         cover: null,
+        playingTime: null,
         listenings: ['2026-11-12T18:04:00.000Z'],
       },
     ])
@@ -157,6 +175,28 @@ describe('albumsFromFileText', () => {
       albumsFromFileText(albumsFileText([{ ...kindOfBlue, cover: COVER }]))[0]
         .cover,
     ).toBe(COVER)
+  })
+
+  it('reads a file without playing times as albums without playing time', () => {
+    expect(
+      albumsFromFileText(
+        fileTextWith([storedWithoutLinkAndCover(kindOfBlue)]),
+      )[0].playingTime,
+    ).toBeNull()
+  })
+
+  it('reads the playing time of an album', () => {
+    expect(
+      albumsFromFileText(
+        albumsFileText([{ ...kindOfBlue, playingTime: 2553 }]),
+      )[0].playingTime,
+    ).toBe(2553)
+  })
+
+  it('rejects an album with an invalid playing time', () => {
+    expect(() =>
+      albumsFromFileText(fileTextWith([{ ...kindOfBlue, playingTime: 0 }])),
+    ).toThrow(UnreadableAlbumsFile)
   })
 
   it('rejects an album with an invalid cover', () => {

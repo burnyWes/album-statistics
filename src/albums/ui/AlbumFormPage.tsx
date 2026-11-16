@@ -29,6 +29,7 @@ import {
   storageFullMessage,
   unreadableCoverMessage,
 } from '../domain/albumAnnouncements'
+import { playingTimeInput } from '../domain/playingTime'
 import { CoverField } from './CoverField'
 
 type AlbumFormPageProps = {
@@ -43,12 +44,19 @@ type AlbumFormPageProps = {
 
 function draftOf(album: Album | null): AlbumDraft {
   if (album === null)
-    return { title: '', artist: '', spotifyLink: '', cover: null }
+    return {
+      title: '',
+      artist: '',
+      spotifyLink: '',
+      cover: null,
+      playingTime: '',
+    }
   return {
     title: album.title,
     artist: album.artist,
     spotifyLink: album.spotifyLink ?? '',
     cover: album.cover,
+    playingTime: playingTimeInput(album.playingTime),
   }
 }
 
@@ -66,6 +74,7 @@ export function AlbumFormPage({
   const [processingCover, setProcessingCover] = useState(false)
   const titleField = useRef<HTMLInputElement>(null)
   const spotifyLinkField = useRef<HTMLInputElement>(null)
+  const playingTimeField = useRef<HTMLInputElement>(null)
   const chooseCoverButton = useRef<HTMLButtonElement>(null)
   const saveButton = useRef<HTMLButtonElement>(null)
   const latestCoverRequest = useRef(0)
@@ -75,6 +84,7 @@ export function AlbumFormPage({
   > = {
     titleMissing: titleField,
     spotifyLinkInvalid: spotifyLinkField,
+    playingTimeInvalid: playingTimeField,
     alreadyListed: titleField,
   }
 
@@ -169,6 +179,20 @@ export function AlbumFormPage({
             aria-describedby="albumFailure"
             onChange={(event) => change({ artist: event.target.value })}
           />
+        </p>
+        <p className="field">
+          <label htmlFor="albumPlayingTime">Spieldauer (optional)</label>
+          <input
+            id="albumPlayingTime"
+            ref={playingTimeField}
+            autoComplete="off"
+            value={draft.playingTime}
+            aria-describedby="albumPlayingTimeHint albumFailure"
+            onChange={(event) => change({ playingTime: event.target.value })}
+          />
+          <span id="albumPlayingTimeHint" className="fieldHint">
+            Minuten oder Minuten:Sekunden, z. B. 42:33
+          </span>
         </p>
         <p className="field">
           <label htmlFor="albumSpotifyLink">Spotify-Link (optional)</label>

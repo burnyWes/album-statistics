@@ -5,9 +5,14 @@ import {
   listenedButtonLabel,
 } from '../domain/albumAnnouncements'
 import { listeningsInTotal, listeningsThisMonth } from '../domain/listening'
+import {
+  listeningDurationInTotal,
+  listeningDurationThisMonth,
+} from '../domain/listeningDuration'
 import { AlbumCoverThumbnail } from './AlbumCover'
 import { SpeakerIcon } from './SpeakerIcon'
 import { CalendarIcon } from './CalendarIcon'
+import { ListeningCount } from './ListeningCount'
 import { RecordIcon } from './RecordIcon'
 
 type AlbumListRowProps = {
@@ -53,9 +58,15 @@ export function AlbumListRow({
             <span className="albumName">{albumName(album)}</span>
             <span className="albumStats">
               <CalendarIcon />
-              {listeningsThisMonth(album, now)}
+              <ListeningCount
+                count={listeningsThisMonth(album, now)}
+                duration={listeningDurationThisMonth(album, now)}
+              />
               <RecordIcon />
-              {listeningsInTotal(album)}
+              <ListeningCount
+                count={listeningsInTotal(album)}
+                duration={listeningDurationInTotal(album)}
+              />
             </span>
           </span>
         </span>

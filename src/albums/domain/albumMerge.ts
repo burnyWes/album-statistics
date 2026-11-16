@@ -59,6 +59,7 @@ function completedWith(album: Album, loaded: LoadedAlbum): Album {
     ...album,
     spotifyLink: album.spotifyLink ?? loaded.spotifyLink,
     cover: album.cover ?? loaded.cover,
+    playingTime: album.playingTime ?? loaded.playingTime,
     listenings: [
       ...album.listenings,
       ...listeningsMissingIn(album.listenings, loaded.listenings),
@@ -70,7 +71,8 @@ function hasChanged(album: Album, completed: Album): boolean {
   return (
     completed.listenings.length !== album.listenings.length ||
     completed.spotifyLink !== album.spotifyLink ||
-    completed.cover !== album.cover
+    completed.cover !== album.cover ||
+    completed.playingTime !== album.playingTime
   )
 }
 

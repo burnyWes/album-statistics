@@ -13,10 +13,16 @@ const kindOfBlue: NewAlbum = {
   artist: 'Miles Davis',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
 }
 
-function draft(title: string, artist: string, spotifyLink = '') {
-  return { title, artist, spotifyLink, cover: null }
+function draft(
+  title: string,
+  artist: string,
+  spotifyLink = '',
+  playingTime = '',
+) {
+  return { title, artist, spotifyLink, cover: null, playingTime }
 }
 
 const COVER = 'data:image/jpeg;base64,/9j/4AAQSkZJRg=='
@@ -28,6 +34,7 @@ function album(title: string, artist = ''): Album {
     artist,
     spotifyLink: null,
     cover: null,
+    playingTime: null,
     listenings: [],
   }
 }
@@ -49,6 +56,7 @@ describe('newAlbum', () => {
       artist: '',
       spotifyLink: null,
       cover: null,
+      playingTime: null,
     })
   })
 
@@ -123,6 +131,27 @@ describe('newAlbum with a cover', () => {
 
   it('keeps no cover without one', () => {
     expect(newAlbum(draft('Kind of Blue', 'Miles Davis'), []).cover).toBeNull()
+  })
+})
+
+describe('newAlbum with a playing time', () => {
+  it('keeps the playing time in seconds', () => {
+    expect(
+      newAlbum(draft('Kind of Blue', 'Miles Davis', '', ' 42:33 '), [])
+        .playingTime,
+    ).toBe(2553)
+  })
+
+  it('keeps no playing time for a blank one', () => {
+    expect(
+      newAlbum(draft('Kind of Blue', 'Miles Davis', '', '  '), []).playingTime,
+    ).toBeNull()
+  })
+
+  it('rejects an invalid playing time', () => {
+    expect(() =>
+      newAlbum(draft('Kind of Blue', 'Miles Davis', '', '42:75'), []),
+    ).toThrow(new InvalidAlbum('playingTimeInvalid'))
   })
 })
 

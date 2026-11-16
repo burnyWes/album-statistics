@@ -27,6 +27,7 @@ const kindOfBlue: Album = {
   artist: 'Miles Davis',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: [],
 }
 
@@ -72,6 +73,24 @@ function artistField() {
 
 function spotifyLinkField() {
   return screen.getByRole('textbox', { name: 'Spotify-Link (optional)' })
+}
+
+function playingTimeField() {
+  return screen.getByRole('textbox', { name: 'Spieldauer (optional)' })
+}
+
+function visibleText(element: Element) {
+  const shown = element.cloneNode(true) as Element
+  shown.querySelectorAll('.visuallyHidden').forEach((hidden) => hidden.remove())
+  return shown.textContent
+}
+
+function listeningCounts(element: Element) {
+  return [...element.querySelectorAll('.listeningCount')].map(visibleText)
+}
+
+function playingTimeLine() {
+  return screen.queryByText(/^Spieldauer/)
 }
 
 function spotifyLinkButton() {
@@ -163,6 +182,7 @@ const theWall: Album = {
   artist: 'Pink Floyd',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: [],
 }
 
@@ -214,6 +234,7 @@ describe('AlbumsArea', () => {
         artist: 'Miles Davis',
         spotifyLink: null,
         cover: null,
+        playingTime: null,
         listenings: [],
       },
     ])
@@ -1181,5 +1202,232 @@ describe('AlbumsArea', () => {
 
       expect(await accessibilityViolations(container)).toEqual([])
     })
+  })
+})
+
+describe('AlbumsArea with playing times', () => {
+  const invalidPlayingTime =
+    'Das ist keine gültige Spieldauer. Bitte Minuten oder Minuten:Sekunden eingeben, z. B. 42:33.'
+
+  it('asks for the playing time between artist and spotify link', async () => {
+    renderArea()
+
+    await userEvent.click(addAlbumButton())
+
+    expect(screen.getAllByRole('textbox').map((field) => field.id)).toEqual([
+      'albumTitle',
+      'albumArtist',
+      'albumPlayingTime',
+      'albumSpotifyLink',
+    ])
+    expect(playingTimeField()).toHaveAccessibleDescription(
+      /Minuten oder Minuten:Sekunden, z. B. 42:33/,
+    )
+  })
+
+  it('adds an album with a playing time and shows it on the details', async () => {
+    const { albumsClient } = renderArea()
+    await userEvent.click(addAlbumButton())
+    await fillIn('Kind of Blue', 'Miles Davis')
+    await userEvent.type(playingTimeField(), ' 42:33 ')
+    await userEvent.click(saveButton())
+
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    const line = playingTimeLine()!
+    expect(within(line).getByText('0:42:33')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    )
+    expect(within(line).getByText('42 Minuten, 33 Sekunden')).toHaveClass(
+      'visuallyHidden',
+    )
+    expect(albumsClient.storedAlbums()[0].playingTime).toBe(2553)
+  })
+
+  it('rejects an invalid playing time', async () => {
+    const { albumsClient, announcements } = renderArea()
+    await userEvent.click(addAlbumButton())
+    await fillIn('Kind of Blue', 'Miles Davis')
+    await userEvent.type(playingTimeField(), '42:75')
+
+    await userEvent.click(saveButton())
+
+    expect(screen.getByText(invalidPlayingTime)).toBeInTheDocument()
+    expect(announcements).toEqual([invalidPlayingTime])
+    expect(playingTimeField()).toHaveFocus()
+    expect(albumsClient.storedAlbums()).toEqual([])
+  })
+
+  it('edits and removes a saved playing time', async () => {
+    const { albumsClient } = renderArea([{ ...kindOfBlue, playingTime: 2520 }])
+    await editAlbum('Kind of Blue, Miles Davis')
+
+    expect(playingTimeField()).toHaveValue('42')
+    await userEvent.clear(playingTimeField())
+    await userEvent.click(saveButton())
+
+    expect(playingTimeLine()).not.toBeInTheDocument()
+    expect(albumsClient.storedAlbums()).toEqual([kindOfBlue])
+  })
+
+  it('shows no playing time for an album without one', async () => {
+    renderArea([kindOfBlue])
+
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(playingTimeLine()).not.toBeInTheDocument()
+  })
+
+  const kindOfBlueListenedFourTimes: Album = {
+    ...kindOfBlue,
+    playingTime: 2553,
+    listenings: [
+      thursdayListening,
+      thursdayListening,
+      thursdayListening,
+      octoberListening,
+    ],
+  }
+
+  it('shows counts with listening durations in the row', () => {
+    renderArea([kindOfBlueListenedFourTimes])
+
+    const row = albumButton('Kind of Blue, Miles Davis')
+    expect(listeningCounts(row)).toEqual(['3 × 2:07:39', '4 × 2:50:12'])
+    expect(row).toHaveAccessibleName(
+      'Kind of Blue, Miles Davis. Diesen Monat 3 Mal, 2 Stunden, 7 Minuten, 39 Sekunden. Insgesamt 4 Mal, 2 Stunden, 50 Minuten, 12 Sekunden.',
+    )
+  })
+
+  it('shows counts with listening durations on the details', async () => {
+    renderArea([kindOfBlueListenedFourTimes])
+
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    const stats = document.querySelector('.albumDetailStats')!
+    expect(
+      [...stats.querySelectorAll('p')].slice(0, 3).map(visibleText),
+    ).toEqual([
+      'Spieldauer 0:42:33',
+      'Diesen Monat 3 × 2:07:39',
+      'Insgesamt 4 × 2:50:12',
+    ])
+    expect(
+      within(stats as HTMLElement).getByText(
+        '2 Stunden, 7 Minuten, 39 Sekunden',
+      ),
+    ).toHaveClass('visuallyHidden')
+  })
+
+  it('updates the listening durations after a listening without announcing them', async () => {
+    const { announcements } = renderArea([kindOfBlueListenedFourTimes])
+
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+    expect(listeningCounts(albumButton('Kind of Blue, Miles Davis'))).toEqual([
+      '4 × 2:50:12',
+      '5 × 3:32:45',
+    ])
+    expect(announcements).toEqual([
+      'Kind of Blue, Miles Davis gehört. Diesen Monat 4, insgesamt 5.',
+    ])
+  })
+
+  it('has no accessibility violations on the list with listening durations', async () => {
+    const { container } = renderArea([kindOfBlueListenedFourTimes, theWall])
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  function durationsSummary() {
+    return document.querySelector('.listeningDurations')
+  }
+
+  function shownSums() {
+    return [
+      ...durationsSummary()!.querySelectorAll('[aria-hidden="true"] .sum'),
+    ].map((sum) => sum.textContent)
+  }
+
+  function hintWithoutPlayingTime() {
+    return screen.queryByText(/ohne Spieldauer$/)
+  }
+
+  const theWallTimed: Album = {
+    ...theWall,
+    playingTime: 4840,
+    listenings: [octoberListening],
+  }
+
+  it('shows no listening durations without albums', () => {
+    renderArea()
+
+    expect(durationsSummary()).not.toBeInTheDocument()
+    expect(hintWithoutPlayingTime()).not.toBeInTheDocument()
+  })
+
+  it('sums up the listening durations and names albums without playing time', () => {
+    renderArea([
+      kindOfBlueListenedFourTimes,
+      theWallTimed,
+      { ...kindOfBlue, id: 'hits', title: 'Greatest Hits', artist: '' },
+    ])
+
+    expect(shownSums()).toEqual(['2:07:39', '4:10:52'])
+    expect(
+      within(durationsSummary() as HTMLElement).getByText(
+        'Hördauer diesen Monat 2 Stunden, 7 Minuten, 39 Sekunden, insgesamt 4 Stunden, 10 Minuten, 52 Sekunden.',
+      ),
+    ).toHaveClass('visuallyHidden')
+    expect(hintWithoutPlayingTime()).toHaveTextContent(
+      '1 Album ohne Spieldauer',
+    )
+  })
+
+  it('names no albums without playing time when all have one', () => {
+    renderArea([kindOfBlueListenedFourTimes, theWallTimed])
+
+    expect(hintWithoutPlayingTime()).not.toBeInTheDocument()
+  })
+
+  it('shows zero sums when no album has a playing time', () => {
+    renderArea([listenedKindOfBlue, theWall])
+
+    expect(shownSums()).toEqual(['0:00:00', '0:00:00'])
+    expect(hintWithoutPlayingTime()).toHaveTextContent(
+      '2 Alben ohne Spieldauer',
+    )
+  })
+
+  it('raises both sums by the playing time after a listening', async () => {
+    renderArea([kindOfBlueListenedFourTimes, theWallTimed])
+
+    await userEvent.click(listenedButton('Kind of Blue, Miles Davis'))
+
+    expect(shownSums()).toEqual(['2:50:12', '4:53:25'])
+  })
+
+  it('has no accessibility violations on the list with sums and hint', async () => {
+    const { container } = renderArea([kindOfBlueListenedFourTimes, theWall])
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('has no accessibility violations in the form with an invalid playing time', async () => {
+    const { container } = renderArea()
+    await userEvent.click(addAlbumButton())
+    await fillIn('Kind of Blue', '')
+    await userEvent.type(playingTimeField(), 'abc')
+    await userEvent.click(saveButton())
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('has no accessibility violations on the details with a playing time', async () => {
+    const { container } = renderArea([{ ...kindOfBlue, playingTime: 2553 }])
+    await openAlbum('Kind of Blue, Miles Davis')
+
+    expect(await accessibilityViolations(container)).toEqual([])
   })
 })

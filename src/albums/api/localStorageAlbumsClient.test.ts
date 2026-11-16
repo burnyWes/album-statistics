@@ -14,6 +14,7 @@ const kindOfBlue: Album = {
   artist: 'Miles Davis',
   spotifyLink: null,
   cover: null,
+  playingTime: null,
   listenings: ['2026-11-12T18:04:00.000Z'],
 }
 

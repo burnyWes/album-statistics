@@ -9,6 +9,7 @@ import {
   albumSavedAnnouncement,
   albumsLoadedAnnouncement,
   albumsSavedAnnouncement,
+  albumsWithoutPlayingTimeHint,
   coverChosenAnnouncement,
   coverRemovedAnnouncement,
   albumsHeading,
@@ -18,6 +19,7 @@ import {
   listenedAnnouncement,
   listenedButtonLabel,
   listeningDeletedAnnouncement,
+  listeningDurationsLabel,
   listeningsHeading,
   listeningTakenBackAnnouncement,
   shareAnnouncement,
@@ -54,6 +56,12 @@ describe('albumFailureMessage', () => {
   it('names a link that is no spotify link', () => {
     expect(albumFailureMessage(new InvalidAlbum('spotifyLinkInvalid'))).toBe(
       'Das ist kein Spotify-Link.',
+    )
+  })
+
+  it('explains an invalid playing time', () => {
+    expect(albumFailureMessage(new InvalidAlbum('playingTimeInvalid'))).toBe(
+      'Das ist keine gültige Spieldauer. Bitte Minuten oder Minuten:Sekunden eingeben, z. B. 42:33.',
     )
   })
 
@@ -102,6 +110,7 @@ function kindOfBlueListened(times: number): Album {
     artist: 'Miles Davis',
     spotifyLink: null,
     cover: null,
+    playingTime: null,
     listenings: Array.from({ length: times }, () => '2026-11-12T18:04:00.000Z'),
   }
 }
@@ -165,6 +174,25 @@ describe('listening texts', () => {
   it('labels the row with both counts', () => {
     expect(albumRowLabel(kindOfBlueListenedSince(3, 11), now)).toBe(
       'Kind of Blue, Miles Davis. Diesen Monat 3 Mal, insgesamt 14 Mal gehört.',
+    )
+  })
+
+  it('labels the row with both counts and listening durations', () => {
+    expect(
+      albumRowLabel(
+        { ...kindOfBlueListenedSince(3, 11), playingTime: 2553 },
+        now,
+      ),
+    ).toBe(
+      'Kind of Blue, Miles Davis. Diesen Monat 3 Mal, 2 Stunden, 7 Minuten, 39 Sekunden. Insgesamt 14 Mal, 9 Stunden, 55 Minuten, 42 Sekunden.',
+    )
+  })
+
+  it('labels the row of an album not listened to with zero durations', () => {
+    expect(
+      albumRowLabel({ ...kindOfBlueListened(0), playingTime: 2553 }, now),
+    ).toBe(
+      'Kind of Blue, Miles Davis. Diesen Monat 0 Mal, 0 Sekunden. Insgesamt 0 Mal, 0 Sekunden.',
     )
   })
 
@@ -319,5 +347,27 @@ describe('saving and loading data', () => {
     expect(shareAnnouncement('shared')).toBe('Daten geteilt.')
     expect(shareAnnouncement('dismissed')).toBe('Teilen abgebrochen.')
     expect(shareAnnouncement('failed')).toBe('Teilen hat nicht geklappt.')
+  })
+})
+
+describe('listening duration texts', () => {
+  it('labels the listening durations of all albums', () => {
+    expect(
+      listeningDurationsLabel({
+        thisMonth: 12015,
+        inTotal: 147753,
+        albumsWithoutPlayingTime: 2,
+      }),
+    ).toBe(
+      'Hördauer diesen Monat 3 Stunden, 20 Minuten, 15 Sekunden, insgesamt 41 Stunden, 2 Minuten, 33 Sekunden.',
+    )
+  })
+
+  it('names one album without playing time', () => {
+    expect(albumsWithoutPlayingTimeHint(1)).toBe('1 Album ohne Spieldauer')
+  })
+
+  it('names several albums without playing time', () => {
+    expect(albumsWithoutPlayingTimeHint(2)).toBe('2 Alben ohne Spieldauer')
   })
 })

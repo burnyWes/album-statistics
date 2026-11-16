@@ -119,6 +119,10 @@ h1:focus-visible {
   margin: 0 0 1rem;
 }
 
+.fieldHint {
+  font-size: 0.875rem;
+}
+
 input,
 select,
 textarea {
@@ -372,8 +376,21 @@ html:has(.bottomBar:not(.bottomBarInFlow)) {
 
 .albumStats {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+}
+
+.listeningDurations {
+  margin-bottom: 1rem;
+}
+
+.listeningDurations p {
+  margin: 0 0 0.25rem;
+}
+
+.listeningCount {
+  white-space: nowrap;
 }
 
 .albumStats .buttonIcon {

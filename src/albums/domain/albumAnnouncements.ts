@@ -9,11 +9,19 @@ import {
 import type { AlbumsMerge } from './albumMerge'
 import type { AlbumOrder } from './albumOrder'
 import { listeningsInTotal, listeningsThisMonth } from './listening'
+import { spokenDuration } from './duration'
+import {
+  listeningDurationInTotal,
+  listeningDurationThisMonth,
+  type ListeningDurations,
+} from './listeningDuration'
 import { spokenListeningTime } from './listeningTime'
 
 const messagesByReason: Record<InvalidAlbumReason, string> = {
   titleMissing: 'Bitte einen Albumnamen eingeben.',
   spotifyLinkInvalid: 'Das ist kein Spotify-Link.',
+  playingTimeInvalid:
+    'Das ist keine gültige Spieldauer. Bitte Minuten oder Minuten:Sekunden eingeben, z. B. 42:33.',
   alreadyListed: 'Dieses Album gibt es schon.',
 }
 
@@ -69,8 +77,24 @@ export function deletionConsequence(album: Album): string {
     : `Damit gehen auch ${lostListenings} Mal Hören verloren.`
 }
 
+function countWithDuration(count: number, duration: number): string {
+  return `${count} Mal, ${spokenDuration(duration)}`
+}
+
 export function albumRowLabel(album: Album, now: Date): string {
-  return `${albumName(album)}. Diesen Monat ${listeningsThisMonth(album, now)} Mal, insgesamt ${listeningsInTotal(album)} Mal gehört.`
+  const durationThisMonth = listeningDurationThisMonth(album, now)
+  const durationInTotal = listeningDurationInTotal(album)
+  if (durationThisMonth === null || durationInTotal === null)
+    return `${albumName(album)}. Diesen Monat ${listeningsThisMonth(album, now)} Mal, insgesamt ${listeningsInTotal(album)} Mal gehört.`
+  return `${albumName(album)}. Diesen Monat ${countWithDuration(listeningsThisMonth(album, now), durationThisMonth)}. Insgesamt ${countWithDuration(listeningsInTotal(album), durationInTotal)}.`
+}
+
+export function listeningDurationsLabel(durations: ListeningDurations): string {
+  return `Hördauer diesen Monat ${spokenDuration(durations.thisMonth)}, insgesamt ${spokenDuration(durations.inTotal)}.`
+}
+
+export function albumsWithoutPlayingTimeHint(count: number): string {
+  return `${albumCountPhrase(count)} ohne Spieldauer`
 }
 
 export function listenedButtonLabel(album: NamedAlbum): string {

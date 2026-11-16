@@ -8,14 +8,21 @@ import {
   listeningsInTotal,
   listeningsThisMonth,
 } from '../domain/listening'
+import {
+  listeningDurationInTotal,
+  listeningDurationThisMonth,
+} from '../domain/listeningDuration'
 import { SpeakerIcon } from './SpeakerIcon'
 import { AlbumDetailCover } from './AlbumCover'
 import { CalendarIcon } from './CalendarIcon'
+import { Duration } from './Duration'
 import { EditIcon } from './EditIcon'
 import { ExternalLinkIcon } from './ExternalLinkIcon'
+import { ListeningCount } from './ListeningCount'
 import { ListeningMonthSection } from './ListeningMonthSection'
 import { ListeningTime } from './ListeningTime'
 import { RecordIcon } from './RecordIcon'
+import { StopwatchIcon } from './StopwatchIcon'
 
 export type AlbumDetailFocus = 'album' | 'listenings'
 
@@ -58,13 +65,27 @@ export function AlbumDetailPage({
       </h1>
       <AlbumDetailCover cover={album.cover} />
       <div className="albumDetailStats">
+        {album.playingTime !== null && (
+          <p>
+            <StopwatchIcon />
+            Spieldauer <Duration seconds={album.playingTime} />
+          </p>
+        )}
         <p>
           <CalendarIcon />
-          Diesen Monat {listeningsThisMonth(album, now)}
+          Diesen Monat{' '}
+          <ListeningCount
+            count={listeningsThisMonth(album, now)}
+            duration={listeningDurationThisMonth(album, now)}
+          />
         </p>
         <p>
           <RecordIcon />
-          Insgesamt {listeningsInTotal(album)}
+          Insgesamt{' '}
+          <ListeningCount
+            count={listeningsInTotal(album)}
+            duration={listeningDurationInTotal(album)}
+          />
         </p>
         {lastListened !== null && (
           <p>

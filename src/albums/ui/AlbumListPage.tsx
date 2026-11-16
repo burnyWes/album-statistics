@@ -3,8 +3,10 @@ import { BottomBar } from '../../shared/ui/BottomBar'
 import type { Album, AlbumId } from '../domain/album'
 import { albumsHeading } from '../domain/albumAnnouncements'
 import type { AlbumOrder } from '../domain/albumOrder'
+import { listeningDurationsOfAll } from '../domain/listeningDuration'
 import { AlbumListRow } from './AlbumListRow'
 import { AlbumOrderButtons } from './AlbumOrderButtons'
+import { ListeningDurationsSummary } from './ListeningDurationsSummary'
 
 export type UndoListening = { label: string; onUndo: () => void }
 
@@ -70,6 +72,9 @@ export function AlbumListPage({
           <p>Noch keine Alben.</p>
         ) : (
           <>
+            <ListeningDurationsSummary
+              durations={listeningDurationsOfAll(albums, now)}
+            />
             <AlbumOrderButtons order={order} onChangeOrder={onChangeOrder} />
             <ul className="itemList">
               {albums.map((album) => (

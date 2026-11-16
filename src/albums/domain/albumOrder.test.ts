@@ -20,6 +20,7 @@ function album(
     artist,
     spotifyLink: null,
     cover: null,
+    playingTime: null,
     listenings,
   }
 }

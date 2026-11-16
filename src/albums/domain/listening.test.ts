@@ -21,6 +21,7 @@ function albumListenedAt(...moments: Date[]): Album {
     artist: 'Miles Davis',
     spotifyLink: null,
     cover: null,
+    playingTime: null,
     listenings: moments.map(listeningAt),
   }
 }
